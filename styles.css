@@ -1,27 +1,21 @@
-/* .container {
+.container {
     overflow: hidden;
-  } */
+  }
   
-  /* #move {
+  #move {
     animation: moveLeftToRight 12.5s linear infinite;
-  } */
+  }
   
-  /* @keyframes moveLeftToRight {
+  @keyframes moveLeftToRight {
     0% {
       transform: translateX(-400%);
     }
     100% {
       transform: translateX(650%);
     }
-  } */
+  }
   
- .rounded{
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  border-radius: 100% !important;
- }
+
   .pressed {
     /* background-color: #486581; */
     background-color: rgb(26, 155, 206);
