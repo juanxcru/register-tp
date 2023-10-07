@@ -24,10 +24,14 @@
  }
   .pressed {
     /* background-color: #486581; */
-    background-color: rgb(26, 155, 206);
-    color: white;
+    color: white !important;
+    background-color: black !important;
+    border-color: black !important;
 }
 
+svg{
+  pointer-events: none;
+}
 /* .navbar{
 
     border: 8px solid red;

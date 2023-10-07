@@ -4,11 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ADM GASTOS</title>
-    <link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="/styles.css" media="screen" />
     <!-- <link rel="stylesheet" type="text/css" href="icons/font/bootstrap-icons.css"> -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
 
     <script defer src="./app.js"></script>
   </head>
@@ -41,164 +50,244 @@
 
     <!-- Modal -->
     <div
-    class="modal fade"
-    id="myModal"
-    tabindex="-1"
-    aria-labelledby="exampleModalCenterTitle"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-dialog-centered modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="modal-title" id="exampleModalCenterTitle">Add move</div>
-        </div>
-        <div class="modal-body">
-          <div class="container-fluid text-center">
-            <form class="row g-3 justify-content-md-center">
-              <div class="col-md-5">
-                <label for="type" class="form-label">Type</label>
-                <select class="form-select" id="type">
-                  <option selected></option>
-                  <option value="Income">Income</option>
-                  <option value="Spent">Spent</option>
-                </select>
-              </div>
-              <div class="col-md-7">
-                <label for="account" class="form-label">Account</label>
-                <select class="form-select" id="account">
-                  <option selected></option>
-                  <option value="Saving Account">Saving Account</option>
-                  <option value="Cash">Cash</option>
-                  <option value="Usd Savings">Usd Savings</option>
-                  <option value="Crypto">Crypto</option>
-                </select>
-              </div>
-              <div class="col-md-12 mb-5">
-                <label for="amount" class="form-label">Amount</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="text" class="form-control" id="amount">
+      class="modal fade"
+      id="myModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title" id="exampleModalCenterTitle">Add move</div>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid text-center">
+              <form id="form-add-reg" class="row g-3 justify-content-md-center">
+                <div class="col-md-5">
+                  <label for="type" class="form-label">Type</label>
+                  <select class="form-select" id="type">
+                    <option selected></option>
+                    <option value="Income">Income</option>
+                    <option value="Spent">Spent</option>
+                  </select>
                 </div>
-              </div>
-              <div id="categorias" class="row fluid justify-content-center ">
+                <div class="col-md-7">
+                  <label for="account" class="form-label">Account</label>
+                  <select class="form-select" id="account">
+                    <option selected></option>
+                    <option value="Saving Account">Saving Account</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Usd Savings">Usd Savings</option>
+                    <option value="Crypto">Crypto</option>
+                  </select>
+                </div>
+                <div class="col-md-12 mb-2">
+                  <label for="amount" class="form-label">Amount</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="text" class="form-control" id="amount" />
+                  </div>
+                </div>
+                <label for="div-categoria" class="form-label">Category</label>
+                <div
+                  id="div-categoria"
+                  class="row fluid justify-content-center mt-2"
+                >
+                  
 
-              
-              <div class="col-sm-3 mb-2">
-                <button type="button" class="cat rounded-circle p-3 btn btn-outline-dark" >
-                  <svg class="bi bi-receipt" width="32" height="32" fill="currentColor">
-                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#receipt"/>
-                  </svg>
-                </button>
-                
-              </div>
-              <div class="col-sm-3 mb-2">
-                <button type="button" class="rounded-circle p-3 btn btn-outline-dark" >
-                  <svg class="bi bi-gift" width="32" height="32" fill="currentColor">
-                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#gift"/>
-                  </svg>
-              </div>
-              <div class="col-sm-3 mb-2">
-                <button type="button" class="rounded-circle p-3 btn btn-outline-dark" >
-                  <svg class="bi bi-bicycle" width="32" height="32" fill="currentColor">
-                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#bicycle"/>
-                  </svg>
-              </div>
-              <div class="col-sm-3 mb-2">
-                <button type="button" class="rounded-circle p-3 btn btn-outline-dark" >
-                  <svg class="bi bi-bag" width="32" height="32" fill="currentColor">
-                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#bag"/>
-                  </svg>
-              </div>
-              <div class="col-sm-3 mb-2">
-                <button type="button" class="rounded-circle p-3 btn btn-outline-dark" >
-                  <svg class="bi bi-hospital" width="32" height="32" fill="currentColor">
-                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#hospital"/>
-                  </svg>
-              </div>
-              <div class="col-sm-3 mb-2">
-                <button type="button" class="rounded-circle p-3 btn btn-outline-dark" >
-                  <svg class="bi bi-balloon" width="32" height="32" fill="currentColor">
-                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#balloon"/>
-                  </svg>
-              </div>
-              <div class="col-sm-3 mb-2">
-                <button type="button" class="rounded-circle p-3 btn btn-outline-dark" >
-                  <svg class="bi bi-bus-front" width="32" height="32" fill="currentColor">
-                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#bus-front"/>
-                  </svg>
-              </div>
-              <div class="col-sm-3 mb-2">
-                <button type="button" class="rounded-circle p-3 btn btn-outline-dark" >
-                  <svg class="bi bi-cup-hot" width="32" height="32" fill="currentColor">
-                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#cup-hot"/>
-                  </svg>
-              </div>
-              <div class="col-sm-3 mb-2">
-                <button type="button" class="rounded-circle p-3 btn btn-outline-dark" >
-                  <svg class="bi bi-credit-card" width="32" height="32" fill="currentColor">
-                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#credit-card"/>
-                  </svg>
-              </div>
+                  <div class="col-sm-3 mb-2">
+                    <button
+                      type="button"
+                      class="cat rounded-circle p-3 btn btn-outline-dark"
+                    >
+                      <svg
+                        class="bi bi-receipt"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
+                        <use
+                          xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#receipt"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="col-sm-3 mb-2">
+                    <button
+                      type="button"
+                      class="cat rounded-circle p-3 btn btn-outline-dark"
+                    >
+                      <svg
+                        class="bi bi-gift"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
+                        <use
+                          xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#gift"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="col-sm-3 mb-2">
+                    <button
+                      type="button"
+                      class="cat rounded-circle p-3 btn btn-outline-dark"
+                    >
+                      <svg
+                        class="bi bi-bicycle"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
+                        <use
+                          xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#bicycle"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="col-sm-3 mb-2">
+                    <button
+                      type="button"
+                      class="cat rounded-circle p-3 btn btn-outline-dark"
+                    >
+                      <svg
+                        class="bi bi-bag"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
+                        <use
+                          xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#bag"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="col-sm-3 mb-2">
+                    <button
+                      type="button"
+                      class="cat rounded-circle p-3 btn btn-outline-dark"
+                    >
+                      <svg
+                        class="bi bi-hospital"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
+                        <use
+                          xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#hospital"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="col-sm-3 mb-2">
+                    <button
+                      type="button"
+                      class="cat rounded-circle p-3 btn btn-outline-dark"
+                    >
+                      <svg
+                        class="bi bi-balloon"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
+                        <use
+                          xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#balloon"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="col-sm-3 mb-2">
+                    <button
+                      type="button"
+                      class="cat rounded-circle p-3 btn btn-outline-dark"
+                    >
+                      <svg
+                        class="bi bi-bus-front"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
+                        <use
+                          xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#bus-front"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="col-sm-3 mb-2">
+                    <button
+                      type="button"
+                      class="cat rounded-circle p-3 btn btn-outline-dark"
+                    >
+                      <svg
+                        class="bi bi-cup-hot"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
+                        <use
+                          xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#cup-hot"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="col-sm-3 mb-2">
+                    <button
+                      type="button"
+                      class="cat rounded-circle p-3 btn btn-outline-dark"
+                    >
+                      <svg
+                        class="bi bi-credit-card"
+                        width="32"
+                        height="32"
+                        fill="currentColor"
+                      >
+                        <use
+                          xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#credit-card"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <button
+                    id="btn-close-modal"
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#myModal"
+                    data-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                  <button
+                    id="btn-save-modal"
+                    type="submit"
+                    class="btn bg-dark text-white"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
             </div>
-              
-              <div class="col-12">
-               
-              </div>
-              <div class="col-12">
-                
-              </div>
-              <div class="modal-footer">
-                <button
-                  id="btn-close-modal"
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-toggle="modal"
-                  data-bs-target="#myModal"
-                  data-dismiss="modal"
-                >
-                  Close
-                </button>
-                <button
-                  id="btn-save-modal"
-                  type="submit"
-                  class="btn bg-dark text-white"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </div>
     </div>
-  </div>
-          <!-- <div class="modal-body">
+    <!-- <div class="modal-body">
             <label for="monto">Monto</label>
             <input type="number" class="form-control" id="monto" placeholder="Ingresa el monto">
         </div> -->
-
-          <div class="modal-footer">
-            <button
-              id="btn-close-modal"
-              type="button"
-              class="btn btn-secondary"
-              data-bs-toggle="modal"
-              data-bs-target="#myModal"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button
-              id="btn-save-modal"
-              type="submit"
-              class="btn bg-dark text-white"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="col-md-12" style="padding: 20px; background-color: #bcccdc">
       <div
@@ -547,7 +636,5 @@
     <footer class="bg-dark text-white text-center py-3">
       <p>&copy; 2023 Made with love by CAMJN</p>
     </footer>
-
-    
   </body>
 </html>
