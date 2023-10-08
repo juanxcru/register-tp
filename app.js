@@ -1,5 +1,40 @@
+let accounts = [
+{
+  name: "Savings",
+  currency : "ARS",
+  description : "BBVA",
+  balance: 100
+},
+{
+  name: "Cheking",
+  currency : "ARS",
+  description : "BSTN",
+  balance: 200
+},
+{
+  name: "Ahorros USD",
+  currency : "USD",
+  description : "Ahorro",
+  balance: 300
+},
+{
+  name: "Ahorros ARS",
+  currency : "ARS",
+  description : "Ahorro",
+  balance: 400
+}
+
+
+];
+
+
+const ARS_USD = 800;
+
 const begin = () => {
+  loadBalance();
+  loadAccounts();
   // document.getElementById('btn-ingreso').addEventListener('click', moneyIn);
+  //document.getElementById("btn-new-reg").addEventListener("click",loadAccounts);
   document
     .getElementById("btn-close-modal")
     .addEventListener("click", closeModal);
@@ -9,21 +44,76 @@ const begin = () => {
   document
     .getElementById("div-categoria")
     .addEventListener("click", selectCategory);
+  
+  
 };
 
-const moneyIn = () => {
-  //abrir un modal
-  // let balanceElement = document.querySelector('#balance')
-  // let currentBalance = parseInt(balanceElement.innerHTML)
-  // let newBalance = currentBalance + 1
-  // balanceElement.innerHTML = newBalance
-  // document.getElementById('#myModal').modal(show=true)
+const loadBalance = () => {
+
+  let balanceScroll = document.getElementById("balance-scroll");
+  
+  for(acc of accounts){
+    let divPill = document.createElement("div");
+    divPill.classList.add("pill-div","col-2");
+    
+    let pTitle = document.createElement("p");
+    pTitle.classList.add("pill-p-title");
+    pTitle.append(acc.name)
+    divPill.appendChild(pTitle);
+    
+    let divAccountBalance = document.createElement("div");
+    divAccountBalance.classList.add("account-balance-div","text-white", "bg-dark");
+    
+    let pBalance = document.createElement("p");
+    pBalance.classList.add("account-balance-p","text-center");
+    //ojo aca: ID en html == acc.name
+    pBalance.setAttribute("id",acc.name);
+    pBalance.append(acc.balance);
+    
+    
+    
+    divAccountBalance.appendChild(pBalance);
+    divPill.appendChild(divAccountBalance);
+    balanceScroll.appendChild(divPill);
+    
+  }
+    
+
+
+
+  let balanceContainer = document.getElementById("balance");
+  let balance = 0;
+  for (let acc of accounts){
+    //hacerlo bien
+    if(acc.currency == "USD"){
+      balance = balance + acc.balance * ARS_USD;
+    }else if (acc.currency == "ARS"){
+      balance += acc.balance
+    }
+    //hacerlo bien
+  }
+  
+  balanceContainer.innerHTML = balance;
+
+
 };
+
+const loadAccounts = () => {
+ let accountContainer = document.getElementById("account");
+for(let acc of accounts){
+  let opt = document.createElement("option");
+      opt.appendChild(document.createTextNode(acc.name));
+      accountContainer.appendChild(opt);
+}
+  
+};
+
+
 
 const selectCategory = (event) => {
   let clickedElement;
   //Detecta de otra manera los clicks en svg / button. No lo toma como 1 solo --fixed
-console.log("golasdajnsd")
+
   if (event.target.classList.contains("cat")) {
     clickedElement = event.target;
     console.log(clickedElement);
@@ -60,6 +150,8 @@ const disableCategories = () => {
 };
 
 const addRecord = (event) => {
+  event.preventDefault();
+  
   let objectData = {};
   checkData(event, objectData);
   let selectedCategory = document.querySelector(".pressed");
@@ -74,60 +166,76 @@ const addRecord = (event) => {
 };
 
 const checkData = (event, objectData) => {
-  let moveType = document.getElementById("type").value;
-  let destinationAccValue = document.getElementById("account").value;
+  let moveTypeContainer  = document.getElementById("type");
+  let moveTypeFeedback = document.getElementById("typeFeedback");
   // let isChecked = document.getElementById('checkCat').checked;
   let enteredAmountInput = document.getElementById("amount");
-  let enteredAmount = enteredAmountInput.value;
+  let enteredAmountFeedback = document.getElementById("amountFeedback")
   let balanceElement = document.getElementById("balance");
+  let destinationAccValueContainer = document.getElementById("account");
+  let destinationAccFeedback = document.getElementById("accountFeedback");
+
+  let moveType = moveTypeContainer.value;
   let balanceAmount = balanceElement.textContent;
+  let enteredAmount = enteredAmountInput.value;
+  let destinationAccValue = destinationAccValueContainer.value;
+  
 
+  let isValidType = validateField(moveType);
+  messageValidation(moveTypeContainer,moveTypeFeedback,isValidType);
+  let isValidAccount = validateField(destinationAccValue);
+  messageValidation(destinationAccValueContainer,destinationAccFeedback,isValidAccount);
+  let isValidAmount = validateAmount(enteredAmount)
+  messageValidation(enteredAmountInput,enteredAmountFeedback,isValidAmount);
 
-  //usar invalid feedback
-  if (enteredAmount === "") {
-    enteredAmountInput.style.border = "2px solid red";
-    enteredAmountInput.focus();
-    alert("This field is required");
-  } else if (enteredAmount < 0) {
-    enteredAmountInput.style.border = "2px solid red";
-    enteredAmountInput.focus();
-    alert("The amount must be greater than 0");
-  }
 
   objectData.MoveType = moveType;
   objectData.Value = enteredAmount;
 
-  if (moveType === "Income" && enteredAmount > 0 && enteredAmountInput !== "") {
-    enteredAmountInput.style.border = "1px solid gray";
-    alert("Exitoso!");
-    reloadCash(moveType, enteredAmount);
-    let newBalance = parseInt(balanceAmount) + parseInt(enteredAmount);
-    balanceElement.innerText = newBalance;
-    // if (isChecked) {
-    //     actualizarCajaAhorro(montoIngresado);
-    // }
-    document.getElementById("btn-save-modal").disabled = true;
-    // document.getElementById('btn-close-modal').style.backgroundColor = '#102a43'
-    document.getElementById("btn-close-modal").classList.add("bg-dark");
-    enteredAmountInput.value = "";
-    // enableCategories()
-    //Borra el color de la categoria y cerrar el modal -- falta cerrar modal
-    objectData.completed = true;
-  } else if (
-    moveType === "Spent" &&
-    enteredAmount > 0 &&
-    enteredAmountInput !== ""
-  ) {
-    enteredAmountInput.style.border = "1px solid gray";
-    alert("Exitoso!");
-    let newBalance = parseInt(balanceAmount) - parseInt(enteredAmount);
-    balanceElement.innerText = newBalance;
-    document.getElementById("btn-save-modal").disabled = true;
-    document.getElementById("btn-close-modal").classList.add("bg-dark");
-    enteredAmountInput.value = "";
-    // enableCategories()
-    objectData.completed = true;
+  if (isValidAccount === true && isValidType === true &&
+      isValidAmount === true){ 
+        reloadBalance(moveType, enteredAmount,destinationAccValue);
+        objectData.completed = true;
+      }
+};
+
+const messageValidation = (container, containerFeedback, isValid) => {
+    if (isValid === true) {
+      if (container.classList.contains("is-invalid")) {
+        container.classList.remove("is-invalid");
+      }
+      container.classList.add("is-valid");
+    } else {
+      if (container.classList.contains("is-valid")) {
+        container.classList.remove("is-valid");
+      }
+      container.classList.add("is-invalid");
+      containerFeedback.innerHTML = isValid;
+    }
+  };
+
+const validateField = (field) => {
+    if (field == "") {
+      return "Tiene que elegir una opcion";
+    }
+    return true;
+};
+
+const validateAmount = (enteredAmount) => {
+
+  let enteredAmountInt = parseInt(enteredAmount);
+
+  if (isNaN(enteredAmountInt)) {
+    return "Monto no valido";
+  }else if ( enteredAmount < 0){
+    return "Monto debe ser positivo"
+  }else if(enteredAmount === 0){
+    return "El monto no debe ser cero"
   }
+
+  return true;
+
+
 };
 
 const realoadSavingAccount = (enteredAmount) => {
@@ -137,17 +245,36 @@ const realoadSavingAccount = (enteredAmount) => {
   savingAccountElement.innerText = newValue;
 };
 
-const reloadCash = (type, enteredAmount) => {
-  let newValue;
+const reloadBalance = (type, enteredAmount, account) => {
+
   //hacer desde check data para handlear que funcion usar
-  let cashElement = document.getElementById("cash-value");
-  let cashElementValue = cashElement.textContent;
-  if (type === "Income") {
-    newValue = parseInt(cashElementValue) + parseInt(enteredAmount);
-  } else {
-    newValue = parseInt(cashElementValue) - parseInt(enteredAmount);
+  //let cashElement = document.getElementById("cash-value");
+enteredAmount = parseInt(enteredAmount)
+let pAccountBalance;
+let balanceContainer = document.getElementById("balance");
+let balance = balanceContainer.innerText;
+balance = parseInt(balance)
+//solo sirve si el name de la cuenta es unico, despues manejar con ID o
+//teniendo el objeto entero una vez sacado del option.
+  for(let acc of accounts){
+    if(account === acc.name){
+
+      if (type === "Income") {
+        acc.balance += enteredAmount;
+        balance += enteredAmount;
+      }else if( type === "Spent"){
+        acc.balance -=  enteredAmount;
+        balance -= enteredAmount;
+      }
+    //busco el p del scrolling pill con el id de la cuenta (ojo)
+      pAccountBalance = document.getElementById(acc.name)
+      pAccountBalance.innerText = acc.balance;
+      balanceContainer.innerText = balance;
+      
+    }
+
   }
-  cashElement.innerText = newValue;
+
 };
 
 const reloadTable = (objectData) => {

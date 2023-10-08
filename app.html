@@ -56,14 +56,16 @@
       aria-labelledby="exampleModalCenterTitle"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered modal-md">
+      <div class="modal-dialog modal-dialog-centered modal-md" id="myModal" tabindex="-1" role="dialog" 
+      aria-labelledby="exampleModalCenterTitle" 
+      aria-hidden="true">
         <div class="modal-content">
           <div class="modal-header">
             <div class="modal-title" id="exampleModalCenterTitle">Add move</div>
           </div>
           <div class="modal-body">
             <div class="container-fluid text-center">
-              <form id="form-add-reg" class="row g-3 justify-content-md-center">
+              <form id="form-add-reg" class="needs-validation row g-3 justify-content-md-center" action="" method="get" novalidate>
                 <div class="col-md-5">
                   <label for="type" class="form-label">Type</label>
                   <select class="form-select" id="type">
@@ -71,22 +73,24 @@
                     <option value="Income">Income</option>
                     <option value="Spent">Spent</option>
                   </select>
+                  <div id="typeFeedback" class="invalid-feedback">
+                  </div>
                 </div>
                 <div class="col-md-7">
                   <label for="account" class="form-label">Account</label>
                   <select class="form-select" id="account">
                     <option selected></option>
-                    <option value="Saving Account">Saving Account</option>
-                    <option value="Cash">Cash</option>
-                    <option value="Usd Savings">Usd Savings</option>
-                    <option value="Crypto">Crypto</option>
                   </select>
+                  <div id="accountFeedback" class="invalid-feedback">
+                  </div>
                 </div>
                 <div class="col-md-12 mb-2">
                   <label for="amount" class="form-label">Amount</label>
                   <div class="input-group">
                     <span class="input-group-text">$</span>
                     <input type="text" class="form-control" id="amount" />
+                    <div id="amountFeedback" class="invalid-feedback">
+                    </div>
                   </div>
                 </div>
                 <label for="div-categoria" class="form-label">Category</label>
@@ -274,6 +278,7 @@
                     id="btn-save-modal"
                     type="submit"
                     class="btn bg-dark text-white"
+                    
                   >
                     Save
                   </button>
@@ -302,34 +307,29 @@
             background-color: #829ab1;
             border-radius: 40px;
           "
+          id="balance-scroll"
         >
           <!-- <div class="col-4" style="display: flex; flex-direction: column; align-items: center;  border: 2px solid red;"> -->
-          <div
-            id="move"
+          <!-- <div
             class="col-2"
-            style="display: flex; flex-direction: column; align-items: center"
+            
           >
-            <p style="font-size: 2vh; font-weight: bold">Saving Acc</p>
+            <p >Saving Acc</p>
             <div
               class="text-white bg-dark"
-              style="
-                text-align: center;
-                width: 11vw;
-                height: 30px;
-                border-radius: 20px;
-              "
+              
             >
               <p
                 class="text-center"
                 id="cajaDeAhorro"
-                style="font-size: 2.5vh; font-weight: bold"
+                
               >
                 150080
               </p>
             </div>
-          </div>
+          </div> -->
           <!-- <div class="col-4" style="display: flex; flex-direction: column; align-items: center; border: 2px solid blue;"> -->
-          <div
+          <!-- <div
             id="move"
             class="col-2"
             style="display: flex; flex-direction: column; align-items: center"
@@ -352,10 +352,10 @@
                 14190
               </p>
             </div>
-          </div>
+          </div> -->
 
           <!-- <div class="col-4" style="display: flex; flex-direction: column; align-items: center; border: 2px solid green;"> -->
-          <div
+          <!-- <div
             id="move"
             class="col-2"
             style="display: flex; flex-direction: column; align-items: center"
@@ -377,9 +377,9 @@
                 1230
               </p>
             </div>
-          </div>
+          </div> -->
 
-          <div
+          <!-- <div
             id="move"
             class="col-2"
             style="display: flex; flex-direction: column; align-items: center"
@@ -401,7 +401,7 @@
                 999
               </p>
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="row" style="height: 45%; margin-top: 30px">
           <!-- <div class="col-4" style="border: 2px solid red;"></div> -->
@@ -411,7 +411,7 @@
           >
             <button
               class="bg-dark text-white"
-              id="btn-ingreso"
+              id="btn-ingreso1"
               style="width: 65px; height: 65px; border-radius: 100%"
             >
               1
@@ -419,7 +419,7 @@
 
             <button
               class="bg-dark text-white"
-              id="btn-ingreso"
+              id="btn-ingreso2"
               style="width: 65px; height: 65px; border-radius: 100%"
             >
               2
@@ -427,7 +427,7 @@
 
             <button
               class="bg-dark text-white"
-              id="btn-ingreso"
+              id="btn-ingreso3"
               style="width: 65px; height: 65px; border-radius: 100%"
             >
               3
@@ -466,7 +466,7 @@
               "
             >
               <p id="balance" style="font-size: 5vh; font-weight: bold">
-                1000000
+                <!-- 1000000 -->
               </p>
             </div>
 
@@ -475,7 +475,7 @@
                 data-bs-toggle="modal"
                 data-bs-target="#myModal"
                 class="bg-dark text-white"
-                id="btn-ingreso"
+                id="btn-new-reg"
                 style="
                   width: 65px;
                   height: 65px;
@@ -496,7 +496,7 @@
           >
             <button
               class="bg-dark text-white"
-              id="btn-ingreso"
+              id="btn-ingreso4"
               style="width: 65px; height: 65px; border-radius: 100%"
             >
               4
@@ -504,7 +504,7 @@
 
             <button
               class="bg-dark text-white"
-              id="btn-ingreso"
+              id="btn-ingres5o"
               style="width: 65px; height: 65px; border-radius: 100%"
             >
               5
@@ -512,7 +512,7 @@
 
             <button
               class="bg-dark text-white"
-              id="btn-ingreso"
+              id="btn-ingreso6"
               style="width: 65px; height: 65px; border-radius: 100%"
             >
               6
