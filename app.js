@@ -28,7 +28,7 @@ let accounts = [
 ];
 
 
-const ARS_USD = 800;
+const ARS_USD = 1000;
 
 const begin = () => {
   loadBalance();

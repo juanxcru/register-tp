@@ -48,15 +48,15 @@
       </div>
     </nav>
 
-    <!-- Modal -->
+    <!-- Modal new reg -->
     <div
       class="modal fade"
-      id="myModal"
+      id="modal-add-reg"
       tabindex="-1"
       aria-labelledby="exampleModalCenterTitle"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered modal-md" id="myModal" tabindex="-1" role="dialog" 
+      <div class="modal-dialog modal-dialog-centered modal-md"  tabindex="-1" role="dialog" 
       aria-labelledby="exampleModalCenterTitle" 
       aria-hidden="true">
         <div class="modal-content">
@@ -269,7 +269,7 @@
                     type="button"
                     class="btn btn-secondary"
                     data-bs-toggle="modal"
-                    data-bs-target="#myModal"
+                    data-bs-target="#modal-add-reg"
                     data-dismiss="modal"
                   >
                     Close
@@ -289,6 +289,18 @@
         </div>
       </div>
     </div>
+
+    <div
+      class="modal fade"
+      id="modal-add-reg"
+      tabindex="-1"
+      aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-md"  tabindex="-1" role="dialog"  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        
+      </div>
+    </div>
     <!-- <div class="modal-body">
             <label for="monto">Monto</label>
             <input type="number" class="form-control" id="monto" placeholder="Ingresa el monto">
@@ -300,7 +312,7 @@
         style="margin-top: 25px; height: 776px; padding: 20px"
       >
         <div
-          class="row"
+          class="row justify-content-center"
           style="
             gap: 10px;
             height: 10%;
@@ -309,99 +321,7 @@
           "
           id="balance-scroll"
         >
-          <!-- <div class="col-4" style="display: flex; flex-direction: column; align-items: center;  border: 2px solid red;"> -->
-          <!-- <div
-            class="col-2"
-            
-          >
-            <p >Saving Acc</p>
-            <div
-              class="text-white bg-dark"
-              
-            >
-              <p
-                class="text-center"
-                id="cajaDeAhorro"
-                
-              >
-                150080
-              </p>
-            </div>
-          </div> -->
-          <!-- <div class="col-4" style="display: flex; flex-direction: column; align-items: center; border: 2px solid blue;"> -->
-          <!-- <div
-            id="move"
-            class="col-2"
-            style="display: flex; flex-direction: column; align-items: center"
-          >
-            <p style="font-size: 2vh; font-weight: bold">Cash</p>
-            <div
-              class="text-white bg-dark"
-              style="
-                text-align: center;
-                width: 11vw;
-                height: 30px;
-                border-radius: 20px;
-              "
-            >
-              <p
-                id="cash-value"
-                class="text-center"
-                style="font-size: 2.5vh; font-weight: bold"
-              >
-                14190
-              </p>
-            </div>
-          </div> -->
-
-          <!-- <div class="col-4" style="display: flex; flex-direction: column; align-items: center; border: 2px solid green;"> -->
-          <!-- <div
-            id="move"
-            class="col-2"
-            style="display: flex; flex-direction: column; align-items: center"
-          >
-            <p style="font-size: 2vh; font-weight: bold">Usd savings</p>
-            <div
-              class="text-white bg-dark"
-              style="
-                text-align: center;
-                width: 11vw;
-                height: 30px;
-                border-radius: 20px;
-              "
-            >
-              <p
-                class="text-center"
-                style="font-size: 2.5vh; font-weight: bold"
-              >
-                1230
-              </p>
-            </div>
-          </div> -->
-
-          <!-- <div
-            id="move"
-            class="col-2"
-            style="display: flex; flex-direction: column; align-items: center"
-          >
-            <p style="font-size: 2vh; font-weight: bold">Crypto</p>
-            <div
-              class="text-white bg-dark"
-              style="
-                text-align: center;
-                width: 11vw;
-                height: 30px;
-                border-radius: 20px;
-              "
-            >
-              <p
-                class="text-center"
-                style="font-size: 2.5vh; font-weight: bold"
-              >
-                999
-              </p>
-            </div>
-          </div> -->
+          
         </div>
         <div class="row" style="height: 45%; margin-top: 30px">
           <!-- <div class="col-4" style="border: 2px solid red;"></div> -->
@@ -473,7 +393,7 @@
             <div style="display: flex; gap: 40px; padding: 20px">
               <button
                 data-bs-toggle="modal"
-                data-bs-target="#myModal"
+                data-bs-target="#modal-add-reg"
                 class="bg-dark text-white"
                 id="btn-new-reg"
                 style="
