@@ -45,6 +45,15 @@ const begin = () => {
     .getElementById("div-categoria")
     .addEventListener("click", selectCategory);
   
+    document.getElementById('btn-show-record').addEventListener('mouseover', handleShowRecordHover)
+    document.getElementById('btn-show-record').addEventListener('mouseleave', handleHideRecordHover)
+    document.getElementById('recordatorios').addEventListener('mouseover', handleShowRecordHover)
+    document.getElementById('recordatorios').addEventListener('mouseleave', handleHideRecordHover)
+
+    document.getElementById('btn-show-objetive').addEventListener('mouseover', handleShowObjetiveHover)
+    document.getElementById('btn-show-objetive').addEventListener('mouseleave', handleHideObjetiveHover)
+    document.getElementById('objetivos').addEventListener('mouseover', handleShowObjetiveHover)
+    document.getElementById('objetivos').addEventListener('mouseleave', handleHideObjetiveHover)
   
 };
 
@@ -313,5 +322,27 @@ const closeModal = () => {
   document.getElementById("form-add-reg").reset();
   enableCategories();
 };
+
+const handleShowRecordHover = () => {
+  let recordElement = document.getElementById('recordatorios')
+  recordElement.classList.remove('d-none')
+  }
+  
+  
+  const handleHideRecordHover = () => {
+  let recordElement = document.getElementById('recordatorios')
+  recordElement.classList.add('d-none')
+  }
+
+  const handleShowObjetiveHover = () => {
+    let recordElement = document.getElementById('objetivos')
+    recordElement.classList.remove('d-none')
+    }
+    
+    
+    const handleHideObjetiveHover = () => {
+    let recordElement = document.getElementById('objetivos')
+    recordElement.classList.add('d-none')
+    }  
 
 window.onload = begin;
