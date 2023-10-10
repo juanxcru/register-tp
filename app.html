@@ -290,17 +290,85 @@
       </div>
     </div>
 
-    <div
-      class="modal fade"
-      id="modal-add-reg"
-      tabindex="-1"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-md"  tabindex="-1" role="dialog"  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        
-      </div>
-    </div>
+     <!-- Modal new acc -->
+     <div
+     class="modal fade"
+     id="modal-add-acc"
+     tabindex="-1"
+     aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true"
+   >
+     <div
+       class="modal-dialog modal-dialog-centered modal-md"
+       tabindex="-1"
+       role="dialog"
+       aria-labelledby="exampleModalCenterTitle"
+       aria-hidden="true"
+     >
+       <div class="modal-content">
+         <div class="modal-header">
+           <div class="modal-title">Add Account</div>
+         </div>
+         <div class="modal-body">
+           <div class="container-fluid text-center">
+             <form
+               id="form-add-reg"
+               class="needs-validation row g-3 justify-content-md-center"
+               action=""
+               method="get"
+               novalidate
+             >
+             
+             <div class="col-md-6">
+               
+               <div class="mb-3">
+                <label for="acc-name" class="form-label">Name</label>
+                 <input type="text" class="form-control" name="acc-name" id="acc-name" placeholder="">
+               </div>
+               <div id="accNameFeedback" class="invalid-feedback"></div>
+             </div>
+             
+             <div class="col-md-6">
+               <label for="acc-init-balance" class="form-label">Initial Balance</label>
+               <div class="input-group">
+                 <span class="input-group-text">$</span>
+                 <input type="text" class="form-control" id="acc-init-balance"/>
+                 <div id="accInitBalanceFeedback" class="invalid-feedback"></div>
+               </div>
+             </div>
+             <div class="col-md-12">
+              <label for="acc-descrip" class="form-label">Description</label>
+                 <textarea class="form-control" name="acc-descrip" id="acc-descrip" rows="3"></textarea>
+              <div id="accDescripFeedback" class="invalid-feedback"></div>
+            </div>
+            <div class="modal-footer">
+              <button
+                id="btn-close-modal-acc"
+                type="button"
+                class="btn btn-secondary"
+                data-bs-toggle="modal"
+                data-bs-target="#modal-add-acc"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                id="btn-save-acc-modal"
+                type="submit"
+                class="btn bg-dark text-white"
+                
+              >
+                Save
+              </button>
+            </div>
+           </form>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+
+
     <!-- <div class="modal-body">
             <label for="monto">Monto</label>
             <input type="number" class="form-control" id="monto" placeholder="Ingresa el monto">
@@ -321,6 +389,14 @@
           "
           id="balance-scroll"
         >
+        <div class="pill-div col-2">
+          <p class="pill-p-title">New Account</p>
+          <div role="button" data-bs-toggle="modal" data-bs-target="#modal-add-acc" class="account-balance-div text-white bg-dark">
+           <p class="account-balance-p text-center">Add</p>
+
+          </div>
+          
+        </div>
           
         </div>
         <!-- -------------------MEDIO------------------- -->
@@ -433,7 +509,7 @@
           >
   
 
-            <div class="col-12" style="">
+            <div class="col-12" >
               <div class="col-12" style="margin-left: 195px">
                 <button
                   class="bg-dark text-white col-12"
