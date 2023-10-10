@@ -7,7 +7,7 @@ const checkLogin = (event) => {
     event.preventDefault();
     let email = document.getElementById('email').value;
     let password = document.getElementById('password').value;
-    (email && password) ? console.log(email) : console.log('Debe completar los campos')   
+    (email && password) ? window.location.assign("/register-tp/app.html") : console.log('Debe completar los campos')   
 }
 
 
