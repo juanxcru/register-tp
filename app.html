@@ -290,6 +290,68 @@
       </div>
     </div>
 
+    <!-- -------------modal objetivos--------------- -->
+
+    <div class="modal fade" id="objModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">New objective</h5>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Name:</label>
+                <input type="text" class="form-control" id="nombre-objetivo">
+              </div>
+                <label for="acc-init-balance" class="form-label">Ammount:</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="text" class="form-control" id="monto-objetivo"/>
+                  <div id="montoObjetivoFeedback" class="invalid-feedback"></div>
+                </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button id="btn-close-obj-modal" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button id="btn-save-obj-modal" type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------- -->
+
+        <!-- -------------modal recordatorios--------------- -->
+
+        <div class="modal fade" id="reminderModal" tabindex="-1">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New reminder</h5>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <div class="form-group">
+                    <label for="recipient-name" class="col-form-label">Name:</label>
+                    <input type="text" class="form-control" id="nombre-recordatorio">
+                  </div>
+                  <div class="form-group">
+                    <label for="recipient-name" class="col-form-label">Due date:</label>
+                    <input type="date" class="form-control" id="monto-recordatorio">
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button id="btn-close-recordatorio-modal" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btn-save-recordatorio-modal" type="submit" class="btn btn-primary">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <!-- ---------------------------- -->
+
     <div
       class="modal fade"
       id="modal-add-reg"
@@ -323,7 +385,7 @@
         >
           
         </div>
-        <!-- -------------------MEDIO------Cuadrante 1------------- -->
+        <!-- -------------------MEDIO------Cuadrante 1 OBJETIVOS------------- -->
         <div class="container">
         <div class="row" style="height: 45%; margin-top: 30px">
           <!-- <div class="col-4" style="border: 2px solid red;"></div> -->

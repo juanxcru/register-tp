@@ -1,32 +1,29 @@
 let accounts = [
-{
-  name: "Savings",
-  currency : "ARS",
-  description : "BBVA",
-  balance: 100
-},
-{
-  name: "Cheking",
-  currency : "ARS",
-  description : "BSTN",
-  balance: 200
-},
-{
-  name: "Ahorros USD",
-  currency : "USD",
-  description : "Ahorro",
-  balance: 300
-},
-{
-  name: "Ahorros ARS",
-  currency : "ARS",
-  description : "Ahorro",
-  balance: 400
-}
-
-
+  {
+    name: "Savings",
+    currency: "ARS",
+    description: "BBVA",
+    balance: 100,
+  },
+  {
+    name: "Cheking",
+    currency: "ARS",
+    description: "BSTN",
+    balance: 200,
+  },
+  {
+    name: "Ahorros USD",
+    currency: "USD",
+    description: "Ahorro",
+    balance: 300,
+  },
+  {
+    name: "Ahorros ARS",
+    currency: "ARS",
+    description: "Ahorro",
+    balance: 400,
+  },
 ];
-
 
 const ARS_USD = 1000;
 
@@ -44,80 +41,100 @@ const begin = () => {
   document
     .getElementById("div-categoria")
     .addEventListener("click", selectCategory);
-  
-    document.getElementById('btn-show-record').addEventListener('mouseover', handleShowRecordHover)
-    document.getElementById('btn-show-record').addEventListener('mouseleave', handleHideRecordHover)
-    document.getElementById('recordatorios').addEventListener('mouseover', handleShowRecordHover)
-    document.getElementById('recordatorios').addEventListener('mouseleave', handleHideRecordHover)
 
-    document.getElementById('btn-show-objetive').addEventListener('mouseover', handleShowObjetiveHover)
-    document.getElementById('btn-show-objetive').addEventListener('mouseleave', handleHideObjetiveHover)
-    document.getElementById('objetivos').addEventListener('mouseover', handleShowObjetiveHover)
-    document.getElementById('objetivos').addEventListener('mouseleave', handleHideObjetiveHover)
-  
+  document
+    .getElementById("btn-show-record")
+    .addEventListener("mouseover", handleShowRecordHover);
+  document
+    .getElementById("btn-show-record")
+    .addEventListener("mouseleave", handleHideRecordHover);
+  document
+    .getElementById("recordatorios")
+    .addEventListener("mouseover", handleShowRecordHover);
+  document
+    .getElementById("recordatorios")
+    .addEventListener("mouseleave", handleHideRecordHover);
+
+  document
+    .getElementById("btn-show-objetive")
+    .addEventListener("mouseover", handleShowObjetiveHover);
+  document
+    .getElementById("btn-show-objetive")
+    .addEventListener("mouseleave", handleHideObjetiveHover);
+  document
+    .getElementById("objetivos")
+    .addEventListener("mouseover", handleShowObjetiveHover);
+  document
+    .getElementById("objetivos")
+    .addEventListener("mouseleave", handleHideObjetiveHover);
+
+  document.getElementById("btn-show-objetive").addEventListener("click", handleObjetiveModal);
+  document.getElementById("btn-show-record").addEventListener("click", handleReminderModal);
+
+  document.getElementById("btn-close-obj-modal").addEventListener('click', handleCloseObjModal)
+  document.getElementById("btn-save-obj-modal").addEventListener('click', handleSaveObjModal)
+
+  document.getElementById("btn-close-recordatorio-modal").addEventListener('click', handleCloseRecordatorioModal)
+  document.getElementById("btn-save-recordatorio-modal").addEventListener('click', handleSaveRecordatorioModal)
+
+
+
+
 };
 
 const loadBalance = () => {
-
   let balanceScroll = document.getElementById("balance-scroll");
-  
-  for(acc of accounts){
+
+  for (acc of accounts) {
     let divPill = document.createElement("div");
-    divPill.classList.add("pill-div","col-2");
-    
+    divPill.classList.add("pill-div", "col-2");
+
     let pTitle = document.createElement("p");
     pTitle.classList.add("pill-p-title");
-    pTitle.append(acc.name)
+    pTitle.append(acc.name);
     divPill.appendChild(pTitle);
-    
+
     let divAccountBalance = document.createElement("div");
-    divAccountBalance.classList.add("account-balance-div","text-white", "bg-dark");
-    
+    divAccountBalance.classList.add(
+      "account-balance-div",
+      "text-white",
+      "bg-dark"
+    );
+
     let pBalance = document.createElement("p");
-    pBalance.classList.add("account-balance-p","text-center");
+    pBalance.classList.add("account-balance-p", "text-center");
     //ojo aca: ID en html == acc.name
-    pBalance.setAttribute("id",acc.name);
+    pBalance.setAttribute("id", acc.name);
     pBalance.append(acc.balance);
-    
-    
-    
+
     divAccountBalance.appendChild(pBalance);
     divPill.appendChild(divAccountBalance);
     balanceScroll.appendChild(divPill);
-    
   }
-    
-
-
 
   let balanceContainer = document.getElementById("balance");
   let balance = 0;
-  for (let acc of accounts){
+  for (let acc of accounts) {
     //hacerlo bien
-    if(acc.currency == "USD"){
+    if (acc.currency == "USD") {
       balance = balance + acc.balance * ARS_USD;
-    }else if (acc.currency == "ARS"){
-      balance += acc.balance
+    } else if (acc.currency == "ARS") {
+      balance += acc.balance;
     }
     //hacerlo bien
   }
-  
+
   balanceContainer.innerHTML = balance;
-
-
 };
 
 const loadAccounts = () => {
- let accountContainer = document.getElementById("account");
-for(let acc of accounts){
-  let opt = document.createElement("option");
-      opt.appendChild(document.createTextNode(acc.name));
-      accountContainer.appendChild(opt);
-}
-  
+  let accountContainer = document.getElementById("account");
+  for (let acc of accounts) {
+    let opt = document.createElement("option");
+    opt.appendChild(document.createTextNode(acc.name));
+    accountContainer.appendChild(opt);
+  }
 };
-
-
 
 const selectCategory = (event) => {
   let clickedElement;
@@ -160,7 +177,7 @@ const disableCategories = () => {
 
 const addRecord = (event) => {
   event.preventDefault();
-  
+
   let objectData = {};
   checkData(event, objectData);
   let selectedCategory = document.querySelector(".pressed");
@@ -175,11 +192,11 @@ const addRecord = (event) => {
 };
 
 const checkData = (event, objectData) => {
-  let moveTypeContainer  = document.getElementById("type");
+  let moveTypeContainer = document.getElementById("type");
   let moveTypeFeedback = document.getElementById("typeFeedback");
   // let isChecked = document.getElementById('checkCat').checked;
   let enteredAmountInput = document.getElementById("amount");
-  let enteredAmountFeedback = document.getElementById("amountFeedback")
+  let enteredAmountFeedback = document.getElementById("amountFeedback");
   let balanceElement = document.getElementById("balance");
   let destinationAccValueContainer = document.getElementById("account");
   let destinationAccFeedback = document.getElementById("accountFeedback");
@@ -188,63 +205,65 @@ const checkData = (event, objectData) => {
   let balanceAmount = balanceElement.textContent;
   let enteredAmount = enteredAmountInput.value;
   let destinationAccValue = destinationAccValueContainer.value;
-  
 
   let isValidType = validateField(moveType);
-  messageValidation(moveTypeContainer,moveTypeFeedback,isValidType);
+  messageValidation(moveTypeContainer, moveTypeFeedback, isValidType);
   let isValidAccount = validateField(destinationAccValue);
-  messageValidation(destinationAccValueContainer,destinationAccFeedback,isValidAccount);
-  let isValidAmount = validateAmount(enteredAmount)
-  messageValidation(enteredAmountInput,enteredAmountFeedback,isValidAmount);
-
+  messageValidation(
+    destinationAccValueContainer,
+    destinationAccFeedback,
+    isValidAccount
+  );
+  let isValidAmount = validateAmount(enteredAmount);
+  messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
 
   objectData.MoveType = moveType;
   objectData.Value = enteredAmount;
 
-  if (isValidAccount === true && isValidType === true &&
-      isValidAmount === true){ 
-        reloadBalance(moveType, enteredAmount,destinationAccValue);
-        objectData.completed = true;
-      }
+  if (
+    isValidAccount === true &&
+    isValidType === true &&
+    isValidAmount === true
+  ) {
+    reloadBalance(moveType, enteredAmount, destinationAccValue);
+    objectData.completed = true;
+  }
 };
 
 const messageValidation = (container, containerFeedback, isValid) => {
-    if (isValid === true) {
-      if (container.classList.contains("is-invalid")) {
-        container.classList.remove("is-invalid");
-      }
-      container.classList.add("is-valid");
-    } else {
-      if (container.classList.contains("is-valid")) {
-        container.classList.remove("is-valid");
-      }
-      container.classList.add("is-invalid");
-      containerFeedback.innerHTML = isValid;
+  if (isValid === true) {
+    if (container.classList.contains("is-invalid")) {
+      container.classList.remove("is-invalid");
     }
-  };
+    container.classList.add("is-valid");
+  } else {
+    if (container.classList.contains("is-valid")) {
+      container.classList.remove("is-valid");
+    }
+    container.classList.add("is-invalid");
+    containerFeedback.innerHTML = isValid;
+  }
+};
 
 const validateField = (field) => {
-    if (field == "") {
-      return "Tiene que elegir una opcion";
-    }
-    return true;
+  if (field == "") {
+    return "Tiene que elegir una opcion";
+  }
+  return true;
 };
 
 const validateAmount = (enteredAmount) => {
-
   let enteredAmountInt = parseInt(enteredAmount);
 
   if (isNaN(enteredAmountInt)) {
     return "Monto no valido";
-  }else if ( enteredAmount < 0){
-    return "Monto debe ser positivo"
-  }else if(enteredAmount === 0){
-    return "El monto no debe ser cero"
+  } else if (enteredAmount < 0) {
+    return "Monto debe ser positivo";
+  } else if (enteredAmount === 0) {
+    return "El monto no debe ser cero";
   }
 
   return true;
-
-
 };
 
 const realoadSavingAccount = (enteredAmount) => {
@@ -255,35 +274,30 @@ const realoadSavingAccount = (enteredAmount) => {
 };
 
 const reloadBalance = (type, enteredAmount, account) => {
-
   //hacer desde check data para handlear que funcion usar
   //let cashElement = document.getElementById("cash-value");
-enteredAmount = parseInt(enteredAmount)
-let pAccountBalance;
-let balanceContainer = document.getElementById("balance");
-let balance = balanceContainer.innerText;
-balance = parseInt(balance)
-//solo sirve si el name de la cuenta es unico, despues manejar con ID o
-//teniendo el objeto entero una vez sacado del option.
-  for(let acc of accounts){
-    if(account === acc.name){
-
+  enteredAmount = parseInt(enteredAmount);
+  let pAccountBalance;
+  let balanceContainer = document.getElementById("balance");
+  let balance = balanceContainer.innerText;
+  balance = parseInt(balance);
+  //solo sirve si el name de la cuenta es unico, despues manejar con ID o
+  //teniendo el objeto entero una vez sacado del option.
+  for (let acc of accounts) {
+    if (account === acc.name) {
       if (type === "Income") {
         acc.balance += enteredAmount;
         balance += enteredAmount;
-      }else if( type === "Spent"){
-        acc.balance -=  enteredAmount;
+      } else if (type === "Spent") {
+        acc.balance -= enteredAmount;
         balance -= enteredAmount;
       }
-    //busco el p del scrolling pill con el id de la cuenta (ojo)
-      pAccountBalance = document.getElementById(acc.name)
+      //busco el p del scrolling pill con el id de la cuenta (ojo)
+      pAccountBalance = document.getElementById(acc.name);
       pAccountBalance.innerText = acc.balance;
       balanceContainer.innerText = balance;
-      
     }
-
   }
-
 };
 
 const reloadTable = (objectData) => {
@@ -324,25 +338,60 @@ const closeModal = () => {
 };
 
 const handleShowRecordHover = () => {
-  let recordElement = document.getElementById('recordatorios')
-  recordElement.classList.remove('d-none')
-  }
-  
-  
-  const handleHideRecordHover = () => {
-  let recordElement = document.getElementById('recordatorios')
-  recordElement.classList.add('d-none')
-  }
+  let recordElement = document.getElementById("recordatorios");
+  recordElement.classList.remove("d-none");
+};
 
-  const handleShowObjetiveHover = () => {
-    let recordElement = document.getElementById('objetivos')
-    recordElement.classList.remove('d-none')
-    }
-    
-    
-    const handleHideObjetiveHover = () => {
-    let recordElement = document.getElementById('objetivos')
-    recordElement.classList.add('d-none')
-    }  
+const handleHideRecordHover = () => {
+  let recordElement = document.getElementById("recordatorios");
+  recordElement.classList.add("d-none");
+};
+
+const handleShowObjetiveHover = () => {
+  let recordElement = document.getElementById("objetivos");
+  recordElement.classList.remove("d-none");
+};
+
+const handleHideObjetiveHover = () => {
+  let recordElement = document.getElementById("objetivos");
+  recordElement.classList.add("d-none");
+};
+
+const handleObjetiveModal = () => {
+  handleObjModalOpen()
+}
+
+const handleObjModalOpen = () => {
+  let objModal = new bootstrap.Modal(document.getElementById('objModal'))
+  objModal.show()
+  return
+}
+
+const handleReminderModal = () => {
+  handleReminderModalOpen()
+  return
+}
+
+const handleReminderModalOpen = () => {
+  let reminderModal = new bootstrap.Modal(document.getElementById('reminderModal'))
+  reminderModal.show()
+  return
+}
+
+const handleCloseObjModal = () => {
+  console.log('test 1')
+}
+
+const handleSaveObjModal = () => {
+  console.log('test 2')
+}
+
+const handleCloseRecordatorioModal = () => {
+  console.log('test 3')
+}
+
+const handleSaveRecordatorioModal = () => {
+  console.log('test 4')
+}
 
 window.onload = begin;
