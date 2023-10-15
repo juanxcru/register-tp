@@ -6,7 +6,7 @@ let accounts = [
     balance: 100,
   },
   {
-    name: "Cheking",
+    name: "Checking",
     currency: "ARS",
     description: "BSTN",
     balance: 200,
@@ -25,9 +25,45 @@ let accounts = [
   },
 ];
 
+let record = [
+  {
+    type: "Income",
+    date: "10-10-2023",
+    amount: 100,
+    category: "",
+    accFrom: "",
+    accTo: "Savings",
+  },
+  {
+    type: "Income",
+    date: "10-10-2023",
+    amount: 200,
+    category: "",
+    accFrom: "",
+    accTo: "Cheking",
+  },
+  {
+    type: "Income",
+    date: "10-10-2023",
+    amount: 300,
+    category: "",
+    accFrom: "",
+    accTo: "Ahorros USD",
+  },
+  {
+    type: "Income",
+    date: "10-10-2023",
+    amount: 400,
+    category: "",
+    accFrom: "",
+    accTo: "Ahorros ARS",
+  },
+];
+
 const ARS_USD = 1000;
 
 const begin = () => {
+  console.log(document.getElementById("account"));
   loadBalance();
   loadAccounts();
   // document.getElementById('btn-ingreso').addEventListener('click', moneyIn);
@@ -44,16 +80,16 @@ const begin = () => {
 
   document
     .getElementById("btn-show-record")
-    .addEventListener("mouseover", handleShowRecordHover);
+    .addEventListener("mouseover", handleShowReminderHover);
   document
     .getElementById("btn-show-record")
-    .addEventListener("mouseleave", handleHideRecordHover);
+    .addEventListener("mouseleave", handleHideReminderHover);
   document
     .getElementById("recordatorios")
-    .addEventListener("mouseover", handleShowRecordHover);
+    .addEventListener("mouseover", handleShowReminderHover);
   document
     .getElementById("recordatorios")
-    .addEventListener("mouseleave", handleHideRecordHover);
+    .addEventListener("mouseleave", handleHideReminderHover);
 
   document
     .getElementById("btn-show-objetive")
@@ -68,18 +104,29 @@ const begin = () => {
     .getElementById("objetivos")
     .addEventListener("mouseleave", handleHideObjetiveHover);
 
-  document.getElementById("btn-show-objetive").addEventListener("click", handleObjetiveModal);
-  document.getElementById("btn-show-record").addEventListener("click", handleReminderModal);
+  document
+    .getElementById("btn-show-objetive")
+    .addEventListener("click", handleObjetiveModal);
+  document
+    .getElementById("btn-show-record")
+    .addEventListener("click", handleReminderModal);
 
-  document.getElementById("btn-close-obj-modal").addEventListener('click', handleCloseObjModal)
-  document.getElementById("btn-save-obj-modal").addEventListener('click', handleSaveObjModal)
+  document
+    .getElementById("btn-close-obj-modal")
+    .addEventListener("click", handleCloseObjModal);
+  document
+    .getElementById("btn-save-obj-modal")
+    .addEventListener("click", handleSaveObjModal);
 
-  document.getElementById("btn-close-recordatorio-modal").addEventListener('click', handleCloseRecordatorioModal)
-  document.getElementById("btn-save-recordatorio-modal").addEventListener('click', handleSaveRecordatorioModal)
-
-
-
-
+  document
+    .getElementById("btn-close-recordatorio-modal")
+    .addEventListener("click", handleCloseRecordatorioModal);
+  document
+    .getElementById("btn-save-recordatorio-modal")
+    .addEventListener("click", handleSaveRecordatorioModal);
+  document
+    .getElementById("type")
+    .addEventListener("change", handleAccountToFrom);
 };
 
 const loadBalance = () => {
@@ -129,10 +176,31 @@ const loadBalance = () => {
 
 const loadAccounts = () => {
   let accountContainer = document.getElementById("account");
+  let accountToContainer = document.getElementById("account-to");
+
+  
   for (let acc of accounts) {
     let opt = document.createElement("option");
     opt.appendChild(document.createTextNode(acc.name));
+    accountToContainer.appendChild(opt.cloneNode(true));
     accountContainer.appendChild(opt);
+  }
+
+};
+
+const handleAccountToFrom = (event) => {
+  let accountToDiv = document.getElementById("account-to-div");
+
+  let type = event.target.value;
+
+  if (type === "Move") {
+    if (accountToDiv.classList.contains("d-none")) {
+      accountToDiv.classList.remove("d-none");
+    }
+  } else {
+    if (!accountToDiv.classList.contains("d-none")) {
+      accountToDiv.classList.add("d-none");
+    }
   }
 };
 
@@ -178,55 +246,87 @@ const disableCategories = () => {
 const addRecord = (event) => {
   event.preventDefault();
 
-  let objectData = {};
-  checkData(event, objectData);
   let selectedCategory = document.querySelector(".pressed");
-  if (selectedCategory) {
-    objectData.category = selectedCategory.id;
-  }
-  if (objectData.completed) {
-    reloadTable(objectData);
+  let recordBuffer = {
+    type: "",
+    amount: 0,
+    category: "",
+    accFrom: "",
+    accTo: "",
+  };
+
+  if (checkData(event, recordBuffer)) {
+    if (selectedCategory) {
+      recordBuffer.category = selectedCategory.id;
+    }
+    refreshBalances(recordBuffer);
+    //reloadTable(recordBuffer);
+
     enableCategories();
+    document.getElementById("form-add-reg").reset();
   }
-  console.log("sss", objectData);
 };
 
-const checkData = (event, objectData) => {
+const checkData = (event, recordBuffer) => {
   let moveTypeContainer = document.getElementById("type");
   let moveTypeFeedback = document.getElementById("typeFeedback");
   // let isChecked = document.getElementById('checkCat').checked;
   let enteredAmountInput = document.getElementById("amount");
   let enteredAmountFeedback = document.getElementById("amountFeedback");
-  let balanceElement = document.getElementById("balance");
-  let destinationAccValueContainer = document.getElementById("account");
-  let destinationAccFeedback = document.getElementById("accountFeedback");
+  //let balanceElement = document.getElementById("balance");
+  let accValueContainer = document.getElementById("account");
+  let accFeedback = document.getElementById("accountFeedback");
+
+  let AccToValueContainer = document.getElementById("account-to");
+  let accToFeedback = document.getElementById("accountToFeedback");
 
   let moveType = moveTypeContainer.value;
-  let balanceAmount = balanceElement.textContent;
   let enteredAmount = enteredAmountInput.value;
-  let destinationAccValue = destinationAccValueContainer.value;
+  let accValue = accValueContainer.value;
+  let accToValue = AccToValueContainer.value;
+
+
 
   let isValidType = validateField(moveType);
   messageValidation(moveTypeContainer, moveTypeFeedback, isValidType);
-  let isValidAccount = validateField(destinationAccValue);
+  
+  
+  let isValidAccount = validateAccount(accValue, accToValue);
+  
+  
   messageValidation(
-    destinationAccValueContainer,
-    destinationAccFeedback,
+    accValueContainer,
+    accFeedback,
     isValidAccount
   );
+
+
+  
+
   let isValidAmount = validateAmount(enteredAmount);
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
-
-  objectData.MoveType = moveType;
-  objectData.Value = enteredAmount;
 
   if (
     isValidAccount === true &&
     isValidType === true &&
     isValidAmount === true
   ) {
-    reloadBalance(moveType, enteredAmount, destinationAccValue);
-    objectData.completed = true;
+    recordBuffer.type = moveType;
+    recordBuffer.amount = enteredAmount;
+    if (moveType === "Income") {
+      recordBuffer.accFrom = "";
+      recordBuffer.accTo = accValue;
+    } else if (moveType === "Spent") {
+      recordBuffer.accFrom = accValue;
+      recordBuffer.accTo = "";
+    }else if (moveType === "Move"){
+      recordBuffer.accFrom = "";
+      recordBuffer.accTo = "";
+    }
+
+    return true;
+  } else {
+    return false;
   }
 };
 
@@ -257,9 +357,9 @@ const validateAmount = (enteredAmount) => {
 
   if (isNaN(enteredAmountInt)) {
     return "Monto no valido";
-  } else if (enteredAmount < 0) {
+  } else if (enteredAmountInt < 0) {
     return "Monto debe ser positivo";
-  } else if (enteredAmount === 0) {
+  } else if (enteredAmountInt === 0) {
     return "El monto no debe ser cero";
   }
 
@@ -273,44 +373,43 @@ const realoadSavingAccount = (enteredAmount) => {
   savingAccountElement.innerText = newValue;
 };
 
-const reloadBalance = (type, enteredAmount, account) => {
+const refreshBalances = (recordBuffer) => {
   //hacer desde check data para handlear que funcion usar
   //let cashElement = document.getElementById("cash-value");
-  enteredAmount = parseInt(enteredAmount);
+  recordBuffer.amount = parseInt(recordBuffer.amount);
   let pAccountBalance;
   let balanceContainer = document.getElementById("balance");
   let balance = balanceContainer.innerText;
   balance = parseInt(balance);
+  let acc;
   //solo sirve si el name de la cuenta es unico, despues manejar con ID o
   //teniendo el objeto entero una vez sacado del option.
-  for (let acc of accounts) {
-    if (account === acc.name) {
-      if (type === "Income") {
-        acc.balance += enteredAmount;
-        balance += enteredAmount;
-      } else if (type === "Spent") {
-        acc.balance -= enteredAmount;
-        balance -= enteredAmount;
-      }
-      //busco el p del scrolling pill con el id de la cuenta (ojo)
-      pAccountBalance = document.getElementById(acc.name);
-      pAccountBalance.innerText = acc.balance;
-      balanceContainer.innerText = balance;
+  for (acc of accounts) {
+    if (recordBuffer.accTo === acc.name) {
+      acc.balance += recordBuffer.amount;
+      balance += recordBuffer.amount;
+    } else if (recordBuffer.accFrom === acc.name) {
+      acc.balance -= recordBuffer.amount;
+      balance -= recordBuffer.amount;
     }
+    pAccountBalance = document.getElementById(acc.name);
+    pAccountBalance.innerText = acc.balance;
+    balanceContainer.innerText = balance;
   }
+  //busco el p del scrolling pill con el id de la cuenta (ojo)
 };
 
-const reloadTable = (objectData) => {
+const reloadTable = (recordBuffer) => {
   //arreglar esto para no repetir codigo. Si hay categoria, mostrarla, sino no.
   const table = document.querySelector("table");
   let row = document.createElement("tr");
-  if (objectData.category) {
+  if (recordBuffer.category) {
     row.innerHTML = `
     <th>${table.rows.length}</th>
     <td>${new Date().toISOString().split("T")[0]}</td>
-    <td>${objectData.MoveType}</td>
-    <td>$${objectData.Value}</td>
-    <td>${objectData.category}</td>
+    <td>${recordBuffer.MoveType}</td>
+    <td>$${recordBuffer.Value}</td>
+    <td>${recordBuffer.category}</td>
     <td><button class="btn bg-dark text-white "><i class="fas fa-pencil-alt"></i>
     </button></td>
 `;
@@ -318,8 +417,8 @@ const reloadTable = (objectData) => {
     row.innerHTML = `
     <th>${table.rows.length}</th>
     <td>${new Date().toISOString().split("T")[0]}</td>
-    <td>${objectData.MoveType}</td>
-    <td>$${objectData.Value}</td>
+    <td>${recordBuffer.MoveType}</td>
+    <td>$${recordBuffer.Value}</td>
     <td></td>
     <td><button class="btn bg-dark text-white "><i class="fas fa-pencil-alt"></i>
     </button></td>
@@ -329,20 +428,27 @@ const reloadTable = (objectData) => {
 };
 
 const closeModal = () => {
-  document.getElementById("btn-save-modal").disabled = false;
-  document.getElementById("btn-close-modal").classList.remove("bg-dark");
   // console.log('cerrar modal')
   //document.getElementById("monto").value = "";
+  let accountToDiv = document.getElementById("account-to-div");
+  
+  
   document.getElementById("form-add-reg").reset();
+  
+  if (!accountToDiv.classList.contains("d-none")) {
+    accountToDiv.classList.add("d-none");
+  }
+  
   enableCategories();
+
 };
 
-const handleShowRecordHover = () => {
+const handleShowReminderHover = () => {
   let recordElement = document.getElementById("recordatorios");
   recordElement.classList.remove("d-none");
 };
 
-const handleHideRecordHover = () => {
+const handleHideReminderHover = () => {
   let recordElement = document.getElementById("recordatorios");
   recordElement.classList.add("d-none");
 };
@@ -358,40 +464,42 @@ const handleHideObjetiveHover = () => {
 };
 
 const handleObjetiveModal = () => {
-  handleObjModalOpen()
-}
+  handleObjModalOpen();
+};
 
 const handleObjModalOpen = () => {
-  let objModal = new bootstrap.Modal(document.getElementById('objModal'))
-  objModal.show()
-  return
-}
+  let objModal = new bootstrap.Modal(document.getElementById("objModal"));
+  objModal.show();
+  return;
+};
 
 const handleReminderModal = () => {
-  handleReminderModalOpen()
-  return
-}
+  handleReminderModalOpen();
+  return;
+};
 
 const handleReminderModalOpen = () => {
-  let reminderModal = new bootstrap.Modal(document.getElementById('reminderModal'))
-  reminderModal.show()
-  return
-}
+  let reminderModal = new bootstrap.Modal(
+    document.getElementById("reminderModal")
+  );
+  reminderModal.show();
+  return;
+};
 
 const handleCloseObjModal = () => {
-  console.log('test 1')
-}
+  console.log("test 1");
+};
 
 const handleSaveObjModal = () => {
-  console.log('test 2')
-}
+  console.log("test 2");
+};
 
 const handleCloseRecordatorioModal = () => {
-  console.log('test 3')
-}
+  console.log("test 3");
+};
 
 const handleSaveRecordatorioModal = () => {
-  console.log('test 4')
-}
+  console.log("test 4");
+};
 
 window.onload = begin;

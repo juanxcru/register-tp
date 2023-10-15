@@ -66,22 +66,31 @@
           <div class="modal-body">
             <div class="container-fluid text-center">
               <form id="form-add-reg" class="needs-validation row g-3 justify-content-md-center" action="" method="get" novalidate>
-                <div class="col-md-5">
+                <div class="col-md-4">
                   <label for="type" class="form-label">Type</label>
                   <select class="form-select" id="type">
                     <option selected></option>
                     <option value="Income">Income</option>
                     <option value="Spent">Spent</option>
+                    <option value="Move">Move</option>
                   </select>
                   <div id="typeFeedback" class="invalid-feedback">
                   </div>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md">
                   <label for="account" class="form-label">Account</label>
                   <select class="form-select" id="account">
                     <option selected></option>
                   </select>
                   <div id="accountFeedback" class="invalid-feedback">
+                  </div>
+                </div>
+                <div class="col-md d-none" id="account-to-div">
+                  <label for="account-to" class="form-label">Account To</label>
+                  <select class="form-select" id="account-to">
+                    <option selected></option>
+                  </select>
+                  <div id="accountToFeedback" class="invalid-feedback">
                   </div>
                 </div>
                 <div class="col-md-12 mb-2">
@@ -104,6 +113,7 @@
                     <button
                       type="button"
                       class="cat rounded-circle p-3 btn btn-outline-dark"
+                      id="Bill"
                     >
                       <svg
                         class="bi bi-receipt"
@@ -122,6 +132,7 @@
                     <button
                       type="button"
                       class="cat rounded-circle p-3 btn btn-outline-dark"
+                      id="Gift"
                     >
                       <svg
                         class="bi bi-gift"
@@ -140,6 +151,7 @@
                     <button
                       type="button"
                       class="cat rounded-circle p-3 btn btn-outline-dark"
+                      id="Sports"
                     >
                       <svg
                         class="bi bi-bicycle"
@@ -158,6 +170,7 @@
                     <button
                       type="button"
                       class="cat rounded-circle p-3 btn btn-outline-dark"
+                      id="Clothing"
                     >
                       <svg
                         class="bi bi-bag"
@@ -176,6 +189,7 @@
                     <button
                       type="button"
                       class="cat rounded-circle p-3 btn btn-outline-dark"
+                      id="Health"
                     >
                       <svg
                         class="bi bi-hospital"
@@ -194,6 +208,7 @@
                     <button
                       type="button"
                       class="cat rounded-circle p-3 btn btn-outline-dark"
+                      id="Party"
                     >
                       <svg
                         class="bi bi-balloon"
@@ -212,6 +227,7 @@
                     <button
                       type="button"
                       class="cat rounded-circle p-3 btn btn-outline-dark"
+                      id="Transport"
                     >
                       <svg
                         class="bi bi-bus-front"
@@ -230,6 +246,7 @@
                     <button
                       type="button"
                       class="cat rounded-circle p-3 btn btn-outline-dark"
+                      id="Food"
                     >
                       <svg
                         class="bi bi-cup-hot"
@@ -248,6 +265,7 @@
                     <button
                       type="button"
                       class="cat rounded-circle p-3 btn btn-outline-dark"
+                      id="Other"
                     >
                       <svg
                         class="bi bi-credit-card"
@@ -304,7 +322,7 @@
                 <label for="recipient-name" class="col-form-label">Name:</label>
                 <input type="text" class="form-control" id="nombre-objetivo">
               </div>
-                <label for="acc-init-balance" class="form-label">Ammount:</label>
+                <label for="acc-init-balance" class="form-label">Amount:</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
                   <input type="text" class="form-control" id="monto-objetivo"/>
