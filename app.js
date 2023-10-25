@@ -127,6 +127,9 @@ const begin = () => {
   document
     .getElementById("type")
     .addEventListener("change", handleAccountToFrom);
+
+
+
 };
 
 const loadBalance = () => {
@@ -246,7 +249,7 @@ const disableCategories = () => {
 const addRecord = (event) => {
   event.preventDefault();
 
-  let selectedCategory = document.querySelector(".pressed");
+  
   let recordBuffer = {
     type: "",
     amount: 0,
@@ -256,18 +259,18 @@ const addRecord = (event) => {
   };
 
   if (checkData(event, recordBuffer)) {
-    if (selectedCategory) {
-      recordBuffer.category = selectedCategory.id;
-    }
+  
     refreshBalances(recordBuffer);
     //reloadTable(recordBuffer);
 
     enableCategories();
+    resetFeedback();
     document.getElementById("form-add-reg").reset();
   }
 };
 
 const checkData = (event, recordBuffer) => {
+  let selectedCategory = document.querySelector(".pressed");
   let moveTypeContainer = document.getElementById("type");
   let moveTypeFeedback = document.getElementById("typeFeedback");
   // let isChecked = document.getElementById('checkCat').checked;
@@ -277,13 +280,13 @@ const checkData = (event, recordBuffer) => {
   let accValueContainer = document.getElementById("account");
   let accFeedback = document.getElementById("accountFeedback");
 
-  let AccToValueContainer = document.getElementById("account-to");
+  let accToValueContainer = document.getElementById("account-to");
   let accToFeedback = document.getElementById("accountToFeedback");
 
   let moveType = moveTypeContainer.value;
   let enteredAmount = enteredAmountInput.value;
   let accValue = accValueContainer.value;
-  let accToValue = AccToValueContainer.value;
+  let accToValue = accToValueContainer.value;
 
 
 
@@ -291,19 +294,19 @@ const checkData = (event, recordBuffer) => {
   messageValidation(moveTypeContainer, moveTypeFeedback, isValidType);
   
   
-  let isValidAccount = validateAccount(accValue, accToValue);
-  
-  
-  messageValidation(
-    accValueContainer,
-    accFeedback,
-    isValidAccount
-  );
+  let isValidAccount;
 
-
-  
-
-  let isValidAmount = validateAmount(enteredAmount);
+  isValidAccount = validateAccount(accValue);
+  messageValidation(accValueContainer, accFeedback, isValidAccount );
+  if(moveType === "Move"){
+    isValidAccount = validateAccount(accToValue);
+    if(isValidAccount === true){
+      isValidAccount = validateMove(accValue,accToValue)
+    } 
+    messageValidation(accToValueContainer, accToFeedback, isValidAccount );
+  }
+    
+  let isValidAmount = validateAmount(enteredAmount, accValue, moveType);
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
 
   if (
@@ -320,10 +323,12 @@ const checkData = (event, recordBuffer) => {
       recordBuffer.accFrom = accValue;
       recordBuffer.accTo = "";
     }else if (moveType === "Move"){
-      recordBuffer.accFrom = "";
-      recordBuffer.accTo = "";
+      recordBuffer.accFrom = accValue; 
+      recordBuffer.accTo = accToValue;
     }
-
+    if (selectedCategory) {
+      recordBuffer.category = selectedCategory.id;
+    }
     return true;
   } else {
     return false;
@@ -352,26 +357,73 @@ const validateField = (field) => {
   return true;
 };
 
-const validateAmount = (enteredAmount) => {
-  let enteredAmountInt = parseInt(enteredAmount);
+const validateAmount = (amt, account, type) => {
+  let amtInt = parseInt(amt);
+  let moveFlag = type === "Spent" ? true : false;
 
-  if (isNaN(enteredAmountInt)) {
+  if (isNaN(amtInt)) {
     return "Monto no valido";
-  } else if (enteredAmountInt < 0) {
+  } else if (amtInt < 0) {
     return "Monto debe ser positivo";
-  } else if (enteredAmountInt === 0) {
+  } else if (amtInt === 0) {
     return "El monto no debe ser cero";
   }
+
+//40 veces por todos lados, refactorizar despues. traer el obj de una una vez validado que existe la cuenta
+  const accFind = accounts.find(acc => acc.name === account);
+
+  if(!accFind)
+    return "Error"
+
+  if(moveFlag && accFind.balance < amtInt)
+    return "Sin fondos"
+  
 
   return true;
 };
 
-const realoadSavingAccount = (enteredAmount) => {
-  let savingAccountElement = document.getElementById("cajaDeAhorro");
-  let savingAccountValue = savingAccountElement.textContent;
-  let newValue = parseInt(savingAccountValue) + parseInt(enteredAmount);
-  savingAccountElement.innerText = newValue;
+
+
+const validateAccount = (accValue) => {
+
+
+  const accFind = accounts.find(acc => acc.name === accValue);
+ 
+  if (!accFind)
+    return "Cuenta no existe";
+  else
+    return true;
+  
+
+}
+
+const validateMove = (accValue, accToValue) => {
+
+
+
+  if(accValue === accToValue)
+    return "Cuenta to igual a cuenta from"
+
+    const accFind = accounts.find(acc => acc.name === accValue);
+    const accToFind = accounts.find(acc => acc.name === accToValue);
+
+  if (accFind.currency !== accToFind.currency)
+    return "Diferente moneda"
+    
+
+  return true;
+
+  
+
+
 };
+
+// const realoadSavingAccount = (enteredAmount) => {
+//   let savingAccountElement = document.getElementById("cajaDeAhorro");
+//   let savingAccountValue = savingAccountElement.textContent;
+//   let newValue = parseInt(savingAccountValue) + parseInt(enteredAmount);
+//   savingAccountElement.innerText = newValue;
+// };
 
 const refreshBalances = (recordBuffer) => {
   //hacer desde check data para handlear que funcion usar
@@ -384,6 +436,7 @@ const refreshBalances = (recordBuffer) => {
   let acc;
   //solo sirve si el name de la cuenta es unico, despues manejar con ID o
   //teniendo el objeto entero una vez sacado del option.
+  //refactor con find?
   for (acc of accounts) {
     if (recordBuffer.accTo === acc.name) {
       acc.balance += recordBuffer.amount;
@@ -438,10 +491,11 @@ const closeModal = () => {
   if (!accountToDiv.classList.contains("d-none")) {
     accountToDiv.classList.add("d-none");
   }
-  
+  resetFeedback();
   enableCategories();
 
 };
+
 
 const handleShowReminderHover = () => {
   let recordElement = document.getElementById("recordatorios");
@@ -501,5 +555,28 @@ const handleCloseRecordatorioModal = () => {
 const handleSaveRecordatorioModal = () => {
   console.log("test 4");
 };
+
+
+const resetFeedback = () => {
+
+
+  let valid = document.getElementsByClassName("is-valid");
+  let invalid = document.getElementsByClassName("is-invalid");
+
+
+
+
+  while (valid.length > 0){
+    valid[0].classList.remove("is-valid")
+  }
+
+  while (invalid.length > 0){
+    invalid[0].classList.remove("is-invalid")
+  }
+ 
+
+  
+};
+
 
 window.onload = begin;
