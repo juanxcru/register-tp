@@ -59,12 +59,19 @@ let record = [
     accTo: "Ahorros ARS",
   },
 ];
-
+const backendServer = "http://localhost:3000/register-tp";
 const ARS_USD = 1000;
 
 const begin = () => {
-  console.log(document.getElementById("account"));
-  loadBalance();
+  testConn()
+    .then((message) => {
+      console.log("Conectado:", message);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+
+  //loadBalance();
   loadAccounts();
   // document.getElementById('btn-ingreso').addEventListener('click', moneyIn);
   //document.getElementById("btn-new-reg").addEventListener("click",loadAccounts);
@@ -127,9 +134,23 @@ const begin = () => {
   document
     .getElementById("type")
     .addEventListener("change", handleAccountToFrom);
+};
 
+const testConn = async () => {
+  try {
+    const response = await fetch(backendServer + "/conf/conn_mysql.php");
 
-
+    if (response.ok) {
+      const message = await response.text();
+      return message;
+    } else {
+      console.error("No conectado");
+      throw new Error("Error de conexión");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
 };
 
 const loadBalance = () => {
@@ -177,18 +198,56 @@ const loadBalance = () => {
   balanceContainer.innerHTML = balance;
 };
 
-const loadAccounts = () => {
+const read = async (type, id) => {
+   /*
+  Esperamos         type  ='account'  -->  cuentas
+                          ='reg'      -->  registers
+                          ='target'   -->  objetivos
+                          ='reminder' -->  recordatorios
+  en request GET
+                    id    = 'all'     -->  traer todos
+                    id    = '1'       -->  traer id especificado
+  */
+
+
+  const params = new URLSearchParams();
+  params.append('type', type);
+  params.append('id', id);
+  const queryString = params.toString();
+
+  const full = backendServer + '/controllers/entryPoint.php/' + (queryString ? `?${queryString}` : '');
+ 
+  try {
+    const response = await fetch(full);
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      throw new Error("Error al obtener los datos");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Puedes volver a lanzar el error si lo deseas
+  }
+ 
+};
+
+const loadAccounts = () => {  
   let accountContainer = document.getElementById("account");
   let accountToContainer = document.getElementById("account-to");
 
-  
-  for (let acc of accounts) {
-    let opt = document.createElement("option");
-    opt.appendChild(document.createTextNode(acc.name));
-    accountToContainer.appendChild(opt.cloneNode(true));
-    accountContainer.appendChild(opt);
-  }
 
+  read('account','all').then(accountsBuffer => {
+    for (let acc of accountsBuffer) {
+      let opt = document.createElement("option");
+      opt.appendChild(document.createTextNode(acc.name));
+      accountToContainer.appendChild(opt.cloneNode(true));
+      accountContainer.appendChild(opt);
+    }
+  } )
+
+
+  
 };
 
 const handleAccountToFrom = (event) => {
@@ -249,7 +308,6 @@ const disableCategories = () => {
 const addRecord = (event) => {
   event.preventDefault();
 
-  
   let recordBuffer = {
     type: "",
     amount: 0,
@@ -259,7 +317,6 @@ const addRecord = (event) => {
   };
 
   if (checkData(event, recordBuffer)) {
-  
     refreshBalances(recordBuffer);
     //reloadTable(recordBuffer);
 
@@ -288,24 +345,21 @@ const checkData = (event, recordBuffer) => {
   let accValue = accValueContainer.value;
   let accToValue = accToValueContainer.value;
 
-
-
   let isValidType = validateField(moveType);
   messageValidation(moveTypeContainer, moveTypeFeedback, isValidType);
-  
-  
+
   let isValidAccount;
 
   isValidAccount = validateAccount(accValue);
-  messageValidation(accValueContainer, accFeedback, isValidAccount );
-  if(moveType === "Move"){
+  messageValidation(accValueContainer, accFeedback, isValidAccount);
+  if (moveType === "Move") {
     isValidAccount = validateAccount(accToValue);
-    if(isValidAccount === true){
-      isValidAccount = validateMove(accValue,accToValue)
-    } 
-    messageValidation(accToValueContainer, accToFeedback, isValidAccount );
+    if (isValidAccount === true) {
+      isValidAccount = validateMove(accValue, accToValue);
+    }
+    messageValidation(accToValueContainer, accToFeedback, isValidAccount);
   }
-    
+
   let isValidAmount = validateAmount(enteredAmount, accValue, moveType);
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
 
@@ -322,8 +376,8 @@ const checkData = (event, recordBuffer) => {
     } else if (moveType === "Spent") {
       recordBuffer.accFrom = accValue;
       recordBuffer.accTo = "";
-    }else if (moveType === "Move"){
-      recordBuffer.accFrom = accValue; 
+    } else if (moveType === "Move") {
+      recordBuffer.accFrom = accValue;
       recordBuffer.accTo = accToValue;
     }
     if (selectedCategory) {
@@ -369,53 +423,32 @@ const validateAmount = (amt, account, type) => {
     return "El monto no debe ser cero";
   }
 
-//40 veces por todos lados, refactorizar despues. traer el obj de una una vez validado que existe la cuenta
-  const accFind = accounts.find(acc => acc.name === account);
+  //40 veces por todos lados, refactorizar despues. traer el obj de una una vez validado que existe la cuenta
+  const accFind = accounts.find((acc) => acc.name === account);
 
-  if(!accFind)
-    return "Error"
+  if (!accFind) return "Error";
 
-  if(moveFlag && accFind.balance < amtInt)
-    return "Sin fondos"
-  
+  if (moveFlag && accFind.balance < amtInt) return "Sin fondos";
 
   return true;
 };
 
-
-
 const validateAccount = (accValue) => {
+  const accFind = accounts.find((acc) => acc.name === accValue);
 
-
-  const accFind = accounts.find(acc => acc.name === accValue);
- 
-  if (!accFind)
-    return "Cuenta no existe";
-  else
-    return true;
-  
-
-}
+  if (!accFind) return "Cuenta no existe";
+  else return true;
+};
 
 const validateMove = (accValue, accToValue) => {
+  if (accValue === accToValue) return "Cuenta to igual a cuenta from";
 
+  const accFind = accounts.find((acc) => acc.name === accValue);
+  const accToFind = accounts.find((acc) => acc.name === accToValue);
 
-
-  if(accValue === accToValue)
-    return "Cuenta to igual a cuenta from"
-
-    const accFind = accounts.find(acc => acc.name === accValue);
-    const accToFind = accounts.find(acc => acc.name === accToValue);
-
-  if (accFind.currency !== accToFind.currency)
-    return "Diferente moneda"
-    
+  if (accFind.currency !== accToFind.currency) return "Diferente moneda";
 
   return true;
-
-  
-
-
 };
 
 // const realoadSavingAccount = (enteredAmount) => {
@@ -484,18 +517,15 @@ const closeModal = () => {
   // console.log('cerrar modal')
   //document.getElementById("monto").value = "";
   let accountToDiv = document.getElementById("account-to-div");
-  
-  
+
   document.getElementById("form-add-reg").reset();
-  
+
   if (!accountToDiv.classList.contains("d-none")) {
     accountToDiv.classList.add("d-none");
   }
   resetFeedback();
   enableCategories();
-
 };
-
 
 const handleShowReminderHover = () => {
   let recordElement = document.getElementById("recordatorios");
@@ -556,27 +586,17 @@ const handleSaveRecordatorioModal = () => {
   console.log("test 4");
 };
 
-
 const resetFeedback = () => {
-
-
   let valid = document.getElementsByClassName("is-valid");
   let invalid = document.getElementsByClassName("is-invalid");
 
-
-
-
-  while (valid.length > 0){
-    valid[0].classList.remove("is-valid")
+  while (valid.length > 0) {
+    valid[0].classList.remove("is-valid");
   }
 
-  while (invalid.length > 0){
-    invalid[0].classList.remove("is-invalid")
+  while (invalid.length > 0) {
+    invalid[0].classList.remove("is-invalid");
   }
- 
-
-  
 };
-
 
 window.onload = begin;
