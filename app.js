@@ -1,29 +1,4 @@
-let accounts = [
-  {
-    name: "Savings",
-    currency: "ARS",
-    description: "BBVA",
-    balance: 100,
-  },
-  {
-    name: "Checking",
-    currency: "ARS",
-    description: "BSTN",
-    balance: 200,
-  },
-  {
-    name: "Ahorros USD",
-    currency: "USD",
-    description: "Ahorro",
-    balance: 300,
-  },
-  {
-    name: "Ahorros ARS",
-    currency: "ARS",
-    description: "Ahorro",
-    balance: 400,
-  },
-];
+let accountBuffer = [];
 
 let record = [
   {
@@ -71,10 +46,8 @@ const begin = () => {
       console.error("Error:", error);
     });
 
-  //loadBalance();
-  loadAccounts();
-  // document.getElementById('btn-ingreso').addEventListener('click', moneyIn);
-  //document.getElementById("btn-new-reg").addEventListener("click",loadAccounts);
+  loadAccounts(); // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
+
   document
     .getElementById("btn-close-modal")
     .addEventListener("click", closeModal);
@@ -153,7 +126,7 @@ const testConn = async () => {
   }
 };
 
-const loadBalance = () => {
+const loadBalance = (accounts) => {
   let balanceScroll = document.getElementById("balance-scroll");
 
   for (acc of accounts) {
@@ -198,56 +171,87 @@ const loadBalance = () => {
   balanceContainer.innerHTML = balance;
 };
 
-const read = async (type, id) => {
-   /*
-  Esperamos         type  ='account'  -->  cuentas
-                          ='reg'      -->  registers
-                          ='target'   -->  objetivos
-                          ='reminder' -->  recordatorios
+const read = async (type, id, iduser) => {
+  /*
+  Esperamos         type    ='account'  -->  cuentas
+                            ='reg'      -->  registers
+                            ='target'   -->  objetivos
+                            ='reminder' -->  recordatorios
   en request GET
-                    id    = 'all'     -->  traer todos
-                    id    = '1'       -->  traer id especificado
+                    id      = 'all'     -->  traer todos
+                    id      = '1'       -->  traer id especificado
+
+                    iduser  = id del usuario (ver mejor manera)
   */
 
-
   const params = new URLSearchParams();
-  params.append('type', type);
-  params.append('id', id);
+  params.append("type", type);
+  params.append("id", id);
+  params.append("iduser", iduser);
   const queryString = params.toString();
 
-  const full = backendServer + '/controllers/entryPoint.php/' + (queryString ? `?${queryString}` : '');
- 
+  const full =
+    backendServer +
+    "/controllers/entryPoint.php/" +
+    (queryString ? `?${queryString}` : "");
+  // backend/?type=tipo&id=all&iduser=21
   try {
     const response = await fetch(full);
     if (response.ok) {
       const data = await response.json();
       return data;
     } else {
-      throw new Error("Error al obtener los datos");
+      throw new Error("Error");
     }
   } catch (error) {
     console.error("Error:", error);
-    throw error; // Puedes volver a lanzar el error si lo deseas
+    throw error;
   }
+};
+
+const save = async (obj) => {
+
+   const full =
+    backendServer +
+    "/controllers/entryPoint.php/";
+
+    try {
+      const response = await fetch(full, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(obj),
+      });
+  
+      if (response.ok) {
+        return true;
+      } else {
+        return false; //logear errores en archivo? demasiado
+      }
+    } catch (error) { 
+      return false;
+    }
  
 };
 
-const loadAccounts = () => {  
+const loadAccounts = () => {
   let accountContainer = document.getElementById("account");
   let accountToContainer = document.getElementById("account-to");
 
-
-  read('account','all').then(accountsBuffer => {
+  read("account", "all", "1").then((accountsBuffer) => {
+    //hay que traer el id usuario, lo dehjamos en la session?
     for (let acc of accountsBuffer) {
+      //cargamos el drop del modal
       let opt = document.createElement("option");
+      opt.value = acc.id; //alambre pero sirve: en el value dejamos el id de la cuenta. 
       opt.appendChild(document.createTextNode(acc.name));
       accountToContainer.appendChild(opt.cloneNode(true));
       accountContainer.appendChild(opt);
     }
-  } )
-
-
-  
+    //se cargan las pills
+    loadBalance(accountsBuffer);
+  });
 };
 
 const handleAccountToFrom = (event) => {
@@ -309,15 +313,28 @@ const addRecord = (event) => {
   event.preventDefault();
 
   let recordBuffer = {
+    id_user: 1, //traerlo de algun lado 
     type: "",
+    regDate: "", // (AAAA-MM-DD HH:MM:SS)
     amount: 0,
     category: "",
-    accFrom: "",
-    accTo: "",
+    accFrom: "", // ir por el id?
+    accTo: "", // ir por el id?
   };
 
   if (checkData(event, recordBuffer)) {
-    refreshBalances(recordBuffer);
+
+    save(recordBuffer).then((res) => {
+      if(res){
+        refreshBalances(recordBuffer);
+        console.log("Se grabo");
+      }else{
+        console.error("No se grabo");
+      }
+
+    });
+  
+    
     //reloadTable(recordBuffer);
 
     enableCategories();
@@ -326,7 +343,7 @@ const addRecord = (event) => {
   }
 };
 
-const checkData = (event, recordBuffer) => {
+const checkData = async (event, recordBuffer) => {
   let selectedCategory = document.querySelector(".pressed");
   let moveTypeContainer = document.getElementById("type");
   let moveTypeFeedback = document.getElementById("typeFeedback");
@@ -345,15 +362,20 @@ const checkData = (event, recordBuffer) => {
   let accValue = accValueContainer.value;
   let accToValue = accToValueContainer.value;
 
+  let accToText = accToValueContainer.options[accToValueContainer.selectedIndex].text;
+  let accText = accValueContainer.options[accValueContainer.selectedIndex].text;
+
+  let iduser = 1;
+
   let isValidType = validateField(moveType);
   messageValidation(moveTypeContainer, moveTypeFeedback, isValidType);
 
   let isValidAccount;
 
-  isValidAccount = validateAccount(accValue);
+  isValidAccount = await validateAccount(accValue,iduser);
   messageValidation(accValueContainer, accFeedback, isValidAccount);
   if (moveType === "Move") {
-    isValidAccount = validateAccount(accToValue);
+    isValidAccount = validateAccount(accToValue, iduser);
     if (isValidAccount === true) {
       isValidAccount = validateMove(accValue, accToValue);
     }
@@ -371,11 +393,11 @@ const checkData = (event, recordBuffer) => {
     recordBuffer.type = moveType;
     recordBuffer.amount = enteredAmount;
     if (moveType === "Income") {
-      recordBuffer.accFrom = "";
+      recordBuffer.accFrom = null;
       recordBuffer.accTo = accValue;
     } else if (moveType === "Spent") {
       recordBuffer.accFrom = accValue;
-      recordBuffer.accTo = "";
+      recordBuffer.accTo = null;
     } else if (moveType === "Move") {
       recordBuffer.accFrom = accValue;
       recordBuffer.accTo = accToValue;
@@ -433,22 +455,37 @@ const validateAmount = (amt, account, type) => {
   return true;
 };
 
-const validateAccount = (accValue) => {
-  const accFind = accounts.find((acc) => acc.name === accValue);
 
-  if (!accFind) return "Cuenta no existe";
-  else return true;
+const validateAccount = async (accValue,iduser) => {
+  
+  
+  let res = await read('account',accValue, iduser);
+    if(res){
+      return true;
+    }else{
+      return "Cuenta no existe";
+    }
+
+
+
 };
 
-const validateMove = (accValue, accToValue) => {
+const validateMove = async (accValue, accToValue,iduser) => {
   if (accValue === accToValue) return "Cuenta to igual a cuenta from";
 
-  const accFind = accounts.find((acc) => acc.name === accValue);
-  const accToFind = accounts.find((acc) => acc.name === accToValue);
+  acc = await read('account',accValue,iduser);
+  accTo = await read('account',accToValue,iduser);
 
-  if (accFind.currency !== accToFind.currency) return "Diferente moneda";
+  if(acc && accTo){
+    if(acc.currency != accTo.currency){
+      return "Diferentes monedas"
+    }else{
+        return true;
+    }
+  }
+   
+  return "Error"
 
-  return true;
 };
 
 // const realoadSavingAccount = (enteredAmount) => {
