@@ -12,7 +12,7 @@ public function save($data){
   $consulta->bindParam(1, $data['type'], PDO::PARAM_STR);
   $consulta->bindParam(2, $data['accFrom'], PDO::PARAM_INT);
   $consulta->bindParam(3, $date['accTo'], PDO::PARAM_INT);
-  $consulta->bindParam(4, $date['regDate'], PDO::PARAM_STR);
+  $consulta->bindParam(4, $date['regDate'], PDO::PARAM_STR); // string formato fecha
   $consulta->bindParam(5, $date['amount'], PDO::PARAM_STR);
   $consulta->bindParam(6, $date['category'], PDO::PARAM_STR);
   

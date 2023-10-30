@@ -23,6 +23,10 @@
         echo $jsonData;
 
       }
+      if($_GET['type'] == 'account' &&  is_int($_GET['id']) ){
+          $data = $accController->readOneById($_GET['id'],$_GET['iduser']);
+
+      }
       break;
     case 'POST':
       if($type == 'register'){
