@@ -26,7 +26,7 @@
         </div>
     </nav>
     
-    <div style="height: 70vh;">
+    <div style="height: 70vh; margin-bottom: 50px;">
         <div class="row justify-content-center " style="margin-top: 190px; padding: 20px;">
             <div class="col-md-4">
                 <div class="card" style="gap: 8px;">
@@ -34,22 +34,22 @@
                         Registrarse
                     </div>
                     <div class="card-body" >
-                        <form>
+                        <form id="formularioRegistro" action="registrarse.php" method="post">
                             <div class="form-group">
                                 <label for="nombre">Nombre</label>
-                                <input type="text" class="form-control" id="nombre" placeholder="Ingresa tu nombre">
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required>
                             </div>
                             <div class="form-group" style="margin-top: 15px;">
                                 <label for="apellido">Apellido</label>
-                                <input type="text" class="form-control" id="Apellido" placeholder="Ingresa tu apellido">
+                                <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingresa tu apellido" required>
                             </div>
                             <div class="form-group" style="margin-top: 15px;">
                                 <label for="email">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="emailRegistro" placeholder="Ingresa tu correo">
+                                <input type="email" class="form-control" id="emailRegistro" name="emailRegistro" placeholder="Ingresa tu correo" required>
                             </div>
                             <div class="form-group" style="margin-top: 15px;">
                                 <label for="password">Contraseña</label>
-                                <input type="password" class="form-control" id="passwordRegistro" placeholder="Elige una contraseña">
+                                <input type="password" class="form-control" id="passwordRegistro" name="passwordRegistro" placeholder="Elige una contraseña" required>
                             </div>
                             <div style="text-align: center;">
                             <button id="btn-registrarse" style="margin-top: 15px;" type="submit" class="btn bg-dark text-white btn-block">Registrarse</button>
