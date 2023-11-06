@@ -4,7 +4,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$db = "proyecto";
+$db = "register";
 
 try {
     $conexion = new PDO(
@@ -30,7 +30,7 @@ $passwordUsuario = $_POST['passwordRegistro'];
 
 
 //INSERTO LOS DATOS EN LA BBDD
-$query = "INSERT INTO cuentas(nombre, apellido, emailRegistro, passwordRegistro)
+$query = "INSERT INTO user(name, lastname, email, password)
             VALUES('$nombreUsuario', '$apellidoUsuario', '$emailUsuario', '$passwordUsuario')";
 
 $conexion->exec($query);

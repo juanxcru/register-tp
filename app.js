@@ -34,7 +34,7 @@ let record = [
     accTo: "Ahorros ARS",
   },
 ];
-const backendServer = "http://localhost:3000/register-tp";
+const backendServer = "http://localhost/TP-LAB-PROG/register-tp";
 const ARS_USD = 1000;
 
 const begin = () => {

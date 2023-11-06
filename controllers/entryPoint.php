@@ -7,7 +7,7 @@
   header("Access-Control-Allow-Origin: http://127.0.0.1:5500");
   $regController = new RegController();
   $accController = new AccountController();
-
+  //$targetController 
   
   
   $typeReq  = $_SERVER['REQUEST_METHOD'];
