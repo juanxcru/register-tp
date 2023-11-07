@@ -197,11 +197,11 @@ const read = async (type, id, iduser) => {
   // backend/?type=tipo&id=all&iduser=21
   try {
     const response = await fetch(full);
-    console.log('respondeme loco', response)
+
     if (response.ok) {
-      console.log('entre')
+
       const data = await response.json();
-      console.log('data', data)
+
       return data;
     } else {
       throw new Error("Error");
@@ -213,7 +213,7 @@ const read = async (type, id, iduser) => {
 };
 
 const save = async (obj) => {
-    console.log('obj', obj)
+
    const full =
     backendServer +
     "/controllers/entryPoint.php?type=register";
@@ -224,12 +224,10 @@ const save = async (obj) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(obj),
+        body: JSON.stringify(obj)
         
       });
-      console.log('body',JSON.stringify(obj))
-      console.log('res: ', response)
-  
+        
       if (response.ok) {
         return true;
       } else {
@@ -282,7 +280,6 @@ const selectCategory = (event) => {
 
   if (event.target.classList.contains("cat")) {
     clickedElement = event.target;
-    console.log(clickedElement);
     if (clickedElement.classList.contains("pressed")) {
       clickedElement.classList.remove("pressed");
       enableCategories();
@@ -319,35 +316,40 @@ const addRecord = (event) => {
   event.preventDefault();
 
   let recordBuffer = {
-    id_user: 1, //traerlo de algun lado 
+    id_user: 1, 
     type: "",
-    regDate: "", // (AAAA-MM-DD HH:MM:SS)
+    regDate: "",
     amount: 0,
     category: "",
-    accFrom: "", // ir por el id?
-    accTo: "", // ir por el id?
+    accFrom: "", 
+    accTo: "" 
   };
 
-  if (checkData(event, recordBuffer)) {
-
-    save(recordBuffer).then((res) => {
+  checkData(event, recordBuffer).then( (res) => {
       if(res){
-        // refreshBalances(recordBuffer);
-        console.log("Se grabo");
-      }else{
-        console.error("No se grabo");
-      }
+        save(recordBuffer).then((res) => {
+          if(res){
+            // refreshBalances(recordBuffer);
+            // reloadTable(recordBuffer);
+            console.log("Se grabo");
+            enableCategories();
+            resetFeedback();
+            document.getElementById("form-add-reg").reset();
+          }else{
+            console.error("No se grabo");
+          }
+        });
+      }});
+      
+    
 
-    });
+    
   
     
-    //reloadTable(recordBuffer);
+    
 
-    enableCategories();
-    resetFeedback();
-    document.getElementById("form-add-reg").reset();
-  }
-};
+    
+  };  
 
 const checkData = async (event, recordBuffer) => {
   let selectedCategory = document.querySelector(".pressed");
@@ -373,13 +375,6 @@ const checkData = async (event, recordBuffer) => {
 
   let iduser = 1;
 
-  console.log('asd', accValue)
-  console.log('asd1', accToValue)
-
-  console.log('as2', accToText)
-
-  console.log('as3d', accText)
-
 
   let isValidType = validateField(moveType);
   messageValidation(moveTypeContainer, moveTypeFeedback, isValidType);
@@ -389,14 +384,15 @@ const checkData = async (event, recordBuffer) => {
   isValidAccount = await validateAccount(accValue,iduser);
   messageValidation(accValueContainer, accFeedback, isValidAccount);
   if (moveType === "Move") {
-    isValidAccount = validateAccount(accToValue, iduser);
+    isValidAccount = await validateAccount(accToValue, iduser);
     if (isValidAccount === true) {
-      isValidAccount = validateMove(accValue, accToValue);
+      isValidAccount = await validateMove(accValue, accToValue,iduser);
     }
     messageValidation(accToValueContainer, accToFeedback, isValidAccount);
   }
 
-  let isValidAmount = validateAmount(enteredAmount, accValue, moveType);
+  let isValidAmount = await validateAmount(enteredAmount, accValue, moveType, iduser);
+
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
 
   if (
@@ -447,9 +443,9 @@ const validateField = (field) => {
   return true;
 };
 
-const validateAmount = (amt, account, type) => {
-  let amtInt = parseInt(amt);
-  let moveFlag = type === "Spent" ? true : false;
+const validateAmount = async (amt, account, type, iduser) => {
+  let amtInt = parseFloat(amt);
+  let moveFlag = type === "Spent" || type === "Move" ? true : false;
 
   if (isNaN(amtInt)) {
     return "Monto no valido";
@@ -459,21 +455,28 @@ const validateAmount = (amt, account, type) => {
     return "El monto no debe ser cero";
   }
 
-  // const accFind = accounts.find((acc) => acc.name === account);
+  if(moveFlag){
+    accTo = await read('account',account,iduser);
+    if(accTo.length == 1){
+      if(parseFloat(accTo[0].balance) < amtInt){
+        return "Sin fondos"
+      }
+    }else{
+      return "Error"
+    }
 
-  // if (!accFind) return "Error";
-
-  // if (moveFlag && accFind.balance < amtInt) return "Sin fondos";
+  }
 
   return true;
+  
 };
 
 
 const validateAccount = async (accValue,iduser) => {
   
   
-  let res = await read('account',accValue, iduser);
-    if(res){
+  let res = await read('account', accValue, iduser);
+    if(res.length == 1){
       return true;
     }else{
       return "Cuenta no existe";
@@ -488,9 +491,8 @@ const validateMove = async (accValue, accToValue,iduser) => {
 
   acc = await read('account',accValue,iduser);
   accTo = await read('account',accToValue,iduser);
-
-  if(acc && accTo){
-    if(acc.currency != accTo.currency){
+  if(acc.length == 1 && accTo.length == 1){
+    if(acc[0].currency != accTo[0].currency){
       return "Diferentes monedas"
     }else{
         return true;
