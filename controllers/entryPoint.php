@@ -4,7 +4,6 @@
   require_once 'AccountController.php';
   require_once 'RegController.php';
 
-  header("Access-Control-Allow-Origin: http://127.0.0.1:5500");
   $regController = new RegController();
   $accController = new AccountController();
   //$targetController 
@@ -21,15 +20,24 @@
         $jsonData = json_encode($data);
         header('Content-Type: application/json');
         echo $jsonData;
+        break;
 
       }
-      if($_GET['type'] == 'account' &&  is_int($_GET['id']) ){
+      if($_GET['type'] == 'account'){
           $data = $accController->readOneById($_GET['id'],$_GET['iduser']);
+
+          $jsonData = json_encode($data);
+          header('Content-Type: application/json');
+          echo $jsonData;
 
       }
       break;
     case 'POST':
-      if($type == 'register'){
+      if($_GET['type'] == 'register'){
+
+        // print('post' . $_POST['type']);
+        // echo 'get' . $_GET['type'];
+
         $data = json_decode(file_get_contents('php://input'), true);
         
         echo $regController->save($data);

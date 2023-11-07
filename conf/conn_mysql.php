@@ -6,8 +6,6 @@ $password = "";
 $port = 3306;
 $db = "register";
 
-header("Access-Control-Allow-Origin: http://127.0.0.1:5500"); // todo ok con el origen del liveserver 
-
 try {
     $conn = new \PDO("mysql:host=$servername;port=$port;dbname=" . $db . ";charset=utf8", $username, $password);
 

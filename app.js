@@ -197,23 +197,26 @@ const read = async (type, id, iduser) => {
   // backend/?type=tipo&id=all&iduser=21
   try {
     const response = await fetch(full);
+    console.log('respondeme loco', response)
     if (response.ok) {
+      console.log('entre')
       const data = await response.json();
+      console.log('data', data)
       return data;
     } else {
       throw new Error("Error");
     }
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error: ", error);
     throw error;
   }
 };
 
 const save = async (obj) => {
-
+    console.log('obj', obj)
    const full =
     backendServer +
-    "/controllers/entryPoint.php/";
+    "/controllers/entryPoint.php?type=register";
 
     try {
       const response = await fetch(full, {
@@ -222,7 +225,10 @@ const save = async (obj) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(obj),
+        
       });
+      console.log('body',JSON.stringify(obj))
+      console.log('res: ', response)
   
       if (response.ok) {
         return true;
@@ -326,7 +332,7 @@ const addRecord = (event) => {
 
     save(recordBuffer).then((res) => {
       if(res){
-        refreshBalances(recordBuffer);
+        // refreshBalances(recordBuffer);
         console.log("Se grabo");
       }else{
         console.error("No se grabo");
@@ -366,6 +372,14 @@ const checkData = async (event, recordBuffer) => {
   let accText = accValueContainer.options[accValueContainer.selectedIndex].text;
 
   let iduser = 1;
+
+  console.log('asd', accValue)
+  console.log('asd1', accToValue)
+
+  console.log('as2', accToText)
+
+  console.log('as3d', accText)
+
 
   let isValidType = validateField(moveType);
   messageValidation(moveTypeContainer, moveTypeFeedback, isValidType);
@@ -445,12 +459,11 @@ const validateAmount = (amt, account, type) => {
     return "El monto no debe ser cero";
   }
 
-  //40 veces por todos lados, refactorizar despues. traer el obj de una una vez validado que existe la cuenta
-  const accFind = accounts.find((acc) => acc.name === account);
+  // const accFind = accounts.find((acc) => acc.name === account);
 
-  if (!accFind) return "Error";
+  // if (!accFind) return "Error";
 
-  if (moveFlag && accFind.balance < amtInt) return "Sin fondos";
+  // if (moveFlag && accFind.balance < amtInt) return "Sin fondos";
 
   return true;
 };
