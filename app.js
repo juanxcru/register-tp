@@ -340,15 +340,7 @@ const addRecord = (event) => {
           }
         });
       }});
-      
-    
 
-    
-  
-    
-    
-
-    
   };  
 
 const checkData = async (event, recordBuffer) => {
