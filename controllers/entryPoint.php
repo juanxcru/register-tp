@@ -3,10 +3,11 @@
    // todo ok con el origen del liveserver 
   require_once 'AccountController.php';
   require_once 'RegController.php';
+  require_once 'TargetController.php';
 
   $regController = new RegController();
   $accController = new AccountController();
-  //$targetController 
+  $targetController = new TargetController();
   
   
   $typeReq  = $_SERVER['REQUEST_METHOD'];
@@ -41,11 +42,18 @@
         $data = json_decode(file_get_contents('php://input'), true);
         
         echo $regController->save($data);
-
-        
-
+        break; 
       }
+
+      if($_GET['type'] == 'target'){
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        echo $targetController->saveTarget($data); 
+      }
+      
 
 
   }
+
+  ?>
     

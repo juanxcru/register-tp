@@ -310,28 +310,27 @@
 
     <!-- -------------modal objetivos--------------- -->
 
-    <div class="modal fade" id="objModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal" id="objModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">New objective</h5>
           </div>
           <div class="modal-body">
-            <form>
+            <form id="formularioTarget" action="" novalidate>
               <div class="form-group">
-                <label for="recipient-name" class="col-form-label">Name:</label>
-                <input type="text" class="form-control" id="nombre-objetivo">
+                <label for="nombre" class="col-form-label">Name:</label>
+                <input type="text" class="form-control" id="nombre-objetivo" name="nombre-objetivo" placeholder="Ingresa el nombre del objetivo">
               </div>
-                <label for="acc-init-balance" class="form-label">Amount:</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="text" class="form-control" id="monto-objetivo"/>
+                <div class="form-group">
+                  <label for="monto" class="form-label mt-3">Amount:</label>
+                  <input type="text" class="form-control" id="monto-objetivo" name="monto-objetivo" placeholder="Ingresa el monto del objetivo"/>
                   <div id="montoObjetivoFeedback" class="invalid-feedback"></div>
                 </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button id="btn-close-obj-modal" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button id="btn-close-obj-modal" type="button" class="btn btn-secondary">Close</button>
             <button id="btn-save-obj-modal" type="submit" class="btn btn-primary">Save</button>
           </div>
         </div>
@@ -351,11 +350,11 @@
               <div class="modal-body">
                 <form>
                   <div class="form-group">
-                    <label for="recipient-name" class="col-form-label">Name:</label>
+                    <label for="nombre" class="col-form-label">Name:</label>
                     <input type="text" class="form-control" id="nombre-recordatorio">
                   </div>
                   <div class="form-group">
-                    <label for="recipient-name" class="col-form-label">Due date:</label>
+                    <label for="" class="col-form-label">Due date:</label>
                     <input type="date" class="form-control" id="monto-recordatorio">
                   </div>
                 </form>

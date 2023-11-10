@@ -47,6 +47,9 @@ const begin = () => {
     });
 
   loadAccounts(); // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
+  // loadTargets();
+  // loadReminders();
+
 
   document
     .getElementById("btn-close-modal")
@@ -58,18 +61,18 @@ const begin = () => {
     .getElementById("div-categoria")
     .addEventListener("click", selectCategory);
 
-  document
-    .getElementById("btn-show-record")
-    .addEventListener("mouseover", handleShowReminderHover);
-  document
-    .getElementById("btn-show-record")
-    .addEventListener("mouseleave", handleHideReminderHover);
-  document
-    .getElementById("recordatorios")
-    .addEventListener("mouseover", handleShowReminderHover);
-  document
-    .getElementById("recordatorios")
-    .addEventListener("mouseleave", handleHideReminderHover);
+  // document
+  //   .getElementById("btn-show-record")
+  //   .addEventListener("mouseover", handleShowReminderHover);
+  // document
+  //   .getElementById("btn-show-record")
+  //   .addEventListener("mouseleave", handleHideReminderHover);
+  // document
+  //   .getElementById("recordatorios")
+  //   .addEventListener("mouseover", handleShowReminderHover);
+  // document
+  //   .getElementById("recordatorios")
+  //   .addEventListener("mouseleave", handleHideReminderHover);
 
   document
     .getElementById("btn-show-objetive")
@@ -83,13 +86,13 @@ const begin = () => {
   document
     .getElementById("objetivos")
     .addEventListener("mouseleave", handleHideObjetiveHover);
-
+//this
   document
     .getElementById("btn-show-objetive")
     .addEventListener("click", handleObjetiveModal);
-  document
-    .getElementById("btn-show-record")
-    .addEventListener("click", handleReminderModal);
+  // document
+  //   .getElementById("btn-show-record")
+  //   .addEventListener("click", handleReminderModal);
 
   document
     .getElementById("btn-close-obj-modal")
@@ -98,15 +101,16 @@ const begin = () => {
     .getElementById("btn-save-obj-modal")
     .addEventListener("click", handleSaveObjModal);
 
-  document
-    .getElementById("btn-close-recordatorio-modal")
-    .addEventListener("click", handleCloseRecordatorioModal);
-  document
-    .getElementById("btn-save-recordatorio-modal")
-    .addEventListener("click", handleSaveRecordatorioModal);
+  // document
+  //   .getElementById("btn-close-recordatorio-modal")
+  //   .addEventListener("click", handleCloseRecordatorioModal);
+  // document
+  //   .getElementById("btn-save-recordatorio-modal")
+  //   .addEventListener("click", handleSaveRecordatorioModal);
   document
     .getElementById("type")
     .addEventListener("change", handleAccountToFrom);
+
 };
 
 const testConn = async () => {
@@ -239,6 +243,8 @@ const save = async (obj) => {
  
 };
 
+//-----------------------------LOAD FIRST TIME---------------------
+
 const loadAccounts = () => {
   let accountContainer = document.getElementById("account");
   let accountToContainer = document.getElementById("account-to");
@@ -257,6 +263,45 @@ const loadAccounts = () => {
     loadBalance(accountsBuffer);
   });
 };
+
+// const loadTargets = () => {
+
+//   read("target", "all", "1").then((accountsBuffer) => {
+//     //hay que traer el id usuario, lo dehjamos en la session?
+//     for (let acc of accountsBuffer) {
+//       //cargamos el drop del modal
+//       let opt = document.createElement("option");
+//       opt.value = acc.id; //alambre pero sirve: en el value dejamos el id de la cuenta. 
+//       opt.appendChild(document.createTextNode(acc.name));
+//       accountToContainer.appendChild(opt.cloneNode(true));
+//       accountContainer.appendChild(opt);
+//     }
+//     //se cargan las pills
+//     loadBalance(accountsBuffer);
+//   });
+// };
+
+
+// const loadReminders = () => {
+
+//   read("reminder", "all", "1").then((accountsBuffer) => {
+//     //hay que traer el id usuario, lo dehjamos en la session?
+//     for (let acc of accountsBuffer) {
+//       //cargamos el drop del modal
+//       let opt = document.createElement("option");
+//       opt.value = acc.id; //alambre pero sirve: en el value dejamos el id de la cuenta. 
+//       opt.appendChild(document.createTextNode(acc.name));
+//       accountToContainer.appendChild(opt.cloneNode(true));
+//       accountContainer.appendChild(opt);
+//     }
+//     //se cargan las pills
+//     loadBalance(accountsBuffer);
+//   });
+// };
+
+
+//-----------------------------LOAD FIRST TIME---------------------
+
 
 const handleAccountToFrom = (event) => {
   let accountToDiv = document.getElementById("account-to-div");
@@ -571,15 +616,17 @@ const closeModal = () => {
   enableCategories();
 };
 
-const handleShowReminderHover = () => {
-  let recordElement = document.getElementById("recordatorios");
-  recordElement.classList.remove("d-none");
-};
+// const handleShowReminderHover = () => {
+//   let recordElement = document.getElementById("recordatorios");
+//   recordElement.classList.remove("d-none");
+// };
 
-const handleHideReminderHover = () => {
-  let recordElement = document.getElementById("recordatorios");
-  recordElement.classList.add("d-none");
-};
+// const handleHideReminderHover = () => {
+//   let recordElement = document.getElementById("recordatorios");
+//   recordElement.classList.add("d-none");
+// };
+
+//-----------OBJ FUNC--------------------------------
 
 const handleShowObjetiveHover = () => {
   let recordElement = document.getElementById("objetivos");
@@ -595,40 +642,91 @@ const handleObjetiveModal = () => {
   handleObjModalOpen();
 };
 
+//ARREGLAR ESTA COSA HORRIBLE DEL MODAL
+
+let objModal = new bootstrap.Modal(document.getElementById("objModal"));
+
 const handleObjModalOpen = () => {
-  let objModal = new bootstrap.Modal(document.getElementById("objModal"));
   objModal.show();
   return;
 };
 
-const handleReminderModal = () => {
-  handleReminderModalOpen();
-  return;
-};
-
-const handleReminderModalOpen = () => {
-  let reminderModal = new bootstrap.Modal(
-    document.getElementById("reminderModal")
-  );
-  reminderModal.show();
-  return;
-};
-
 const handleCloseObjModal = () => {
-  console.log("test 1");
+  // console.log("test 1");
+  //ARREGLAR
+  // let objModal = new bootstrap.Modal(document.getElementById("objModal"));
+  objModal.hide();
+  console.log('Modal cerrado')
 };
 
-const handleSaveObjModal = () => {
-  console.log("test 2");
+const handleSaveObjModal = async (event) => {
+  event.preventDefault()
+  //Hacer validacion de campos vacios
+
+
+  let nombreObjetivo = document.getElementById('nombre-objetivo')
+  let montoObjetivo = document.getElementById('monto-objetivo')
+  let nombreObjetivoValue = nombreObjetivo.value
+  let montoObjetivoValue = montoObjetivo.value
+
+  let testObj = {
+    name : nombreObjetivoValue,
+    amount: montoObjetivoValue,
+    id_user: 1,
+    //currency
+  };
+
+  const full =
+  backendServer +
+  "/controllers/entryPoint.php?type=target";
+
+  try {
+    console.log('si')
+    const response = await fetch(full, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(testObj)
+      
+    });
+      
+    if (response.ok) {
+      console.log('ok')
+    } else {
+      console.log('no')
+    }
+  } catch (error) { 
+    return false;
+  }
+
+  console.log('1', nombreObjetivoValue)
+  console.log('2', montoObjetivoValue)
 };
 
-const handleCloseRecordatorioModal = () => {
-  console.log("test 3");
-};
+//-------------------------------------------
 
-const handleSaveRecordatorioModal = () => {
-  console.log("test 4");
-};
+// const handleReminderModal = () => {
+//   handleReminderModalOpen();
+//   return;
+// };
+
+// const handleReminderModalOpen = () => {
+//   let reminderModal = new bootstrap.Modal(
+//     document.getElementById("reminderModal")
+//   );
+//   reminderModal.show();
+//   return;
+// };
+
+
+// const handleCloseRecordatorioModal = () => {
+//   console.log("test 3");
+// };
+
+// const handleSaveRecordatorioModal = () => {
+//   console.log("test 4");
+// };
 
 const resetFeedback = () => {
   let valid = document.getElementsByClassName("is-valid");
