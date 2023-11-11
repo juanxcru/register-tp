@@ -151,9 +151,9 @@ const loadBalance = (accounts) => {
 
     let pBalance = document.createElement("p");
     pBalance.classList.add("account-balance-p", "text-center");
-    //ojo aca: ID en html == acc.name
-    pBalance.setAttribute("id", acc.name);
-    pBalance.append(acc.balance);
+    //ojo aca: ID en html == acc.id
+    pBalance.setAttribute("id", "acc-balance-p-id" + acc.id);
+    pBalance.append(acc.balance.toFixed(1));
 
     divAccountBalance.appendChild(pBalance);
     divPill.appendChild(divAccountBalance);
@@ -172,7 +172,7 @@ const loadBalance = (accounts) => {
     //hacerlo bien
   }
 
-  balanceContainer.innerHTML = balance;
+  balanceContainer.innerHTML = balance.toFixed(1);
 };
 
 const read = async (type, id, iduser) => {
@@ -217,7 +217,7 @@ const read = async (type, id, iduser) => {
 };
 
 const save = async (obj) => {
-
+// agregar argumento para reutilizar.
    const full =
     backendServer +
     "/controllers/entryPoint.php?type=register";
@@ -243,7 +243,6 @@ const save = async (obj) => {
  
 };
 
-//-----------------------------LOAD FIRST TIME---------------------
 
 const loadAccounts = () => {
   let accountContainer = document.getElementById("account");
@@ -360,10 +359,19 @@ const disableCategories = () => {
 const addRecord = (event) => {
   event.preventDefault();
 
+//fecha
+let fecha = new Date();
+let fechaSegundosIso = new Date((new Date(fecha)).toISOString() );
+// diferencia entre utc/iso y local. milis - (minOfset*60000)
+let milisLocal = new Date(fechaSegundosIso.getTime()-(fecha.getTimezoneOffset()*60000));
+let formateoMysql = milisLocal.toISOString().slice(0, 19).replace('T', ' ');
+
+
+
   let recordBuffer = {
-    id_user: 1, 
+    iduser: 1, 
     type: "",
-    regDate: "",
+    regDate: formateoMysql,
     amount: 0,
     category: "",
     accFrom: "", 
@@ -371,7 +379,7 @@ const addRecord = (event) => {
   };
 
   checkData(event, recordBuffer).then( (res) => {
-      if(res){
+      if(res == true){
         save(recordBuffer).then((res) => {
           if(res){
             // refreshBalances(recordBuffer);
@@ -379,6 +387,7 @@ const addRecord = (event) => {
             console.log("Se grabo");
             enableCategories();
             resetFeedback();
+            refreshMoveBalance(recordBuffer.accTo, recordBuffer.accFrom, recordBuffer.amount);
             document.getElementById("form-add-reg").reset();
           }else{
             console.error("No se grabo");
@@ -494,8 +503,8 @@ const validateAmount = async (amt, account, type, iduser) => {
 
   if(moveFlag){
     accTo = await read('account',account,iduser);
-    if(accTo.length == 1){
-      if(parseFloat(accTo[0].balance) < amtInt){
+    if(accTo != null){
+      if(parseFloat(accTo.balance) < amtInt){
         return "Sin fondos"
       }
     }else{
@@ -513,7 +522,7 @@ const validateAccount = async (accValue,iduser) => {
   
   
   let res = await read('account', accValue, iduser);
-    if(res.length == 1){
+    if(res != null){
       return true;
     }else{
       return "Cuenta no existe";
@@ -528,8 +537,8 @@ const validateMove = async (accValue, accToValue,iduser) => {
 
   acc = await read('account',accValue,iduser);
   accTo = await read('account',accToValue,iduser);
-  if(acc.length == 1 && accTo.length == 1){
-    if(acc[0].currency != accTo[0].currency){
+  if(acc != null && accTo != null){
+    if(acc.currency != accTo.currency){
       return "Diferentes monedas"
     }else{
         return true;
@@ -547,32 +556,53 @@ const validateMove = async (accValue, accToValue,iduser) => {
 //   savingAccountElement.innerText = newValue;
 // };
 
-const refreshBalances = (recordBuffer) => {
-  //hacer desde check data para handlear que funcion usar
-  //let cashElement = document.getElementById("cash-value");
-  recordBuffer.amount = parseInt(recordBuffer.amount);
-  let pAccountBalance;
+const refreshMoveBalance =  async (accTo, accFrom, amount) => {
+  
   let balanceContainer = document.getElementById("balance");
-  let balance = balanceContainer.innerText;
-  balance = parseInt(balance);
-  let acc;
-  //solo sirve si el name de la cuenta es unico, despues manejar con ID o
-  //teniendo el objeto entero una vez sacado del option.
-  //refactor con find?
-  for (acc of accounts) {
-    if (recordBuffer.accTo === acc.name) {
-      acc.balance += recordBuffer.amount;
-      balance += recordBuffer.amount;
-    } else if (recordBuffer.accFrom === acc.name) {
-      acc.balance -= recordBuffer.amount;
-      balance -= recordBuffer.amount;
+  let balance = parseFloat(balanceContainer.innerHTML);
+  amount = parseFloat(amount)
+  if(accTo != null ){
+    let accToBuffer = await read('account',accTo, 1);
+    
+    let pAccountBalance = document.getElementById("acc-balance-p-id" + accToBuffer.id);
+    pAccountBalance.innerText = accToBuffer.balance.toFixed(1);
+
+    if(accToBuffer.currency == "ARS"){
+      console.log(balance)
+      console.log(accToBuffer.balance)
+      balance = balance + amount;
+      console.log(balance)
+
+    }else if (accToBuffer.currency == "USD"){
+      balance = balance + amount * ARS_USD;
     }
-    pAccountBalance = document.getElementById(acc.name);
-    pAccountBalance.innerText = acc.balance;
-    balanceContainer.innerText = balance;
+
+    balanceContainer.innerText = balance.toFixed(1);
+
   }
-  //busco el p del scrolling pill con el id de la cuenta (ojo)
+
+  if(accFrom != null){
+
+      let accFromBuffer = await read('account',accFrom, 1)
+      let balanceContainer = document.getElementById("balance");
+      let balance = parseFloat(balanceContainer.innerHTML);
+      let pAccountBalance = document.getElementById("acc-balance-p-id" + accFromBuffer.id);
+
+      pAccountBalance.innerText = accFromBuffer.balance.toFixed(1);
+
+      if(accFromBuffer.currency == "ARS"){
+        balance = balance - amount;
+      }else if (accFromBuffer.currency == "USD"){
+        balance = balance - amount * ARS_USD;
+      }
+
+      balanceContainer.innerText = balance.toFixed(1);
+  } 
+    
+    
+    
 };
+
 
 const reloadTable = (recordBuffer) => {
   //arreglar esto para no repetir codigo. Si hay categoria, mostrarla, sino no.
