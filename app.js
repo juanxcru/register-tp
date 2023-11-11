@@ -672,7 +672,7 @@ const handleSaveObjModal = async (event) => {
   let testObj = {
     name : nombreObjetivoValue,
     amount: montoObjetivoValue,
-    id_user: 1,
+    iduser: 1,
     //currency
   };
 

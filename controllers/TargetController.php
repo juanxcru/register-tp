@@ -3,13 +3,19 @@
 class TargetController {
 
 
-private function saveTarget($data) {
+public function saveTarget($data) {
 
   require "../conf/conn_mysql.php";
 
-    // $query = "INSERT INTO targets($data['name'], ) VALUES()";
-    $query = 'INSERT INTO targets(name,amount,currency) VALUES("proyector",20,"ARS")';
+    $query = 'INSERT INTO targets(name,amount,id_user) VALUES(?,?,?)';
+
     $consulta = $conn->prepare($query);
+
+    $consulta->bindParam(1, $data['name'], PDO::PARAM_STR);
+    $consulta->bindParam(2, $data['amount'], PDO::PARAM_STR);
+    $consulta->bindParam(3, $data['iduser'], PDO::PARAM_INT);
+    // $consulta->bindParam(4, $data['currency'], PDO::PARAM_STR);
+
 
     if($consulta->execute()){
       return true;
