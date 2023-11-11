@@ -681,27 +681,17 @@ const handleSaveObjModal = async (event) => {
   "/controllers/entryPoint.php?type=target";
 
   try {
-    console.log('si')
     const response = await fetch(full, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(testObj)
-      
     });
-      
-    if (response.ok) {
-      console.log('ok')
-    } else {
-      console.log('no')
-    }
   } catch (error) { 
-    return false;
+    alert('ERROR: ', error.message)
   }
-
-  console.log('1', nombreObjetivoValue)
-  console.log('2', montoObjetivoValue)
+  objModal.hide();
 };
 
 //-------------------------------------------
