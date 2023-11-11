@@ -34,35 +34,30 @@ private function refreshBalance($accTo, $accFrom, $amount) : bool {
 
   require "../conf/conn_mysql.php";
 
-    
-    $query = "UPDATE accounts SET balance = ((SELECT balance FROM accounts WHERE id = ?) "; // + ? ) WHERE id = ? 
 
-    if ($accTo !== NULL) {
-        $query .= "+ ?";
-    } else if ($accFrom !== NULL) {
-        $query .= "- ?";
-    } else {
-        return false;
-    }
-
-    $query .= ") WHERE id = ?";
-    $consulta = $conn->prepare($query);
-
-    if ($accTo !== NULL) {
-        $consulta->bindParam(1, $accTo, PDO::PARAM_INT);
-        $consulta->bindParam(2, $amount, PDO::PARAM_STR);
-        $consulta->bindParam(3, $accTo, PDO::PARAM_INT);
-    } else if ($accFrom !== NULL) {
-        $consulta->bindParam(1, $accFrom, PDO::PARAM_INT);
-        $consulta->bindParam(2, $amount, PDO::PARAM_STR);
-        $consulta->bindParam(3, $accFrom, PDO::PARAM_INT);
-    }
-
-    if($consulta->execute()){
-      return true;
-    }else{
+  if ($accTo === null && $accFrom === null) {
       return false;
-    }
+  }
+
+  $stringTo = "UPDATE accounts SET balance = (SELECT balance FROM accounts WHERE id = ?) WHERE id = ?";
+  $stringFrom = "UPDATE accounts SET balance = (SELECT balance FROM accounts WHERE id = ?) WHERE id = ?";
+
+  $consultaTo = $conn->prepare($stringTo);
+  $consultaFrom = $conn->prepare($stringFrom);
+
+  if ($accTo !== null) {
+      $consultaTo->bindParam(1, $amount, PDO::PARAM_STR);
+      $consultaTo->bindParam(2, $accTo, PDO::PARAM_INT);
+      $consultaTo->execute();
+  }
+
+  if ($accFrom !== null) {
+      $consultaFrom->bindParam(1, $amount, PDO::PARAM_STR);
+      $consultaFrom->bindParam(2, $accFrom, PDO::PARAM_INT);
+      $consultaFrom->execute();
+  }
+
+  return true;
 
     
   }

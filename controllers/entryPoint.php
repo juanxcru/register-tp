@@ -36,8 +36,6 @@
     case 'POST':
       if($_GET['type'] == 'register'){
 
-        // print('post' . $_POST['type']);
-        // echo 'get' . $_GET['type'];
 
         $data = json_decode(file_get_contents('php://input'), true);
         
@@ -49,6 +47,7 @@
         $data = json_decode(file_get_contents('php://input'), true);
         
         echo $targetController->saveTarget($data); 
+        break;
       }
       
 
