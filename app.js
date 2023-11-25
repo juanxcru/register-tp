@@ -3,15 +3,12 @@
 const backendServer = "http://localhost/TP-LAB-PROG/register-tp";
 const ARS_USD = 1000;
 
-const begin = () => {
-  testConn()
-    .then((message) => {
-      console.log("Conectado:", message);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+const begin = async () => {
+  let aut = await checkPermission();
 
+  if ( aut === true){
+
+  
   loadAccounts(); // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
   // loadTargets();
   // loadReminders();
@@ -76,8 +73,34 @@ const begin = () => {
   document
     .getElementById("type")
     .addEventListener("change", handleAccountToFrom);
+  }else if(aut === "login"){
+
+    location.assign("http://localhost/TP-LAB-PROG/register-tp/registrarse.html");
+
+  }else if(aut === false){
+
+    location.assign("http://localhost/TP-LAB-PROG/register-tp/login.html");
+
+  }
 
 };
+
+
+const checkPermission = async () => {
+
+  let res = await fetch(backendServer + "/controllers/entryPoint.php?role=user");
+
+  let resjson =  await res.json();
+
+
+  return false;
+  
+
+
+}
+
+
+
 
 const testConn = async () => {
   try {
