@@ -26,6 +26,7 @@ const checkLogin = async (event) => {
 
       if(resjson.exito){
         console.log(resjson.mensaje);
+        location.assign("http://localhost/TP-LAB-PROG/register-tp/app.html")
       }else{
         console.log(resjson.mensaje)
       }
