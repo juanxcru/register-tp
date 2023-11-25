@@ -6,7 +6,7 @@ const begin = () => {
 }
 
 const checkRegister = (event) => {
-    //event.preventDefault();
+    event.preventDefault();
     let nombre = document.getElementById('nombre').value;
     let apellido = document.getElementById('apellido').value;
     let email = document.getElementById('emailRegistro').value;

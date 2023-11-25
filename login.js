@@ -3,11 +3,31 @@ const begin = () => {
     document.getElementById('btn-login').addEventListener('click', checkLogin);
 }
 
-const checkLogin = (event) => {
+const checkLogin = async (event) => {
     event.preventDefault();
-    let email = document.getElementById('email').value;
-    let password = document.getElementById('password').value;
-    (email && password) ? console.log(email) : console.log('Debe completar los campos')   
+   
+    
+    
+    let obj = {
+        email : document.getElementById('email').value,
+        password : document.getElementById('password').value
+    }
+
+    let res = await fetch("http://localhost/TP-LAB-PROG/register-tp/controllers/login.php",{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(obj)
+        
+      });
+
+      if (!res.ok){
+        console.log("error")
+      }
+
+
+
 }
 
 

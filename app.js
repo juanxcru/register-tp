@@ -1,39 +1,5 @@
-let accountBuffer = [];
 
-let record = [
-  {
-    type: "Income",
-    date: "10-10-2023",
-    amount: 100,
-    category: "",
-    accFrom: "",
-    accTo: "Savings",
-  },
-  {
-    type: "Income",
-    date: "10-10-2023",
-    amount: 200,
-    category: "",
-    accFrom: "",
-    accTo: "Cheking",
-  },
-  {
-    type: "Income",
-    date: "10-10-2023",
-    amount: 300,
-    category: "",
-    accFrom: "",
-    accTo: "Ahorros USD",
-  },
-  {
-    type: "Income",
-    date: "10-10-2023",
-    amount: 400,
-    category: "",
-    accFrom: "",
-    accTo: "Ahorros ARS",
-  },
-];
+
 const backendServer = "http://localhost/TP-LAB-PROG/register-tp";
 const ARS_USD = 1000;
 

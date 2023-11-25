@@ -1,6 +1,5 @@
 <?php
 
-   // todo ok con el origen del liveserver 
   require_once 'AccountController.php';
   require_once 'RegController.php';
   require_once 'TargetController.php';
