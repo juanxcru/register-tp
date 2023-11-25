@@ -13,7 +13,7 @@ const checkLogin = async (event) => {
         password : document.getElementById('password').value
     }
 
-    let res = await fetch("http://localhost/TP-LAB-PROG/register-tp/controllers/login.php",{
+    let res = await fetch("http://localhost/TP-LAB-PROG/register-tp/services/login.php",{
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,8 +22,12 @@ const checkLogin = async (event) => {
         
       });
 
-      if (!res.ok){
-        console.log("error")
+      let resjson = await res.json();
+
+      if(resjson.exito){
+        console.log(resjson.mensaje);
+      }else{
+        console.log(resjson.mensaje)
       }
 
 

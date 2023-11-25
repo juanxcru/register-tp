@@ -14,6 +14,9 @@
   
   switch ($typeReq){
     case 'GET':
+      if(isset($_GET['login']) && $_GET['login'] == 'success'){
+        
+      }
       if( $_GET['type'] == 'account' && $_GET['id'] == 'all'){
         $data = $accController->readAll($_GET['iduser']);
 
@@ -29,7 +32,7 @@
           $jsonData = json_encode($data);
           header('Content-Type: application/json');
           echo $jsonData;
-
+          break;
       }
       break;
     case 'POST':
