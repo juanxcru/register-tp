@@ -8,6 +8,7 @@ const checkRegister = (nombre, apellido, email, password) => {
     
    
     return (nombre && apellido && email && password)
+    //invalids feedback
     
 }
 
@@ -37,8 +38,9 @@ const sendForm = async (event) => {
       let resjson = await res.json();
 
       if(resjson.exito){
-        console.log(resjson.mensaje);
+        location.assign("http://localhost/TP-LAB-PROG/register-tp/login.html");
       }else{
+        //invalids feedback
         console.log(resjson.mensaje)
       }
 
