@@ -10,7 +10,7 @@ const begin = async () => {
 
   
   loadAccounts(); // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
-  // loadTargets();
+  loadTargets();
   // loadReminders();
 
 
@@ -258,22 +258,93 @@ const loadAccounts = () => {
   });
 };
 
-// const loadTargets = () => {
+const loadTargets = async () => {
 
-//   read("target", "all", "1").then((accountsBuffer) => {
-//     //hay que traer el id usuario, lo dehjamos en la session?
-//     for (let acc of accountsBuffer) {
-//       //cargamos el drop del modal
-//       let opt = document.createElement("option");
-//       opt.value = acc.id; //alambre pero sirve: en el value dejamos el id de la cuenta. 
-//       opt.appendChild(document.createTextNode(acc.name));
-//       accountToContainer.appendChild(opt.cloneNode(true));
-//       accountContainer.appendChild(opt);
-//     }
-//     //se cargan las pills
-//     loadBalance(accountsBuffer);
-//   });
-// };
+  let divTargets = document.getElementById("objetivos")
+
+  await read("target", "all", "1").then((targetsBuffer) => {
+
+    console.log(targetsBuffer)
+
+    for (let target of targetsBuffer) {
+      let targetDiv = document.getElementById("objetivos")
+
+      let rowDiv = document.createElement("div")
+      rowDiv.classList.add("row")
+      rowDiv.style.padding = "15px"
+      rowDiv.style.borderTop = "1px solid white";
+      rowDiv.style.borderBottom = "1px solid white";
+      rowDiv.style.textAlign = "center"
+
+      let nameDiv = document.createElement("div")
+      nameDiv.classList.add("col-md-4")
+
+      let amountDiv = document.createElement("div")
+      amountDiv.classList.add("col-md-4")
+
+      let deleteDiv = document.createElement("div");
+      deleteDiv.classList.add("col-md-4");
+
+      let deleteButton = document.createElement("button");
+      let deleteButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+      let path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      let path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      
+      deleteButton.style.backgroundColor = "white";
+      deleteButton.style.width = "40px";
+      deleteButton.style.height = "40px";
+      deleteButton.style.borderRadius = "50px"
+      
+      deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      deleteButtonIcon.setAttribute("width", "16");
+      deleteButtonIcon.setAttribute("height", "16");
+      deleteButtonIcon.setAttribute("fill", "currentColor");
+      deleteButtonIcon.setAttribute("class", "bi bi-trash");
+      deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
+      
+      path1.setAttribute("d", "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z");
+      path2.setAttribute("d", "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z");
+      
+      deleteButtonIcon.appendChild(path1);
+      deleteButtonIcon.appendChild(path2);
+      
+      deleteButton.appendChild(deleteButtonIcon);
+      deleteDiv.appendChild(deleteButton);
+      deleteDiv.appendChild(deleteButton)
+
+      //ver si ahorros usd es mas alto que algun target
+
+      let ahorrosUsdElement = document.getElementById("acc-balance-p-id5")
+      let ahorrosUsdValue = ahorrosUsdElement.textContent
+
+      let tgName = document.createElement("p");
+      tgName.appendChild(document.createTextNode(target.name));
+
+      let tgAmount = document.createElement("p");
+      tgAmount.appendChild(document.createTextNode(target.amount));
+
+      if(target.amount > ahorrosUsdValue){
+        tgName.style.color = "green"
+        tgAmount.style.color = "green"
+      } else {
+        tgName.style.color = "red"
+        tgAmount.style.color = "red"
+      }
+
+      nameDiv.appendChild(tgName)
+      amountDiv.appendChild(tgAmount)
+
+      rowDiv.appendChild(nameDiv)
+      rowDiv.appendChild(amountDiv)
+      rowDiv.appendChild(deleteDiv)
+
+      targetDiv.appendChild(rowDiv)
+
+    }
+    
+  });
+};
 
 
 // const loadReminders = () => {

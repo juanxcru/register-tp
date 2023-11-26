@@ -467,8 +467,9 @@
     <div class="col-md-12" style="padding: 20px; background-color: #bcccdc">
       <div
         class="col-md-12"
+       
         style="margin-top: 25px; height: 776px; padding: 20px"
-      >
+      > <!-- ARREGLAR ACA, ARRIBA ERA HEIGHT: 776PX -->
         <div
           class="row justify-content-center"
           style="
@@ -484,8 +485,8 @@
         >
           <div class="pill-div col-2" >
             <p class="pill-p-title">New Account</p>
-            <div role="button" data-bs-toggle="modal" data-bs-target="#modal-add-acc" class="account-balance-div text-white bg-dark">
-            <p class="account-balance-p text-center">Add</p>
+            <div role="button" data-bs-toggle="modal" data-bs-target="#modal-add-acc" class="account-balance-div text-white bg-dark" style="min-width: 200px;" >
+            <p class="account-balance-p text-center" >Add</p>
             </div>  
           </div>
       
@@ -523,24 +524,34 @@
                   </svg>
                 </button>
               </div>
-  
-              <div
-                id="objetivos"
-                class="row bg-dark text-white d-none "
-                style="padding: 25px; border-radius: 20px; margin-right: 20px;"
-              >
-                <div class="col-12">
-                  <p>Objetivo 1</p>
-                </div>
-                <div class="col-12">
-                  <p>Objetivo 2</p>
-                </div>
-                <div class="col-12">
-                  <p>Objetivo 3</p>
+              <div class="col-12">
+                <div
+                  id="objetivos"
+                  class="row bg-dark text-white d-none"
+                  style=" border-radius: 20px; padding: 15px; justify-content: space-around; align-items: center;"
+                >
+                  <!-- <div class="row text-center" style="color: rgb(19, 174, 19); font-weight: bolder;">
+                    <div id="targetName" class="col-md-6">
+                      <p>Un objetivo</p>
+                    </div>
+                    <div id="targetAmount" class="col-md-6">
+                      <p>$1200</p>
+                    </div>
+                  </div> -->
                 </div>
               </div>
+              
             <!-- </div> -->
           </div>
+                            <!-- <div class="col-12">
+                    <p>Objetivo 1</p>
+                  </div>
+                  <div class="col-12">
+                    <p>Objetivo 2</p>
+                  </div>
+                  <div class="col-12">
+                    <p>Objetivo 3</p>
+                  </div> -->
 <!-- ---------------------------- Cuadrante 2-->
           <div
             class="col-4"
@@ -636,13 +647,14 @@
 
       </div>
         <!-- ----------------------------CAT------------------ -->
-        <div class="row" style="height: 42.5%">
+        <div id="tablita" class="row" style="height: 42.5%">
           <!-- <div class="col-4" style="border: 2px solid red;"></div>
                 <div class="col-4" style="border: 2px solid blue;"></div>
                 <div class="col-4" style="border: 2px solid green;"></div> -->
           <div
+            id="tablita2"
             class="container"
-            style="height: 80%; margin-top: 50px; overflow: scroll"
+            style="height: 80%; margin-top: 30px; overflow: scroll"
           >
             <table
               class="table table-responsive table-hover"

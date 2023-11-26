@@ -85,6 +85,15 @@
           echo $jsonData;
           break;
       }
+      if($_GET['type'] == 'target' & $_GET['id'] == 'all'){
+        $data = $targetController->readAll($_GET['iduser']);
+
+        $jsonData = json_encode($data);
+        header('Content-Type: application/json');
+        echo $jsonData;
+        break;
+      }
+      
       break;
     case 'POST':
       if($_GET['type'] == 'register'){
