@@ -170,7 +170,7 @@ const loadBalance = (accounts) => {
   balanceContainer.innerHTML = balance.toFixed(1);
 };
 
-const read = async (type, id, iduser) => {
+const read = async (type, id) => {
   /*
   Esperamos         type    ='account'  -->  cuentas
                             ='reg'      -->  registers
@@ -186,28 +186,35 @@ const read = async (type, id, iduser) => {
   const params = new URLSearchParams();
   params.append("type", type);
   params.append("id", id);
-  params.append("iduser", iduser);
   const queryString = params.toString();
 
   const full =
     backendServer +
     "/controllers/entryPoint.php/" +
     (queryString ? `?${queryString}` : "");
-  // backend/?type=tipo&id=all&iduser=21
+  // backend/?type=tipo&id=all
   try {
     const response = await fetch(full);
 
-    if (response.ok) {
+    if (response.status == 200) {
 
       const data = await response.json();
-
       return data;
-    } else {
+
+    } else if (response.status == 401){
+
+      console.log("Unauthorized")
+
+    }else if(response.status == 403){
+
+      console.log("Unlogged")
+
+    }
+    else {
       throw new Error("Error");
     }
   } catch (error) {
     console.error("Error: ", error);
-    throw error;
   }
 };
 
@@ -243,8 +250,8 @@ const loadAccounts = () => {
   let accountContainer = document.getElementById("account");
   let accountToContainer = document.getElementById("account-to");
 
-  read("account", "all", "1").then((accountsBuffer) => {
-    //hay que traer el id usuario, lo dehjamos en la session?
+  read("account", "all").then((accountsBuffer) => {
+
     for (let acc of accountsBuffer) {
       //cargamos el drop del modal
       let opt = document.createElement("option");
@@ -260,7 +267,7 @@ const loadAccounts = () => {
 
 const loadTargets = () => {
 
-  read("target", "all", "1").then((targetsBuffer) => {
+  read("target", "all").then((targetsBuffer) => {
 
     console.log(targetsBuffer)
 
@@ -433,7 +440,6 @@ let formateoMysql = milisLocal.toISOString().slice(0, 19).replace('T', ' ');
 
 
   let recordBuffer = {
-    iduser: 1, 
     type: "",
     regDate: formateoMysql,
     amount: 0,
@@ -483,25 +489,23 @@ const checkData = async (event, recordBuffer) => {
   let accToText = accToValueContainer.options[accToValueContainer.selectedIndex].text;
   let accText = accValueContainer.options[accValueContainer.selectedIndex].text;
 
-  let iduser = 1;
-
 
   let isValidType = validateField(moveType);
   messageValidation(moveTypeContainer, moveTypeFeedback, isValidType);
 
   let isValidAccount;
 
-  isValidAccount = await validateAccount(accValue,iduser);
+  isValidAccount = await validateAccount(accValue);
   messageValidation(accValueContainer, accFeedback, isValidAccount);
   if (moveType === "Move") {
-    isValidAccount = await validateAccount(accToValue, iduser);
+    isValidAccount = await validateAccount(accToValue);
     if (isValidAccount === true) {
-      isValidAccount = await validateMove(accValue, accToValue,iduser);
+      isValidAccount = await validateMove(accValue, accToValue);
     }
     messageValidation(accToValueContainer, accToFeedback, isValidAccount);
   }
 
-  let isValidAmount = await validateAmount(enteredAmount, accValue, moveType, iduser);
+  let isValidAmount = await validateAmount(enteredAmount, accValue, moveType);
 
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
 
@@ -553,7 +557,7 @@ const validateField = (field) => {
   return true;
 };
 
-const validateAmount = async (amt, account, type, iduser) => {
+const validateAmount = async (amt, account, type) => {
   let amtInt = parseFloat(amt);
   let moveFlag = type === "Spent" || type === "Move" ? true : false;
 
@@ -566,7 +570,7 @@ const validateAmount = async (amt, account, type, iduser) => {
   }
 
   if(moveFlag){
-    accTo = await read('account',account,iduser);
+    accTo = await read('account',account);
     if(accTo != null){
       if(parseFloat(accTo.balance) < amtInt){
         return "Sin fondos"
@@ -582,10 +586,10 @@ const validateAmount = async (amt, account, type, iduser) => {
 };
 
 
-const validateAccount = async (accValue,iduser) => {
+const validateAccount = async (accValue) => {
   
   
-  let res = await read('account', accValue, iduser);
+  let res = await read('account', accValue);
     if(res != null){
       return true;
     }else{
@@ -596,11 +600,11 @@ const validateAccount = async (accValue,iduser) => {
 
 };
 
-const validateMove = async (accValue, accToValue,iduser) => {
+const validateMove = async (accValue, accToValue) => {
   if (accValue === accToValue) return "Cuenta to igual a cuenta from";
 
-  acc = await read('account',accValue,iduser);
-  accTo = await read('account',accToValue,iduser);
+  acc = await read('account',accValue);
+  accTo = await read('account',accToValue);
   if(acc != null && accTo != null){
     if(acc.currency != accTo.currency){
       return "Diferentes monedas"
@@ -626,7 +630,7 @@ const refreshMoveBalance =  async (accTo, accFrom, amount) => {
   let balance = parseFloat(balanceContainer.innerHTML);
   amount = parseFloat(amount)
   if(accTo != null ){
-    let accToBuffer = await read('account',accTo, 1);
+    let accToBuffer = await read('account',accTo);
     
     let pAccountBalance = document.getElementById("acc-balance-p-id" + accToBuffer.id);
     pAccountBalance.innerText = accToBuffer.balance.toFixed(1);
@@ -647,7 +651,7 @@ const refreshMoveBalance =  async (accTo, accFrom, amount) => {
 
   if(accFrom != null){
 
-      let accFromBuffer = await read('account',accFrom, 1)
+      let accFromBuffer = await read('account',accFrom)
       let balanceContainer = document.getElementById("balance");
       let balance = parseFloat(balanceContainer.innerHTML);
       let pAccountBalance = document.getElementById("acc-balance-p-id" + accFromBuffer.id);

@@ -2,12 +2,12 @@
 
 class RegController {
 
-public function save($data){
+public function save($data, $idUser){
 
   require_once "../conf/conn_mysql.php";
 
 
-  if($this->refreshBalance($data['accTo'], $data['accFrom'], $data['amount'], $data['iduser'])){
+  if($this->refreshBalance($data['accTo'], $data['accFrom'], $data['amount'], $idUser)){
 
     $consulta = $conn->prepare("CALL insert_rec_segun_type(?, ?, ?, ?, ?, ?,?)");
 
@@ -17,7 +17,7 @@ public function save($data){
     $consulta->bindParam(4, $data['regDate'], PDO::PARAM_STR);
     $consulta->bindParam(5, $data['amount'], PDO::PARAM_STR);
     $consulta->bindParam(6, $data['category'], PDO::PARAM_STR);
-    $consulta->bindParam(7, $data['iduser'], PDO::PARAM_INT);
+    $consulta->bindParam(7, $idUser, PDO::PARAM_INT);
 
     
     if($consulta->execute()){

@@ -17,8 +17,8 @@
   
   switch ($typeReq){
     case 'GET':
-      if(isset($_GET['role'])){ 
-        // quiere decir que estamos consultando permisos 
+      if(isset($_GET['role'])){ // quiere decir que estamos consultando permisos 
+        
         // en donde quiera que este, consulto con el rol que debiera tener (los permisos son fijos x rol x usuario)
         
         //traigo el rol del usuario
@@ -34,10 +34,10 @@
           
           if($_GET['role'] != $role){
             //header('Location: http://localhost/TP-LAB-PROG/register-tp/index.html');
-            $mensaje = "Usuario sin permiso" . " role " . $role . " role get " . $_GET['role'] . $_SESSION['user_id'];
+             
             $respuesta = [
              "exito" => false,
-             "mensaje" => $mensaje
+             "mensaje" => "Usuario sin permiso"
             ];
     
             http_response_code(200);
@@ -68,42 +68,136 @@
 
           break; 
       }
-      if( $_GET['type'] == 'account' && $_GET['id'] == 'all'){
-        $data = $accController->readAll($_GET['iduser']);
+      if($_GET['type'] == 'account' && $_GET['id'] == 'all'){ // leer todas las cuentas
+        
+        if (isset($_SESSION['user_id'])){
+        
+          if($permissionController->tienePermiso('ver cuenta', $_SESSION['user_id'])){
 
-        $jsonData = json_encode($data);
-        header('Content-Type: application/json');
-        echo $jsonData;
-        break;
+            $data = $accController->readAll($_SESSION['user_id']);
+            
+            $jsonData = json_encode($data);
+            header('Content-Type: application/json');
+            http_response_code(200);
+            echo $jsonData;
+            break;
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
 
-      }
-      if($_GET['type'] == 'account'){
-          $data = $accController->readOneById($_GET['id'],$_GET['iduser']);
-
-          $jsonData = json_encode($data);
-          header('Content-Type: application/json');
-          echo $jsonData;
+        }else{
+          $respuesta = [
+            "exito" => false,
+            "mensaje" => "Unlogged"
+          ];
+          http_response_code(403);
+          echo json_encode($respuesta);
           break;
+        }
       }
-      if($_GET['type'] == 'target' & $_GET['id'] == 'all'){
-        $data = $targetController->readAll($_GET['iduser']);
+      if($_GET['type'] == 'account'){ // cuenta por id
 
-        $jsonData = json_encode($data);
-        header('Content-Type: application/json');
-        echo $jsonData;
+        if (isset($_SESSION['user_id'])){
+          if($permissionController->tienePermiso('ver cuenta', $_SESSION['user_id'])){
+            
+            $data = $accController->readOneById($_GET['id'],$_SESSION['user_id']);
+
+            $jsonData = json_encode($data);
+            header('Content-Type: application/json');
+            echo $jsonData;
+              
+            break;
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unlogged"
+        ];
+        http_response_code(403);
+        echo json_encode($respuesta);
         break;
       }
-      
+      }
+      if($_GET['type'] == 'target' & $_GET['id'] == 'all'){ // objetivos todos
+        if (isset($_SESSION['user_id'])){
+          if($permissionController->tienePermiso('ver objetivo', $_SESSION['user_id'])){
+            
+            $data = $targetController->readAll($_SESSION['user_id']);
+
+            $jsonData = json_encode($data);
+            header('Content-Type: application/json');
+            http_response_code(200);
+            echo $jsonData;
+            break;
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unlogged"
+        ];
+        http_response_code(403);
+        echo json_encode($respuesta);
+        break;
+      }
+
+
+
+
+
+
+
+      }
       break;
     case 'POST':
       if($_GET['type'] == 'register'){
-
-
-        $data = json_decode(file_get_contents('php://input'), true);
-        
-        echo $regController->save($data);
-        break; 
+        if (isset($_SESSION['user_id'])){
+          if($permissionController->tienePermiso('crear registro', $_SESSION['user_id'])) {
+            
+            $data = json_decode(file_get_contents('php://input'), true);
+            http_response_code(200);
+            echo $regController->save($data, $_SESSION['user_id'] );
+            break; 
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+        }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unlogged"
+        ];
+        http_response_code(403);
+        echo json_encode($respuesta);
+        break;
       }
+    }
 
       if($_GET['type'] == 'target'){
         $data = json_decode(file_get_contents('php://input'), true);
