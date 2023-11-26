@@ -91,10 +91,16 @@ const checkPermission = async () => {
   let res = await fetch(backendServer + "/controllers/entryPoint.php?role=user");
 
   let resjson =  await res.json();
-
-
-  return false;
   
+  console.log(resjson);
+  
+  if(resjson.mensaje == "login"){
+    return "login"
+  }else if(resjson.exito){
+    return true;
+  }else{
+    return false;
+  }
 
 
 }
