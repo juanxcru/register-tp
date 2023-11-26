@@ -258,11 +258,9 @@ const loadAccounts = () => {
   });
 };
 
-const loadTargets = async () => {
+const loadTargets = () => {
 
-  let divTargets = document.getElementById("objetivos")
-
-  await read("target", "all", "1").then((targetsBuffer) => {
+  read("target", "all", "1").then((targetsBuffer) => {
 
     console.log(targetsBuffer)
 
