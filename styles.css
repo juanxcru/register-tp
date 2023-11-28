@@ -80,6 +80,10 @@ justify-self: center;
 justify-items: center;
 text-justify: center; */
 
+#balance-scroll{
+  overflow-y: auto;
+  max-height: 100px;
+}
 
 #balance-scroll::-webkit-scrollbar {
   display: none;

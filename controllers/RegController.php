@@ -4,7 +4,7 @@ class RegController {
 
 public function save($data, $idUser){
 
-  require_once "../conf/conn_mysql.php";
+  require "../conf/conn_mysql.php";
 
 
   if($this->refreshBalance($data['accTo'], $data['accFrom'], $data['amount'], $idUser)){

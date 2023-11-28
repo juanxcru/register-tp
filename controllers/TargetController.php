@@ -6,7 +6,7 @@ class TargetController {
   public function readAll($id){
 
     
-    require_once "../conf/conn_mysql.php";
+    require "../conf/conn_mysql.php";
 
     //ver relacion con user : cuentas de un usuario tabla accounts + id de user?
     $consulta = $conn->prepare("SELECT * FROM targets WHERE id_user = :id");

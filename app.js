@@ -195,6 +195,7 @@ const read = async (type, id) => {
   // backend/?type=tipo&id=all
   try {
     const response = await fetch(full);
+    console.log('res', response)
 
     if (response.status == 200) {
 
@@ -269,7 +270,7 @@ const loadTargets = () => {
 
   read("target", "all").then((targetsBuffer) => {
 
-    console.log(targetsBuffer)
+    console.log('asd',targetsBuffer)
 
     for (let target of targetsBuffer) {
       let targetDiv = document.getElementById("objetivos")
@@ -320,7 +321,7 @@ const loadTargets = () => {
 
       //ver si ahorros usd es mas alto que algun target
 
-      let ahorrosUsdElement = document.getElementById("acc-balance-p-id5")
+      let ahorrosUsdElement = document.getElementById("acc-balance-p-id12")
       let ahorrosUsdValue = ahorrosUsdElement.textContent
 
       let tgName = document.createElement("p");
