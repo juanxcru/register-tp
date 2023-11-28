@@ -22,7 +22,7 @@ class AccountController {
   public function readOneById($id,$iduser){
 
     
-    require_once "../conf/conn_mysql.php";
+    require "../conf/conn_mysql.php";
 
      $consulta = $conn->prepare("SELECT * FROM accounts WHERE id_user = :iduser AND id = :id");
      $consulta->bindParam(':iduser', $iduser);
