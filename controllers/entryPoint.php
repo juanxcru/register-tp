@@ -13,6 +13,7 @@
   $permissionController = new PermissionController();
   
   $typeReq  = $_SERVER['REQUEST_METHOD'];
+  header('Content-Type: application/json');
 
   
   switch ($typeReq){
@@ -30,7 +31,7 @@
           // (todos los usuarios del mismo rol tienen los mismos permisos.)
           // entonces, si es de determinado rol, tiene determinados permisos.
           
-          $role = $permissionController->getRoleIdByidUser($_SESSION['user_id']);
+          $role = $permissionController->getRoleNameIdByidUser($_SESSION['user_id']);
           
           if($_GET['role'] != $role){
             //header('Location: http://localhost/TP-LAB-PROG/register-tp/index.html');
@@ -70,14 +71,15 @@
       }
       if($_GET['type'] == 'account' && $_GET['id'] == 'all'){ // leer todas las cuentas
         
-        if (isset($_SESSION['user_id'])){
-        
-          if($permissionController->tienePermiso('ver cuenta', $_SESSION['user_id'])){
 
-            $data = $accController->readAll($_SESSION['user_id']);
+        if (isset($_SESSION['user_id'])){
+
+          if($permissionController->tienePermiso('ver cuenta', $_SESSION['user_id'])){
             
+           
+            $data = $accController->readAll($_SESSION['user_id']);
+
             $jsonData = json_encode($data);
-            header('Content-Type: application/json');
             http_response_code(200);
             echo $jsonData;
             break;

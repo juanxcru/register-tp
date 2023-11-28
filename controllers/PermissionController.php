@@ -5,7 +5,87 @@ class PermissionController{
 
     public function getRoleIdByidUser($idUsuario)
     {
-        require_once "../conf/conn_mysql.php";
+        require "../conf/conn_mysql.php";
+
+        $sql = "
+            SELECT 
+                roles.id
+            FROM 
+                roles
+            INNER JOIN
+                roles_usuarios
+                    ON
+                        roles_usuarios.id_role = roles.id
+            WHERE 
+                roles_usuarios.id_user= :idUsuario;
+        ";
+    
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':idUsuario', $idUsuario);
+    
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if(isset($result['id'])){
+            return $result['id'];
+        }else{
+            return null;
+        }
+    }
+
+
+    public function getPermisosById($idUsuario)
+{
+    $idRol = $this->getRoleIdByidUser($idUsuario);
+    
+    require "../conf/conn_mysql.php";
+
+
+    $sql = "
+        SELECT 
+            permisos.permiso
+        FROM 
+            permisos
+        INNER JOIN
+            roles_permisos
+                ON
+                    roles_permisos.id_permiso = permisos.id
+        WHERE 
+            roles_permisos.id_role = :idRol;
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindValue(':idRol', $idRol); 
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $permisos = [];
+
+    foreach ($result as $row) {
+        $permisos[] = $row['permiso'];
+    }
+
+    return $permisos;
+
+}
+
+
+    public function tienePermiso($permiso, $idUsuario){
+
+    $permisosUsuario = $this->getPermisosById($idUsuario); // Obtiene los permisos del usuario
+
+    foreach ($permisosUsuario as $p) {
+        if ($p === $permiso) {
+            return true;
+        }
+    }
+
+    return false;
+    }
+
+
+    public function getRoleNameIdByidUser($idUsuario){
+
+        require "../conf/conn_mysql.php";
 
         $sql = "
             SELECT 
@@ -31,53 +111,8 @@ class PermissionController{
         }else{
             return null;
         }
+
     }
-
-
-    public function getPermisosById($idUsuario)
-{
-    $idRol = $this->getRoleIdByidUser($idUsuario);
-    require_once "../conf/conn_mysql.php";
-
-
-    $sql = "
-        SELECT 
-            permisos.permiso
-        FROM 
-            permisos
-        INNER JOIN
-            roles_permisos
-                ON
-                    roles_permisos.id_permiso = permisos.id
-        WHERE 
-            roles_permisos.id_role = :idRol;
-    ";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->bindValue(':idRol', $idRol); 
-
-    $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    return $result;
-}
-
-
-    public function tienePermiso($permiso, $idUsuario){
-
-    $permisosUsuario = $this->getPermisosById($idUsuario); // Obtiene los permisos del usuario
-
-    foreach ($permisosUsuario as $p) {
-        if ($p['permiso'] === $permiso) {
-            return true;
-        }
-    }
-
-    return false;
-    }
-
-
-
     
     
 
