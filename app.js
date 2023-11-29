@@ -158,13 +158,13 @@ const loadBalance = (accounts) => {
   let balanceContainer = document.getElementById("balance");
   let balance = 0;
   for (let acc of accounts) {
-    //hacerlo bien
-    if (acc.currency == "USD") {
+    //hacerlo bien X2
+    if (acc.currency.toUpperCase() == "USD") {
       balance = balance + acc.balance * ARS_USD;
-    } else if (acc.currency == "ARS") {
+    } else if (acc.currency.toUpperCase() == "ARS") {
       balance += acc.balance;
     }
-    //hacerlo bien
+    //hacerlo bien X2
   }
 
   balanceContainer.innerHTML = balance.toFixed(1);

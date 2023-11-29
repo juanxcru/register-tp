@@ -6,13 +6,13 @@
     <title>ADM GASTOS</title>
     <link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script  defer src="./registrarse.js"></script>
+    <script defer src="./registrarse.js"></script>
 </head>
 <body class="pt-5">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top mb-4">
         <div class="container-fluid">
-          <a class="navbar-brand" href="registrarse.html">Resgistrarse</a>
+          <a class="navbar-brand" href="registrarse.html">Registrarse</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -24,40 +24,39 @@
             </div>
           </div>
         </div>
-      </nav>
-    
-    <div class="container mt-5">
+    </nav>
+
+    <div class="container mt-5" style="min-height: 78vh;">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-4">
                 <div class="card">
                     <div class="card-header bg-dark text-white">
                         Registrarse
                     </div>
-                    <div class="card-body" >
+                    <div class="card-body">
                         <form id="formularioRegistro" novalidate>
                             <div class="form-group mb-3">
                                 <label for="nombre" class="form-label">Nombre</label>
                                 <input type="text" class="form-control" id="nombre" placeholder="Ingresa tu nombre" required>
-                                <div id="nombreFeedback" class="invalid-feedback">
+                                <div id="nombreFeedback" class="invalid-feedback"></div>
                             </div>
                             <div class="form-group mb-3">
                                 <label for="apellido" class="form-label">Apellido</label>
                                 <input type="text" class="form-control" id="apellido" placeholder="Ingresa tu apellido" required>
-                                <div id="apellidoFeedback" class="invalid-feedback">
+                                <div id="apellidoFeedback" class="invalid-feedback"></div>
                             </div>
                             <div class="form-group mb-3">
                                 <label for="email" class="form-label">Correo Electrónico</label>
                                 <input type="email" class="form-control" id="emailRegistro"  placeholder="Ingresa tu correo" required>
-                                <div id="emailFeedback" class="invalid-feedback">
+                                <div id="emailFeedback" class="invalid-feedback"></div>
                             </div>
                             <div class="form-group mb-3">
                                 <label for="password" class="form-label">Contraseña</label>
                                 <input type="password" class="form-control" id="passwordRegistro" placeholder="Elige una contraseña" required>
-                                <div id="passwordFeedback" class="invalid-feedback">
+                                <div id="passwordFeedback" class="invalid-feedback"></div>
                             </div>
-                            <div class="d-grid gap-2"> 
-                            <button id="btn-registrarse" type="submit" class="btn btn-dark">Registrarse</button>
-
+                            <div class="d-grid gap-2">
+                                <button id="btn-registrarse" type="submit" class="btn btn-dark">Registrarse</button>
                             </div>
                         </form>
                     </div>
@@ -65,11 +64,12 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Footer fuera del formulario -->
     <footer class="bg-dark text-white text-center py-3 mt-5">
         <p>&copy; 2023 Made with love by Juancho & Ale </p>
     </footer>
-        
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 </body>
 </html>
