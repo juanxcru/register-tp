@@ -12,7 +12,7 @@ class TargetController {
     $consulta = $conn->prepare("SELECT * FROM targets WHERE id_user = :id");
     $consulta->bindParam(':id', $id);
     $consulta->execute();
-
+  
     $data = $consulta->fetchAll(PDO::FETCH_ASSOC);
 
     return $data;

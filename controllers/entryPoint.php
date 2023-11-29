@@ -69,7 +69,7 @@
 
           break; 
       }
-      if($_GET['type'] == 'account' && $_GET['id'] == 'all'){ // leer todas las cuentas
+      if(isset($_GET['type']) && $_GET['type'] == 'account' && $_GET['id'] == 'all'){ // leer todas las cuentas
         
 
         if (isset($_SESSION['user_id'])){
@@ -103,7 +103,7 @@
           break;
         }
       }
-      if($_GET['type'] == 'account'){ // cuenta por id
+      if(isset($_GET['type']) && $_GET['type'] == 'account'){ // cuenta por id
 
         if (isset($_SESSION['user_id'])){
           if($permissionController->tienePermiso('ver cuenta', $_SESSION['user_id'])){
@@ -134,7 +134,7 @@
         break;
       }
       }
-      if($_GET['type'] == 'target' & $_GET['id'] == 'all'){ // objetivos todos
+      if(isset($_GET['type']) && $_GET['type'] == 'target' & $_GET['id'] == 'all'){ // objetivos todos
         if (isset($_SESSION['user_id'])){
           if($permissionController->tienePermiso('ver objetivo', $_SESSION['user_id'])){
             
@@ -173,14 +173,28 @@
       }
       break;
     case 'POST':
-      if($_GET['type'] == 'register'){
+      if(isset($_GET['type']) && $_GET['type'] == 'register'){
         if (isset($_SESSION['user_id'])){
           if($permissionController->tienePermiso('crear registro', $_SESSION['user_id'])) {
             
             $data = json_decode(file_get_contents('php://input'), true);
-            http_response_code(200);
-            echo $regController->save($data, $_SESSION['user_id'] );
-            break; 
+
+            if($regController->save($data, $_SESSION['user_id'] )){
+              $respuesta = [
+                "exito" => true,
+                "mensaje" => "Save OK"
+              ];
+              http_response_code(200);
+              echo json_encode($respuesta);
+              break; 
+            }else{
+              $respuesta = [
+                "exito" => false,
+                "mensaje" => "BBDD error"
+              ];
+              http_response_code(500);
+              echo json_encode($respuesta);
+            }
           }else{
             $respuesta = [
               "exito" => false,
@@ -199,11 +213,45 @@
         echo json_encode($respuesta);
         break;
       }
-    }
-
-      if($_GET['type'] == 'target'){
-        $data = json_decode(file_get_contents('php://input'), true);
+      }
+      if (isset($_GET['type']) && $_GET['type'] == 'account'){
+        if (isset($_SESSION['user_id'])){
+          if($permissionController->tienePermiso('crear cuenta', $_SESSION['user_id'])) {
+            $data = json_decode(file_get_contents('php://input'), true);
+            if($accController->save($data)){
+              $respuesta = [
+                "exito" => true,
+                "mensaje" => "Save OK"
+              ];
+              http_response_code(200);
+              echo json_encode($respuesta);
+        }else{
+          $respuesta = [
+            "exito" => false,
+            "mensaje" => "BBDD error"
+          ];
+          http_response_code(500);
+          echo json_encode($respuesta);
+        }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unauthorized"
+        ];
+        http_response_code(401);
+        echo json_encode($respuesta);
         
+      }
+    }else{
+      $respuesta = [
+        "exito" => false,
+        "mensaje" => "Unlogged"
+      ];
+      http_response_code(403);
+      echo json_encode($respuesta);
+    }}
+      if(isset($_GET['type']) && $_GET['type'] == 'target'){
+        $data = json_decode(file_get_contents('php://input'), true);
         echo $targetController->saveTarget($data); 
         break;
       }
