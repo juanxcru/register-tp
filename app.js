@@ -148,7 +148,7 @@ const loadBalance = (accounts) => {
     pBalance.classList.add("account-balance-p", "text-center");
     //ojo aca: ID en html == acc.id
     pBalance.setAttribute("id", "acc-balance-p-id" + acc.id);
-    pBalance.append(acc.balance.toFixed(1));
+    pBalance.append(acc.balance.toFixed(0));
 
     divAccountBalance.appendChild(pBalance);
     divPill.appendChild(divAccountBalance);
@@ -167,7 +167,7 @@ const loadBalance = (accounts) => {
     //hacerlo bien X2
   }
 
-  balanceContainer.innerHTML = balance.toFixed(1);
+  balanceContainer.innerHTML = balance.toFixed(0);
 };
 
 const read = async (type, id) => {
@@ -628,13 +628,13 @@ const validateMove = async (accValue, accToValue) => {
 const refreshMoveBalance =  async (accTo, accFrom, amount) => {
   
   let balanceContainer = document.getElementById("balance");
-  let balance = parseFloat(balanceContainer.innerHTML);
-  amount = parseFloat(amount)
+  let balance = parseInt(balanceContainer.innerHTML);
+  amount = parseInt(amount)
   if(accTo != null ){
     let accToBuffer = await read('account',accTo);
     
     let pAccountBalance = document.getElementById("acc-balance-p-id" + accToBuffer.id);
-    pAccountBalance.innerText = accToBuffer.balance.toFixed(1);
+    pAccountBalance.innerText = accToBuffer.balance.toFixed(0);
 
     if(accToBuffer.currency == "ARS"){
       console.log(balance)
@@ -646,7 +646,7 @@ const refreshMoveBalance =  async (accTo, accFrom, amount) => {
       balance = balance + amount * ARS_USD;
     }
 
-    balanceContainer.innerText = balance.toFixed(1);
+    balanceContainer.innerText = balance.toFixed(0);
 
   }
 
@@ -657,7 +657,7 @@ const refreshMoveBalance =  async (accTo, accFrom, amount) => {
       let balance = parseFloat(balanceContainer.innerHTML);
       let pAccountBalance = document.getElementById("acc-balance-p-id" + accFromBuffer.id);
 
-      pAccountBalance.innerText = accFromBuffer.balance.toFixed(1);
+      pAccountBalance.innerText = accFromBuffer.balance.toFixed(0);
 
       if(accFromBuffer.currency == "ARS"){
         balance = balance - amount;
@@ -665,7 +665,7 @@ const refreshMoveBalance =  async (accTo, accFrom, amount) => {
         balance = balance - amount * ARS_USD;
       }
 
-      balanceContainer.innerText = balance.toFixed(1);
+      balanceContainer.innerText = balance.toFixed(0);
   } 
     
     
