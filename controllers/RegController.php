@@ -41,6 +41,22 @@ public function save($data, $idUser){
 
 }
 
+public function readAllFromAllUsers(){
+
+  require "../conf/conn_mysql.php";
+
+     $consulta = $conn->prepare("SELECT type, amount FROM reg");
+
+     $consulta->execute();
+
+    $data = $consulta->fetchAll(PDO::FETCH_ASSOC);
+
+    return $data; 
+}
+
+
+
+
 private function refreshBalance($accTo, $accFrom, $amount, $iduser) : bool {
 
   require "../conf/conn_mysql.php";

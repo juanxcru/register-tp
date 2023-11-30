@@ -6,8 +6,6 @@ const begin = () => {
 const checkLogin = async (event) => {
     event.preventDefault();
    
-    console.log('ASD')
-    
     
     let obj = {
         email : document.getElementById('email').value,
@@ -25,8 +23,6 @@ const checkLogin = async (event) => {
       });
 
       let resjson = await res.json();
-
-      console.log('rej',resjson)
 
       resjson.role == 'admin' ? location.assign("http://localhost/TP-LAB-PROG/register-tp/estadisticas.html") : location.assign("http://localhost/TP-LAB-PROG/register-tp/app.html")
 

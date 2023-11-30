@@ -15,7 +15,7 @@ const begin = async () => {
     targetsLoaded = await loadTargets();
   } // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
   // loadReminders();
-  loadStats();
+  // loadStats();
   document
     .getElementById("btn-save-acc-modal")
     .addEventListener("click", addAccount);
@@ -461,9 +461,6 @@ const loadRegisters =  () => {
     }
   }
   });
-
-
-
 
 };
 
@@ -1009,20 +1006,17 @@ const resetFeedback = () => {
   }
 };
 
-const loadStats = () => {
-  read("stats", "all").then((regsBuffer) => {
-    console.log(regsBuffer)
-    if(!regsBuffer){
-      console.log("No hay registros para el usuario")
-    }else if (regsBuffer.mensaje){
-      alert(regsBuffer.mensaje)
-    }else{ 
-      console.log(regsBuffer)
-    }
-  });
-
-
-
-}
+// const loadStats = () => {
+//   read("stats", "all").then((regsBuffer) => {
+//     console.log(regsBuffer)
+//     if(!regsBuffer){
+//       console.log("No hay registros para el usuario")
+//     }else if (regsBuffer.mensaje){
+//       alert(regsBuffer.mensaje)
+//     }else{ 
+//       console.log(regsBuffer)
+//     }
+//   });
+// }
 
 window.onload = begin;
