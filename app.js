@@ -346,7 +346,7 @@ const insertAccount = (acc) => {
 
 const loadTargets = async () => {
 
-  await read("target", "all").then((targetsBuffer) => {
+ read("target", "all").then((targetsBuffer) => {
 
     console.log(targetsBuffer);
     if(!targetsBuffer){
@@ -438,7 +438,7 @@ const loadTargets = async () => {
       targetDiv.appendChild(rowDiv)
     }
     
-  });
+  }});
   return true
 
 };
