@@ -8,9 +8,11 @@ const begin = async () => {
 
   if ( aut === true){
 
-  
-  loadAccounts(); // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
-  loadTargets();
+  let targetsLoaded;
+  let accountsLoaded = await loadAccounts();
+  if(accountsLoaded){
+    targetsLoaded = await loadTargets();
+  } // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
   // loadReminders();
   document
     .getElementById("btn-save-acc-modal")
@@ -66,6 +68,12 @@ const begin = async () => {
   document
     .getElementById("btn-save-obj-modal")
     .addEventListener("click", handleSaveObjModal);
+
+  if(targetsLoaded){
+  document.getElementById("btn-target").addEventListener("click", handleDeleteTarget)
+  }
+
+
 
   // document
   //   .getElementById("btn-close-recordatorio-modal")
@@ -289,9 +297,9 @@ const save = async (obj, type) => {
 };
 
 
-const loadAccounts = () => {
+const loadAccounts = async () => {
   
-  read("account", "all").then((accountsBuffer) => {
+  await read("account", "all").then((accountsBuffer) => {
 
     for (let acc of accountsBuffer) {
       //cargamos el drop del modal
@@ -302,6 +310,7 @@ const loadAccounts = () => {
     
 
   });
+  return true
 };
 
 const insertAccount = (acc) => {
@@ -319,11 +328,10 @@ const insertAccount = (acc) => {
       loadBalance(acc);
   }
 
-const loadTargets = () => {
+const loadTargets = async () => {
 
-  read("target", "all").then((targetsBuffer) => {
+  await read("target", "all").then((targetsBuffer) => {
 
-    console.log(targetsBuffer);
     for (let target of targetsBuffer) {
       let targetDiv = document.getElementById("objetivos")
 
@@ -333,6 +341,8 @@ const loadTargets = () => {
       rowDiv.style.borderTop = "1px solid white";
       rowDiv.style.borderBottom = "1px solid white";
       rowDiv.style.textAlign = "center"
+      rowDiv.setAttribute('id', `target-${targetsBuffer.indexOf(target)}`)
+      rowDiv.setAttribute('key', target.id)
 
       let nameDiv = document.createElement("div")
       nameDiv.classList.add("col-md-4")
@@ -344,6 +354,10 @@ const loadTargets = () => {
       deleteDiv.classList.add("col-md-4");
 
       let deleteButton = document.createElement("button");
+      // deleteButton.setAttribute('id',`btn-target-${targetsBuffer.indexOf(target)}`)
+      deleteButton.setAttribute("id", "btn-target");
+
+
       let deleteButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
       let path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -398,10 +412,11 @@ const loadTargets = () => {
       rowDiv.appendChild(deleteDiv)
 
       targetDiv.appendChild(rowDiv)
-
     }
     
   });
+  return true
+
 };
 
 
@@ -842,6 +857,31 @@ const handleSaveObjModal = async (event) => {
   }
   objModal.hide();
 };
+
+const handleDeleteTarget = async (event) => {
+  event.preventDefault()
+  //Hacer validacion de campos vacios
+  let elementToDelete = event.target
+  let deleteTarget = elementToDelete.parentNode.parentNode
+  let keyToDelete = deleteTarget.getAttribute('key')
+
+  const full =`${backendServer}/controllers/entryPoint.php?type=target&id=${keyToDelete}`;
+
+  try {
+    console.log('entre')
+    const response = await fetch(full,{
+      method: "DELETE",
+    });
+    console.log('res',response)
+    if (response.ok) {
+      console.log('Target deleted successfully');
+    } else {
+      console.error('Failed to delete target:', response.status, response.statusText);
+    }
+  } catch (error) {
+    alert('ERROR: ', error.message)
+  }
+}
 
 //-------------------------------------------
 
