@@ -380,8 +380,15 @@
         echo json_encode($respuesta);
         break;
       }
-      break;
+      
       }
-  }
+  
+    case 'PUT':
+      if(isset($_GET['type']) && $_GET['type'] == "register"){
+        
+      }
+    }
+
+
   ?>
     

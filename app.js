@@ -9,7 +9,7 @@ const begin = async () => {
   if ( aut === true){
 
   let targetsLoaded;
-  loadRegisters();
+  let regLoaded = await loadRegisters();
   let accountsLoaded = await loadAccounts();
   if(accountsLoaded){
     targetsLoaded = await loadTargets();
@@ -24,7 +24,11 @@ const begin = async () => {
   document
     .getElementById("btn-save-modal")
     .addEventListener("click", addRecord);
-
+  console.log(regLoaded)
+  if(regLoaded){
+    document.getElementById("table-reg").addEventListener('click', editDeleteReg);
+    
+  }
   
   document
     .getElementById("div-categoria")
@@ -71,8 +75,7 @@ const begin = async () => {
     .addEventListener("click", handleSaveObjModal);
 
   if(targetsLoaded){
-    console.log('entre')
-  document.getElementById("btn-target").addEventListener("click", handleDeleteTarget)
+    document.getElementById("btn-target").addEventListener("click", handleDeleteTarget)
   }
 
 
@@ -218,8 +221,88 @@ const loadBalance = (acc) => {
   balanceContainer.innerText = balance.toFixed(0);
 };
 
+const editDeleteReg = async (event) => {
+
+  const targetBtn = event.target;
+  if (targetBtn.classList.contains('edit-btn')) {
+    const regId = targetBtn.dataset.id;
+    editReg(regId)
+  } else if (targetBtn.classList.contains('delete-btn')) {
+    const regId = targetBtn.dataset.id;
+    deleteReg(regId)
+  }
+   
+};
+
+const editReg = async (id) => {
+
+  let moveTypeContainer = document.getElementById("type");
+  let accValueContainer = document.getElementById("account");
+  let accToValueContainer = document.getElementById("account-to");
+  let enteredAmountInput = document.getElementById("amount");
+  
+  
+  
+  const recordInfo = await read("register",id);
+  
+  let selectedCategory = document.getElementById(recordInfo.category);
+  selectedCategory.classList.add("pressed");
+  moveTypeContainer.value = recordInfo.type;
+  enteredAmountInput.value = recordInfo.amount;
+  console.log(recordInfo.id_acc_to)
+
+  if((recordInfo.id_acc_to) && (recordInfo.id_acc_from) ){ // move
+    for (let i = 0; i < accToValueContainer.options.length; i++) {
+      if (accToValueContainer.options[i].value == recordInfo.id_acc_to) {
+        accToValueContainer.options[i].selected = true;
+        
+        break; 
+      }
+  }
+    for (let i = 0; i < accValueContainer.options.length; i++) {
+      if (accValueContainer.options[i].value == recordInfo.id_acc_from) {
+        accValueContainer.options[i].selected = true;
+        break; 
+      }
+
+  }}else if(recordInfo.id_acc_to){ // income
+    for (let i = 0; i < accValueContainer.options.length; i++) {
+      if (accValueContainer.options[i].value == recordInfo.id_acc_to) {
+        accValueContainer.options[i].selected = true;
+        break; 
+      }
+  }}else{ // spent
+    for (let i = 0; i < accValueContainer.options.length; i++) {
+      if (accValueContainer.options[i].value == recordInfo.id_acc_from) {
+        accValueContainer.options[i].selected = true;
+        break; 
+      }
+  }
+  }
+  
+  handleAccountToFrom(); 
 
 
+  const modal = new bootstrap.Modal(document.getElementById('modal-add-reg'));
+  modal.show();
+
+  let res = await checkData(recordInfo);
+
+  if(res){
+    
+  }
+
+  // // Agregar un evento al botón "Save" dentro del modal para llamar a la función de actualización
+  // document.getElementById('btn-save-modal').addEventListener('click', () => {
+  //   // Lógica para enviar la actualización a la base de datos usando 'recordId' y los valores de los campos del modal
+  //   updateRecordInDB(recordId, /* valores de los campos del modal */); // Implementa esta función de actualización
+  // });
+}
+
+
+const deleteReg = async (id) => {
+
+}
 
 
 const read = async (type, id) => {
@@ -407,7 +490,6 @@ const insertAccount = (acc) => {
   
           deleteButton.appendChild(deleteButtonIcon);
           deleteDiv.appendChild(deleteButton);
-          deleteDiv.appendChild(deleteButton);
   
           //ver si ahorros usd es más alto que algún target
   
@@ -446,25 +528,26 @@ const insertAccount = (acc) => {
   };
   
 
-const loadRegisters =  () => {
-
-  read("register", "all").then((regsBuffer) => {
-    console.log(regsBuffer)
-    if(!regsBuffer){
-      console.log("No hay registros para el usuario")
-    }else if (regsBuffer.mensaje){
-      alert(regsBuffer.mensaje)
-    }else{ 
-    for (let reg of regsBuffer) {
-      reloadTable(reg);
+  const loadRegisters = async () => {
+    try {
+      const regsBuffer = await read("register", "all");
+      console.log(regsBuffer);
+  
+      if (!regsBuffer) {
+        console.log("No hay registros para el usuario");
+      } else if (regsBuffer.mensaje) {
+        alert(regsBuffer.mensaje);
+      } else {
+        for (let reg of regsBuffer) {
+          reloadTable(reg);
+        }
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
     }
-  }
-  });
-
-
-
-
-};
+  };
+  
 
 // const loadReminders = () => {
 
@@ -487,10 +570,10 @@ const loadRegisters =  () => {
 //-----------------------------LOAD FIRST TIME---------------------
 
 
-const handleAccountToFrom = (event) => {
+const handleAccountToFrom = () => {
   let accountToDiv = document.getElementById("account-to-div");
-
-  let type = event.target.value;
+  let type = document.getElementById("type").value;
+  console.log(type)
 
   if (type === "Move") {
     if (accountToDiv.classList.contains("d-none")) {
@@ -543,7 +626,7 @@ const disableCategories = () => {
 
 const addRecord = async (event) => {
   event.preventDefault();
-
+  console.log(event.target);
 //fecha
   let fecha = new Date();
   let fechaSegundosIso = new Date((new Date(fecha)).toISOString() );
@@ -590,7 +673,7 @@ const addRecord = async (event) => {
   }
 }
 
-const checkData = async (event, recordBuffer) => {
+const checkData = async (recordBuffer) => {
   let selectedCategory = document.querySelector(".pressed");
   let moveTypeContainer = document.getElementById("type");
   let moveTypeFeedback = document.getElementById("typeFeedback");
@@ -838,7 +921,6 @@ const reloadTable = async (recordBuffer) => {
     let accFrom = await read("account",recordBuffer.id_acc_from);
     accFromName = accFrom.name;
    }
-
     row.innerHTML = `
     <th>${table.rows.length}</th>
     <td>${recordBuffer.reg_date}</td>
@@ -847,9 +929,9 @@ const reloadTable = async (recordBuffer) => {
     <td>${accToName}</td>
     <td>${accFromName}</td>
     <td>${recordBuffer.category}</td>
-    <td><button class="btn btn-outline-dark text-white "><i class="fas fa-pencil-alt"></i>
+    <td><button class="btn btn-dark text-white edit-btn" data-id="${recordBuffer.id}" > Edit
     </button>
-    <button class="btn btn-outline-danger text-white "><i class="fas fa-pencil-alt"></i>
+    <button class="btn btn-danger text-white delete-btn" data-id="${recordBuffer.id}" > Delete
     </button></td>`;
   
   table.querySelector("tbody").append(row);
