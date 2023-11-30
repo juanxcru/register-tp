@@ -20,13 +20,22 @@ public function save($data, $idUser){
     $consulta->bindParam(7, $idUser, PDO::PARAM_INT);
 
     
-    if($consulta->execute()){
-      return "OK";
-    }else{
-      return "NO OK";
+    try{
+
+      $consulta->execute();
+      // uso last insert id que me devuleve el id de la ultima insercion 
+      // como uso el sp, no me funciona el metodo de pdo
+     
+      $consulta = $conn->prepare("SELECT LAST_INSERT_ID() AS id");
+      $consulta->execute();       
+      $res = $consulta->fetch(PDO::FETCH_ASSOC);
+      $id = $res["id"];
+      return $id;
+    }catch(Exception $e){
+      return false;
     }
   }else{
-    return "NO OK REFRESH";
+    return false;
   }
 
 
@@ -69,6 +78,36 @@ private function refreshBalance($accTo, $accFrom, $amount, $iduser) : bool {
     
   }
 
+
+public function readOneById($id, $iduser){
+
+  require "../conf/conn_mysql.php";
+
+     $consulta = $conn->prepare("SELECT * FROM reg WHERE id_user_reg = :iduser AND id = :id");
+     $consulta->bindParam(':iduser', $iduser);
+     $consulta->bindParam(':id', $id);
+
+    $consulta->execute();
+
+    $data = $consulta->fetch(PDO::FETCH_ASSOC);
+
+    return $data; 
+}
+
+
+public function readAll($iduser){
+
+  require "../conf/conn_mysql.php";
+
+     $consulta = $conn->prepare("SELECT * FROM reg WHERE id_user_reg = :iduser");
+     $consulta->bindParam(':iduser', $iduser);
+
+     $consulta->execute();
+
+    $data = $consulta->fetchAll(PDO::FETCH_ASSOC);
+
+    return $data; 
+}
 
 }
       

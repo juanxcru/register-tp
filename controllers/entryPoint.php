@@ -68,8 +68,8 @@
         }
 
           break; 
-      }
-      if(isset($_GET['type']) && $_GET['type'] == 'account' && $_GET['id'] == 'all'){ // leer todas las cuentas
+      }else
+      if(isset($_GET['type']) && $_GET['type'] == 'account' && isset($_GET['id']) && $_GET['id'] == 'all'){ // leer todas las cuentas
         
 
         if (isset($_SESSION['user_id'])){
@@ -102,8 +102,8 @@
           echo json_encode($respuesta);
           break;
         }
-      }
-      if(isset($_GET['type']) && $_GET['type'] == 'account'){ // cuenta por id
+      }else
+      if(isset($_GET['type']) && $_GET['type'] == 'account' && isset($_GET['id'])){ // cuenta por id
 
         if (isset($_SESSION['user_id'])){
           if($permissionController->tienePermiso('ver cuenta', $_SESSION['user_id'])){
@@ -133,8 +133,8 @@
         echo json_encode($respuesta);
         break;
       }
-      }
-      if(isset($_GET['type']) && $_GET['type'] == 'target' & $_GET['id'] == 'all'){ // objetivos todos
+      }else
+      if(isset($_GET['type']) && $_GET['type'] == 'target'  && isset($_GET['id']) && $_GET['id'] == 'all'){ // objetivos todos
         if (isset($_SESSION['user_id'])){
           if($permissionController->tienePermiso('ver objetivo', $_SESSION['user_id'])){
             
@@ -165,24 +165,83 @@
       }
 
 
+      }else
+      if(isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id']) && $_GET['id'] == 'all' ){ // leer todos los registros
+        if (isset($_SESSION['user_id'])){
+          if($permissionController->tienePermiso('ver registro', $_SESSION['user_id'])){
+            
+            $data = $regController->readAll($_SESSION['user_id']);
 
+            $jsonData = json_encode($data);
+            header('Content-Type: application/json');
+            echo $jsonData;
+              
+            break;
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unlogged"
+        ];
+        http_response_code(403);
+        echo json_encode($respuesta);
+        break;
+      }
+      }else
+      if(isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id'])){ // register por id
+        if (isset($_SESSION['user_id'])){
+          if($permissionController->tienePermiso('ver registro', $_SESSION['user_id'])){
+            
+            $data = $regController->readOneById($_GET['id'],$_SESSION['user_id']);
 
-
-
-
+            $jsonData = json_encode($data);
+            header('Content-Type: application/json');
+            echo $jsonData;
+              
+            break;
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unlogged"
+        ];
+        http_response_code(403);
+        echo json_encode($respuesta);
+        break;
+      }
+        
       }
       break;
     case 'POST':
       if(isset($_GET['type']) && $_GET['type'] == 'register'){
+        
         if (isset($_SESSION['user_id'])){
           if($permissionController->tienePermiso('crear registro', $_SESSION['user_id'])) {
             
             $data = json_decode(file_get_contents('php://input'), true);
-
-            if($regController->save($data, $_SESSION['user_id'] )){
+            
+            $resu = $regController->save($data, $_SESSION['user_id'] );
+            if($resu){
               $respuesta = [
                 "exito" => true,
-                "mensaje" => "Save OK"
+                "mensaje" => "Save OK",
+                "id" => $resu
               ];
               http_response_code(200);
               echo json_encode($respuesta);
