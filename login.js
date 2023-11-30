@@ -7,11 +7,11 @@ const checkLogin = async (event) => {
     event.preventDefault();
    
     
-    
     let obj = {
         email : document.getElementById('email').value,
         password : document.getElementById('password').value
     }
+
 
     let res = await fetch("http://localhost/TP-LAB-PROG/register-tp/services/login.php",{
         method: "POST",
@@ -24,12 +24,14 @@ const checkLogin = async (event) => {
 
       let resjson = await res.json();
 
-      if(resjson.exito){
-        console.log(resjson.mensaje);
-        location.assign("http://localhost/TP-LAB-PROG/register-tp/app.html")
-      }else{
-        console.log(resjson.mensaje)
-      }
+      resjson.role == 'admin' ? location.assign("http://localhost/TP-LAB-PROG/register-tp/estadisticas.html") : location.assign("http://localhost/TP-LAB-PROG/register-tp/app.html")
+
+      // if(resjson.exito){
+      //   console.log(resjson.mensaje);
+      //   location.assign("http://localhost/TP-LAB-PROG/register-tp/app.html")
+      // }else{
+      //   console.log(resjson.mensaje)
+      // }
 
 
 

@@ -1,11 +1,14 @@
 <?php
 
 require_once "../conf/conn_mysql.php";
+require_once "../controllers/PermissionController.php";
 header("Content-Type: application/json");
 
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+  $permissionController = new PermissionController();
 
   $objData = json_decode(file_get_contents('php://input'), true);
 
@@ -24,11 +27,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['name'] = $user['lastname'];
         $_SESSION['lastname'] = $user['lastname'];
+
+        $role = $permissionController->getRoleNameIdByidUser($_SESSION['user_id']);
           
         $respuesta = [
           "exito" => true,
           "mensaje" => "Login OK",
-      ];
+          "role" => $role,
+        ];
+
       http_response_code(200);
 
       echo json_encode($respuesta);

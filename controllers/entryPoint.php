@@ -196,6 +196,37 @@
         break;
       }
       }else
+      if(isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id']) && $_GET['id'] == 'adm' ){ // leer todos los registros ADMIN
+        if (isset($_SESSION['name']) && $_SESSION['name'] == 'admin'){
+          if($permissionController->tienePermiso('ver registro', $_SESSION['user_id'])){
+            
+            $data = $regController->readAllFromAllUsers();
+
+            $jsonData = json_encode($data);
+            header('Content-Type: application/json');
+            echo $jsonData;
+              
+            break;
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unlogged"
+        ];
+        http_response_code(403);
+        echo json_encode($respuesta);
+        break;
+      }
+      break;
+      }else
       if(isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id'])){ // register por id
         if (isset($_SESSION['user_id'])){
           if($permissionController->tienePermiso('ver registro', $_SESSION['user_id'])){
@@ -225,8 +256,8 @@
         echo json_encode($respuesta);
         break;
       }
-        
-      }
+      } 
+
       break;
     case 'POST':
       if(isset($_GET['type']) && $_GET['type'] == 'register'){
