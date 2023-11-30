@@ -10,7 +10,7 @@ const begin = async () => {
 
   
   loadAccounts(); // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
-  //loadTargets();
+  loadTargets();
   // loadReminders();
   document
     .getElementById("btn-save-acc-modal")
@@ -323,7 +323,7 @@ const loadTargets = () => {
 
   read("target", "all").then((targetsBuffer) => {
 
-
+    console.log(targetsBuffer);
     for (let target of targetsBuffer) {
       let targetDiv = document.getElementById("objetivos")
 
