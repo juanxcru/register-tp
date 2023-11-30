@@ -216,47 +216,82 @@
       }
       if (isset($_GET['type']) && $_GET['type'] == 'account'){
         if (isset($_SESSION['user_id'])){
-          if($permissionController->tienePermiso('crear cuenta', $_SESSION['user_id'])) {
+          if($permissionController->tienePermiso('crear cuenta', $_SESSION['user_id'])) { 
             $data = json_decode(file_get_contents('php://input'), true);
-            if($accController->save($data)){
+            $resu = $accController->save($data, $_SESSION['user_id']);
+            if($resu){
+              $respuesta = [
+                "exito" => true,
+                "mensaje" => "Save OK",
+                "id" => $resu
+              ];
+              http_response_code(200);
+              echo json_encode($respuesta);
+            }else{
+              $respuesta = [
+                "exito" => false,
+                "mensaje" => "BBDD error"
+              ];
+              http_response_code(500);
+              echo json_encode($respuesta);
+            }
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            
+          }
+        }else{
+          $respuesta = [
+            "exito" => false,
+            "mensaje" => "Unlogged"
+          ];
+          http_response_code(403);
+          echo json_encode($respuesta);
+        }
+      }
+      if(isset($_GET['type']) && $_GET['type'] == 'target'){
+        if (isset($_SESSION['user_id'])){
+          if($permissionController->tienePermiso('crear objetivo', $_SESSION['user_id'])) {
+            $data = json_decode(file_get_contents('php://input'), true);
+            if($targetController->saveTarget($data, $_SESSION['user_id'])){
               $respuesta = [
                 "exito" => true,
                 "mensaje" => "Save OK"
               ];
               http_response_code(200);
               echo json_encode($respuesta);
+            }else{
+              $respuesta = [
+                "exito" => false,
+                "mensaje" => "BBDD error"
+              ];
+              http_response_code(500);
+              echo json_encode($respuesta);
+            }
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+          }
         }else{
           $respuesta = [
             "exito" => false,
-            "mensaje" => "BBDD error"
+            "mensaje" => "Unlogged"
           ];
-          http_response_code(500);
+          http_response_code(403);
           echo json_encode($respuesta);
         }
-      }else{
-        $respuesta = [
-          "exito" => false,
-          "mensaje" => "Unauthorized"
-        ];
-        http_response_code(401);
-        echo json_encode($respuesta);
-        
-      }
-    }else{
-      $respuesta = [
-        "exito" => false,
-        "mensaje" => "Unlogged"
-      ];
-      http_response_code(403);
-      echo json_encode($respuesta);
-    }}
-      if(isset($_GET['type']) && $_GET['type'] == 'target'){
-        $data = json_decode(file_get_contents('php://input'), true);
-        echo $targetController->saveTarget($data); 
         break;
       }
       
-
+    
 
   }
 

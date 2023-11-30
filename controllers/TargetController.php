@@ -19,7 +19,7 @@ class TargetController {
 
   }
 
-  public function saveTarget($data) {
+  public function saveTarget($data, $idUser) {
 
     require "../conf/conn_mysql.php";
 
@@ -29,13 +29,14 @@ class TargetController {
 
       $consulta->bindParam(1, $data['name'], PDO::PARAM_STR);
       $consulta->bindParam(2, $data['amount'], PDO::PARAM_STR);
-      $consulta->bindParam(3, $data['iduser'], PDO::PARAM_INT);
+      $consulta->bindParam(3, $idUser, PDO::PARAM_INT);
       // $consulta->bindParam(4, $data['currency'], PDO::PARAM_STR);
 
 
-      if($consulta->execute()){
+      try{
+        $consulta->execute();
         return true;
-      }else{
+      }catch(Exception $e){
         return false;
       }
       

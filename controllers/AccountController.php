@@ -32,32 +32,35 @@ class AccountController {
 
     $data = $consulta->fetch(PDO::FETCH_ASSOC);
 
-    return $data;
+    return $data; 
 
   }
 
-  public function save($data){
+  public function save($data, $idUser){
     
     require "../conf/conn_mysql.php";
+    $crcy = "ARS";
+    
+    $consulta = $conn->prepare("INSERT INTO accounts (name, description, currency, balance, id_user) VALUES (?, ?, ?, ?, ?);");
+    
+    $consulta->bindParam(1, $data['name'],PDO::PARAM_STR);
+    $consulta->bindParam(2, $data['description'],PDO::PARAM_STR);
+    $consulta->bindParam(3, $crcy ,PDO::PARAM_STR);
+    $consulta->bindParam(4, $data['balance'],PDO::PARAM_STR);
+    $consulta->bindParam(5, $idUser,PDO::PARAM_INT);
 
-    $consulta = $conn->prepare("INSERT INTO accounts (name, description, currency, balance, id_user) VALUES (?,?,?,?,?");
-    $consulta->bindParam(1, $data['name']);
-    $consulta->bindParam(2, $data['description']);
-    $consulta->bindParam(3, "ARS");
-    $consulta->bindParam(4, $data['balance']);
-    $consulta->bindParam(5, $_SESSION['id_user']);
 
     try{
+
       $consulta->execute();
-      return true;
+      // uso last insert id que me devuleve el id de la ultima insercion 
+     
+      $id = $conn->lastInsertId();
+
+      return $id;
     }catch(Exception $e){
       return false;
     }
-
-  
-
-    
-
 
   }
 

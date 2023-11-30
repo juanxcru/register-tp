@@ -10,16 +10,19 @@ const begin = async () => {
 
   
   loadAccounts(); // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
-  loadTargets();
+  //loadTargets();
   // loadReminders();
-
-
+  document
+    .getElementById("btn-save-acc-modal")
+    .addEventListener("click", addAccount);
   document
     .getElementById("btn-close-modal")
     .addEventListener("click", closeModal);
   document
     .getElementById("btn-save-modal")
     .addEventListener("click", addRecord);
+
+  
   document
     .getElementById("div-categoria")
     .addEventListener("click", selectCategory);
@@ -105,7 +108,41 @@ const checkPermission = async () => {
 
 }
 
+const addAccount = async (event) =>  {
+  event.preventDefault();
 
+  console.log("asd")
+
+  let accName = document.getElementById("acc-name").value;
+  let accDescr = document.getElementById("acc-descrip").value;
+  let accBalance = document.getElementById("acc-init-balance").value;
+
+  console.log(accBalance)
+  console.log(accDescr)
+  console.log(accName)
+
+  let obj = {
+    name : accName,
+    description : accDescr,
+    balance : accBalance
+  };
+
+  console.log(obj);
+
+  let resjson = await save(obj, 'account');
+
+  if(resjson.exito){
+    document.getElementById("form-add-reg").reset();
+    resjson = await read("account", resjson.id);
+
+    insertAccount(resjson);
+
+  }else{
+    console.error(resjson.mensaje);
+  }
+
+
+}
 
 
 const testConn = async () => {
@@ -125,10 +162,10 @@ const testConn = async () => {
   }
 };
 
-const loadBalance = (accounts) => {
+const loadBalance = (acc) => {
   let balanceScroll = document.getElementById("balance-scroll");
 
-  for (acc of accounts) {
+  
     let divPill = document.createElement("div");
     divPill.classList.add("pill-div", "col-2");
 
@@ -153,11 +190,13 @@ const loadBalance = (accounts) => {
     divAccountBalance.appendChild(pBalance);
     divPill.appendChild(divAccountBalance);
     balanceScroll.appendChild(divPill);
-  }
+  
 
   let balanceContainer = document.getElementById("balance");
   let balance = 0;
-  for (let acc of accounts) {
+  if(balanceContainer.innerText != "0"){ 
+    balance = parseInt(balanceContainer.innerHTML);
+  }
     //hacerlo bien X2
     if (acc.currency.toUpperCase() == "USD") {
       balance = balance + acc.balance * ARS_USD;
@@ -165,10 +204,14 @@ const loadBalance = (accounts) => {
       balance += acc.balance;
     }
     //hacerlo bien X2
-  }
+  
 
-  balanceContainer.innerHTML = balance.toFixed(0);
+  balanceContainer.innerText = balance.toFixed(0);
 };
+
+
+
+
 
 const read = async (type, id) => {
   /*
@@ -195,7 +238,6 @@ const read = async (type, id) => {
   // backend/?type=tipo&id=all
   try {
     const response = await fetch(full);
-    console.log('res', response)
 
     if (response.status == 200) {
 
@@ -219,11 +261,11 @@ const read = async (type, id) => {
   }
 };
 
-const save = async (obj) => {
+const save = async (obj, type) => {
 // agregar argumento para reutilizar.
    const full =
     backendServer +
-    "/controllers/entryPoint.php?type=register";
+    "/controllers/entryPoint.php?type=" + type;
 
     try {
       const response = await fetch(full, {
@@ -235,42 +277,52 @@ const save = async (obj) => {
         
       });
         
-      if (response.ok) {
-        return true;
-      } else {
-        return false; //logear errores en archivo? demasiado
-      }
+      resjson = await response.json();
+      
+      return resjson;
+      
     } catch (error) { 
-      return false;
+      console.error(error.message);
+      return null;
     }
  
 };
 
 
 const loadAccounts = () => {
-  let accountContainer = document.getElementById("account");
-  let accountToContainer = document.getElementById("account-to");
-
+  
   read("account", "all").then((accountsBuffer) => {
 
     for (let acc of accountsBuffer) {
+      //cargamos el drop del modal
+      //se cargan las pills
+      insertAccount(acc)
+    }
+    
+    
+
+  });
+};
+
+const insertAccount = (acc) => {
+  let accountContainer = document.getElementById("account");
+  let accountToContainer = document.getElementById("account-to");
+
       //cargamos el drop del modal
       let opt = document.createElement("option");
       opt.value = acc.id; //alambre pero sirve: en el value dejamos el id de la cuenta. 
       opt.appendChild(document.createTextNode(acc.name));
       accountToContainer.appendChild(opt.cloneNode(true));
       accountContainer.appendChild(opt);
-    }
-    //se cargan las pills
-    loadBalance(accountsBuffer);
-  });
-};
+      
+      //se cargan las pills
+      loadBalance(acc);
+  }
 
 const loadTargets = () => {
 
   read("target", "all").then((targetsBuffer) => {
 
-    console.log('asd',targetsBuffer)
 
     for (let target of targetsBuffer) {
       let targetDiv = document.getElementById("objetivos")
@@ -451,9 +503,8 @@ let formateoMysql = milisLocal.toISOString().slice(0, 19).replace('T', ' ');
 
   checkData(event, recordBuffer).then( (res) => {
       if(res == true){
-        save(recordBuffer).then((res) => {
-          if(res){
-            // refreshBalances(recordBuffer);
+        save(recordBuffer,'register').then((res) => {
+          if(res.exito){
             // reloadTable(recordBuffer);
             console.log("Se grabo");
             enableCategories();
@@ -461,7 +512,7 @@ let formateoMysql = milisLocal.toISOString().slice(0, 19).replace('T', ' ');
             refreshMoveBalance(recordBuffer.accTo, recordBuffer.accFrom, recordBuffer.amount);
             document.getElementById("form-add-reg").reset();
           }else{
-            console.error("No se grabo");
+            console.error(res.mensaje);
           }
         });
       }});
@@ -771,7 +822,6 @@ const handleSaveObjModal = async (event) => {
   let testObj = {
     name : nombreObjetivoValue,
     amount: montoObjetivoValue,
-    iduser: 1,
     //currency
   };
 

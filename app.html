@@ -65,7 +65,7 @@
           </div>
           <div class="modal-body">
             <div class="container-fluid text-center">
-              <form id="form-add-reg" class="needs-validation row g-3 justify-content-md-center" action="" method="get" novalidate>
+              <form id="form-add-reg" class="needs-validation row g-3 justify-content-md-center" novalidate>
                 <div class="col-md-4">
                   <label for="type" class="form-label">Type</label>
                   <select class="form-select" id="type">
@@ -317,7 +317,7 @@
             <h5 class="modal-title" id="exampleModalLabel">New objective</h5>
           </div>
           <div class="modal-body">
-            <form id="formularioTarget" action="" novalidate>
+            <form id="formularioTarget" novalidate>
               <div class="form-group">
                 <label for="nombre" class="col-form-label">Name:</label>
                 <input type="text" class="form-control" id="nombre-objetivo" name="nombre-objetivo" placeholder="Ingresa el nombre del objetivo">
@@ -369,17 +369,7 @@
     
         <!-- ---------------------------- -->
 
-    <div
-      class="modal fade"
-      id="modal-add-reg"
-      tabindex="-1"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered modal-md"  tabindex="-1" role="dialog"  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        
-      </div>
-    </div>
+
      <!-- Modal new acc -->
      <div
      class="modal fade"
@@ -404,14 +394,14 @@
              <form
                id="form-add-reg"
                class="needs-validation row g-3 justify-content-md-center"
-               novalidate
+                              novalidate
              >
              
              <div class="col-md-6">
                
                <div class="mb-3">
                 <label for="acc-name" class="form-label">Name</label>
-                 <input type="text" class="form-control" name="acc-name" id="acc-name" placeholder="">
+                 <input type="text" class="form-control" id="acc-name" placeholder="">
                </div>
                <div id="accNameFeedback" class="invalid-feedback"></div>
              </div>
@@ -426,7 +416,7 @@
              </div>
              <div class="col-md-12">
               <label for="acc-descrip" class="form-label">Description</label>
-                 <textarea class="form-control" name="acc-descrip" id="acc-descrip" rows="3"></textarea>
+                 <textarea class="form-control" id="acc-descrip" rows="3"></textarea>
               <div id="accDescripFeedback" class="invalid-feedback"></div>
             </div>
             <div class="modal-footer">
@@ -442,9 +432,8 @@
               </button>
               <button
                 id="btn-save-acc-modal"
-                type="button"
+                type="submit"
                 class="btn bg-dark text-white"
-                
               >
                 Save
               </button>
@@ -580,7 +569,7 @@
             "
         >
             <p id="balance" style="font-size: 2.7vw; font-weight: bold; max-width: fit-content;"> <!-- Cambiado a vw para que sea relativo al ancho de la pantalla -->
-                <!-- 1000000 -->
+                0
             </p>
         </div>
         
