@@ -8,7 +8,8 @@ const begin = async () => {
 
   if ( aut === true){
 
-  let targetsLoaded;loadRegisters();
+  let targetsLoaded;
+  loadRegisters();
   let accountsLoaded = await loadAccounts();
   if(accountsLoaded){
     targetsLoaded = await loadTargets();
@@ -70,6 +71,7 @@ const begin = async () => {
     .addEventListener("click", handleSaveObjModal);
 
   if(targetsLoaded){
+    console.log('entre')
   document.getElementById("btn-target").addEventListener("click", handleDeleteTarget)
   }
 
@@ -327,6 +329,7 @@ const loadAccounts = async () => {
 
 
   });
+  return true
 };
 
 const insertAccount = (acc) => {
@@ -344,104 +347,104 @@ const insertAccount = (acc) => {
       loadBalance(acc);
   }
 
-const loadTargets = async () => {
-
- read("target", "all").then((targetsBuffer) => {
-
-    console.log(targetsBuffer);
-    if(!targetsBuffer){
-      console.log("No hay targets")
-    }else if (targetsBuffer.mensaje) {
-      alert(objNuevo.mensaje)
-    }else{
-
-    
-      for (let target of targetsBuffer) {
-        let targetDiv = document.getElementById("objetivos")
-
-      let rowDiv = document.createElement("div")
-      rowDiv.classList.add("row")
-      rowDiv.style.padding = "15px"
-      rowDiv.style.borderTop = "1px solid white";
-      rowDiv.style.borderBottom = "1px solid white";
-      rowDiv.style.textAlign = "center"
-      rowDiv.setAttribute('id', `target-${targetsBuffer.indexOf(target)}`)
-      rowDiv.setAttribute('key', target.id)
-
-        let nameDiv = document.createElement("div")
-        nameDiv.classList.add("col-md-4")
-
-        let amountDiv = document.createElement("div")
-        amountDiv.classList.add("col-md-4")
-
-        let deleteDiv = document.createElement("div");
-        deleteDiv.classList.add("col-md-4");
-
-      let deleteButton = document.createElement("button");
-      // deleteButton.setAttribute('id',`btn-target-${targetsBuffer.indexOf(target)}`)
-      deleteButton.setAttribute("id", "btn-target");
-
-
-      let deleteButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-
-        let path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        let path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        
-        deleteButton.style.backgroundColor = "white";
-        deleteButton.style.width = "40px";
-        deleteButton.style.height = "40px";
-        deleteButton.style.borderRadius = "50px"
-        
-        deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        deleteButtonIcon.setAttribute("width", "16");
-        deleteButtonIcon.setAttribute("height", "16");
-        deleteButtonIcon.setAttribute("fill", "currentColor");
-        deleteButtonIcon.setAttribute("class", "bi bi-trash");
-        deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
-        
-        path1.setAttribute("d", "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z");
-        path2.setAttribute("d", "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z");
-        
-        deleteButtonIcon.appendChild(path1);
-        deleteButtonIcon.appendChild(path2);
-        
-        deleteButton.appendChild(deleteButtonIcon);
-        deleteDiv.appendChild(deleteButton);
-        deleteDiv.appendChild(deleteButton)
-
-        //ver si ahorros usd es mas alto que algun target
-
-        let ahorrosUsdElement = document.getElementById("acc-balance-p-id12")
-        let ahorrosUsdValue = ahorrosUsdElement.textContent
-
-        let tgName = document.createElement("p");
-        tgName.appendChild(document.createTextNode(target.name));
-
-        let tgAmount = document.createElement("p");
-        tgAmount.appendChild(document.createTextNode(target.amount));
-
-        if(target.amount > ahorrosUsdValue){
-          tgName.style.color = "green"
-          tgAmount.style.color = "green"
-        } else {
-          tgName.style.color = "red"
-          tgAmount.style.color = "red"
+  const loadTargets = async () => {
+    try {
+      const targetsBuffer = await read("target", "all");
+  
+      console.log(targetsBuffer);
+  
+      if (!targetsBuffer) {
+        console.log("No hay targets");
+      } else if (targetsBuffer.mensaje) {
+        alert(objNuevo.mensaje);
+      } else {
+        for (let target of targetsBuffer) {
+          let targetDiv = document.getElementById("objetivos");
+  
+          let rowDiv = document.createElement("div");
+          rowDiv.classList.add("row");
+          rowDiv.style.padding = "15px";
+          rowDiv.style.borderTop = "1px solid white";
+          rowDiv.style.borderBottom = "1px solid white";
+          rowDiv.style.textAlign = "center";
+          rowDiv.setAttribute("id", `target-${targetsBuffer.indexOf(target)}`);
+          rowDiv.setAttribute("key", target.id);
+  
+          let nameDiv = document.createElement("div");
+          nameDiv.classList.add("col-md-4");
+  
+          let amountDiv = document.createElement("div");
+          amountDiv.classList.add("col-md-4");
+  
+          let deleteDiv = document.createElement("div");
+          deleteDiv.classList.add("col-md-4");
+  
+          let deleteButton = document.createElement("button");
+          deleteButton.setAttribute("id", "btn-target");
+  
+          let deleteButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  
+          let path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          let path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  
+          deleteButton.style.backgroundColor = "white";
+          deleteButton.style.width = "40px";
+          deleteButton.style.height = "40px";
+          deleteButton.style.borderRadius = "50px";
+  
+          deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+          deleteButtonIcon.setAttribute("width", "16");
+          deleteButtonIcon.setAttribute("height", "16");
+          deleteButtonIcon.setAttribute("fill", "currentColor");
+          deleteButtonIcon.setAttribute("class", "bi bi-trash");
+          deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
+  
+          path1.setAttribute("d", "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z");
+          path2.setAttribute("d", "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z");
+  
+          deleteButtonIcon.appendChild(path1);
+          deleteButtonIcon.appendChild(path2);
+  
+          deleteButton.appendChild(deleteButtonIcon);
+          deleteDiv.appendChild(deleteButton);
+          deleteDiv.appendChild(deleteButton);
+  
+          //ver si ahorros usd es más alto que algún target
+  
+          let ahorrosUsdElement = document.getElementById("acc-balance-p-id12");
+          let ahorrosUsdValue = ahorrosUsdElement.textContent;
+  
+          let tgName = document.createElement("p");
+          tgName.appendChild(document.createTextNode(target.name));
+  
+          let tgAmount = document.createElement("p");
+          tgAmount.appendChild(document.createTextNode(target.amount));
+  
+          if (target.amount > ahorrosUsdValue) {
+            tgName.style.color = "green";
+            tgAmount.style.color = "green";
+          } else {
+            tgName.style.color = "red";
+            tgAmount.style.color = "red";
+          }
+  
+          nameDiv.appendChild(tgName);
+          amountDiv.appendChild(tgAmount);
+  
+          rowDiv.appendChild(nameDiv);
+          rowDiv.appendChild(amountDiv);
+          rowDiv.appendChild(deleteDiv);
+  
+          targetDiv.appendChild(rowDiv);
         }
-
-        nameDiv.appendChild(tgName)
-        amountDiv.appendChild(tgAmount)
-
-        rowDiv.appendChild(nameDiv)
-        rowDiv.appendChild(amountDiv)
-        rowDiv.appendChild(deleteDiv)
-
-      targetDiv.appendChild(rowDiv)
+      }
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
-    
-  }});
-  return true
-
-};
+  };
+  
 
 const loadRegisters =  () => {
 
