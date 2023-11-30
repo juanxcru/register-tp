@@ -412,6 +412,37 @@
         break;
       }
       
+      }else
+      if(isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id'])){ // cuenta por id
+
+        if (isset($_SESSION['user_id'])){
+          if($permissionController->tienePermiso('eliminar objetivo', $_SESSION['user_id'])){
+            
+            $data = $regController->deleteTarget($_GET['id'],$_SESSION['user_id']);
+
+            $jsonData = json_encode($data);
+            echo $jsonData;
+              
+            break;
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unlogged"
+        ];
+        http_response_code(403);
+        echo json_encode($respuesta);
+        break;
+      }
+      
       }
   
     case 'PUT':

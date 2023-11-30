@@ -54,7 +54,25 @@ public function readAllFromAllUsers(){
     return $data; 
 }
 
+public function deleteTarget($id, $idUser) {
 
+  require "../conf/conn_mysql.php";
+
+  $query = 'DELETE FROM reg WHERE id = ?';
+
+    $consulta = $conn->prepare($query);
+
+    $consulta->bindParam(1, $id, PDO::PARAM_INT);
+
+
+    try{
+      $consulta->execute();
+      return true;
+    }catch(Exception $e){
+      return false;
+    }
+    
+  }
 
 
 private function refreshBalance($accTo, $accFrom, $amount, $iduser) : bool {
