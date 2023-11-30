@@ -8,7 +8,7 @@ const begin = async () => {
 
   if ( aut === true){
 
-  let targetsLoaded;
+  let targetsLoaded;loadRegisters();
   let accountsLoaded = await loadAccounts();
   if(accountsLoaded){
     targetsLoaded = await loadTargets();
@@ -119,15 +119,10 @@ const checkPermission = async () => {
 const addAccount = async (event) =>  {
   event.preventDefault();
 
-  console.log("asd")
-
   let accName = document.getElementById("acc-name").value;
   let accDescr = document.getElementById("acc-descrip").value;
   let accBalance = document.getElementById("acc-init-balance").value;
 
-  console.log(accBalance)
-  console.log(accDescr)
-  console.log(accName)
 
   let obj = {
     name : accName,
@@ -135,16 +130,20 @@ const addAccount = async (event) =>  {
     balance : accBalance
   };
 
-  console.log(obj);
+
 
   let resjson = await save(obj, 'account');
 
   if(resjson.exito){
     document.getElementById("form-add-reg").reset();
-    resjson = await read("account", resjson.id);
-
-    insertAccount(resjson);
-
+    objNuevo = await read("account", resjson.id);
+    if(!objNuevo){
+      alert("Error en lectura de cuenta nueva")
+    }else if (objNuevo.mensaje){
+      alert(objNuevo.mensaje)
+    }else{
+      insertAccount(objNuevo);
+    }
   }else{
     console.error(resjson.mensaje);
   }
@@ -250,22 +249,35 @@ const read = async (type, id) => {
     if (response.status == 200) {
 
       const data = await response.json();
-      return data;
+      if(id === "all"){
+        if(!data[0].id){
+          return null;
+        }else{
+          return data;
+        }
+      }else{
+        if(!data.id){
+          return null;
+        }else{
+          return data;
+        }
+      }
+      
 
     } else if (response.status == 401){
-
-      console.log("Unauthorized")
+      
+      return await response.json();
 
     }else if(response.status == 403){
 
-      console.log("Unlogged")
-
+      return await response.json();
     }
     else {
-      throw new Error("Error");
+      return null;
     }
   } catch (error) {
     console.error("Error: ", error);
+    return null;
   }
 };
 
@@ -300,17 +312,21 @@ const save = async (obj, type) => {
 const loadAccounts = async () => {
   
   await read("account", "all").then((accountsBuffer) => {
-
+    console.log(accountsBuffer)
+    if(!accountsBuffer){
+      alert("No hay cuentas para el usuario")
+    }else if (accountsBuffer.mensaje){
+      alert(accountsBuffer.mensaje)
+    }else{ // podriamos preguntar / vlaidar q sea array, pero por def va a haber dos cuentas.
     for (let acc of accountsBuffer) {
       //cargamos el drop del modal
       //se cargan las pills
       insertAccount(acc)
     }
-    
-    
+  }
+
 
   });
-  return true
 };
 
 const insertAccount = (acc) => {
@@ -332,8 +348,16 @@ const loadTargets = async () => {
 
   await read("target", "all").then((targetsBuffer) => {
 
-    for (let target of targetsBuffer) {
-      let targetDiv = document.getElementById("objetivos")
+    console.log(targetsBuffer);
+    if(!targetsBuffer){
+      console.log("No hay targets")
+    }else if (targetsBuffer.mensaje) {
+      alert(objNuevo.mensaje)
+    }else{
+
+    
+      for (let target of targetsBuffer) {
+        let targetDiv = document.getElementById("objetivos")
 
       let rowDiv = document.createElement("div")
       rowDiv.classList.add("row")
@@ -344,14 +368,14 @@ const loadTargets = async () => {
       rowDiv.setAttribute('id', `target-${targetsBuffer.indexOf(target)}`)
       rowDiv.setAttribute('key', target.id)
 
-      let nameDiv = document.createElement("div")
-      nameDiv.classList.add("col-md-4")
+        let nameDiv = document.createElement("div")
+        nameDiv.classList.add("col-md-4")
 
-      let amountDiv = document.createElement("div")
-      amountDiv.classList.add("col-md-4")
+        let amountDiv = document.createElement("div")
+        amountDiv.classList.add("col-md-4")
 
-      let deleteDiv = document.createElement("div");
-      deleteDiv.classList.add("col-md-4");
+        let deleteDiv = document.createElement("div");
+        deleteDiv.classList.add("col-md-4");
 
       let deleteButton = document.createElement("button");
       // deleteButton.setAttribute('id',`btn-target-${targetsBuffer.indexOf(target)}`)
@@ -360,56 +384,56 @@ const loadTargets = async () => {
 
       let deleteButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
-      let path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      let path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      
-      deleteButton.style.backgroundColor = "white";
-      deleteButton.style.width = "40px";
-      deleteButton.style.height = "40px";
-      deleteButton.style.borderRadius = "50px"
-      
-      deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-      deleteButtonIcon.setAttribute("width", "16");
-      deleteButtonIcon.setAttribute("height", "16");
-      deleteButtonIcon.setAttribute("fill", "currentColor");
-      deleteButtonIcon.setAttribute("class", "bi bi-trash");
-      deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
-      
-      path1.setAttribute("d", "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z");
-      path2.setAttribute("d", "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z");
-      
-      deleteButtonIcon.appendChild(path1);
-      deleteButtonIcon.appendChild(path2);
-      
-      deleteButton.appendChild(deleteButtonIcon);
-      deleteDiv.appendChild(deleteButton);
-      deleteDiv.appendChild(deleteButton)
+        let path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        let path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        
+        deleteButton.style.backgroundColor = "white";
+        deleteButton.style.width = "40px";
+        deleteButton.style.height = "40px";
+        deleteButton.style.borderRadius = "50px"
+        
+        deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        deleteButtonIcon.setAttribute("width", "16");
+        deleteButtonIcon.setAttribute("height", "16");
+        deleteButtonIcon.setAttribute("fill", "currentColor");
+        deleteButtonIcon.setAttribute("class", "bi bi-trash");
+        deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
+        
+        path1.setAttribute("d", "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z");
+        path2.setAttribute("d", "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z");
+        
+        deleteButtonIcon.appendChild(path1);
+        deleteButtonIcon.appendChild(path2);
+        
+        deleteButton.appendChild(deleteButtonIcon);
+        deleteDiv.appendChild(deleteButton);
+        deleteDiv.appendChild(deleteButton)
 
-      //ver si ahorros usd es mas alto que algun target
+        //ver si ahorros usd es mas alto que algun target
 
-      let ahorrosUsdElement = document.getElementById("acc-balance-p-id12")
-      let ahorrosUsdValue = ahorrosUsdElement.textContent
+        let ahorrosUsdElement = document.getElementById("acc-balance-p-id12")
+        let ahorrosUsdValue = ahorrosUsdElement.textContent
 
-      let tgName = document.createElement("p");
-      tgName.appendChild(document.createTextNode(target.name));
+        let tgName = document.createElement("p");
+        tgName.appendChild(document.createTextNode(target.name));
 
-      let tgAmount = document.createElement("p");
-      tgAmount.appendChild(document.createTextNode(target.amount));
+        let tgAmount = document.createElement("p");
+        tgAmount.appendChild(document.createTextNode(target.amount));
 
-      if(target.amount > ahorrosUsdValue){
-        tgName.style.color = "green"
-        tgAmount.style.color = "green"
-      } else {
-        tgName.style.color = "red"
-        tgAmount.style.color = "red"
-      }
+        if(target.amount > ahorrosUsdValue){
+          tgName.style.color = "green"
+          tgAmount.style.color = "green"
+        } else {
+          tgName.style.color = "red"
+          tgAmount.style.color = "red"
+        }
 
-      nameDiv.appendChild(tgName)
-      amountDiv.appendChild(tgAmount)
+        nameDiv.appendChild(tgName)
+        amountDiv.appendChild(tgAmount)
 
-      rowDiv.appendChild(nameDiv)
-      rowDiv.appendChild(amountDiv)
-      rowDiv.appendChild(deleteDiv)
+        rowDiv.appendChild(nameDiv)
+        rowDiv.appendChild(amountDiv)
+        rowDiv.appendChild(deleteDiv)
 
       targetDiv.appendChild(rowDiv)
     }
@@ -419,6 +443,25 @@ const loadTargets = async () => {
 
 };
 
+const loadRegisters =  () => {
+
+  read("register", "all").then((regsBuffer) => {
+    console.log(regsBuffer)
+    if(!regsBuffer){
+      console.log("No hay registros para el usuario")
+    }else if (regsBuffer.mensaje){
+      alert(regsBuffer.mensaje)
+    }else{ 
+    for (let reg of regsBuffer) {
+      reloadTable(reg);
+    }
+  }
+  });
+
+
+
+
+};
 
 // const loadReminders = () => {
 
@@ -495,15 +538,15 @@ const disableCategories = () => {
   });
 };
 
-const addRecord = (event) => {
+const addRecord = async (event) => {
   event.preventDefault();
 
 //fecha
-let fecha = new Date();
-let fechaSegundosIso = new Date((new Date(fecha)).toISOString() );
-// diferencia entre utc/iso y local. milis - (minOfset*60000)
-let milisLocal = new Date(fechaSegundosIso.getTime()-(fecha.getTimezoneOffset()*60000));
-let formateoMysql = milisLocal.toISOString().slice(0, 19).replace('T', ' ');
+  let fecha = new Date();
+  let fechaSegundosIso = new Date((new Date(fecha)).toISOString() );
+  // diferencia entre utc/iso y local. milis - (minOfset*60000)
+  let milisLocal = new Date(fechaSegundosIso.getTime()-(fecha.getTimezoneOffset()*60000));
+  let formateoMysql = milisLocal.toISOString().slice(0, 19).replace('T', ' ');
 
 
 
@@ -516,23 +559,33 @@ let formateoMysql = milisLocal.toISOString().slice(0, 19).replace('T', ' ');
     accTo: "" 
   };
 
-  checkData(event, recordBuffer).then( (res) => {
-      if(res == true){
-        save(recordBuffer,'register').then((res) => {
-          if(res.exito){
-            // reloadTable(recordBuffer);
-            console.log("Se grabo");
-            enableCategories();
-            resetFeedback();
-            refreshMoveBalance(recordBuffer.accTo, recordBuffer.accFrom, recordBuffer.amount);
-            document.getElementById("form-add-reg").reset();
-          }else{
-            console.error(res.mensaje);
-          }
-        });
-      }});
+  let verif = await checkData(event, recordBuffer);
+  console.log(verif);
+  if(verif == true){
+    console.log("truely", recordBuffer)
+    let res = await save(recordBuffer,'register');
+    if(res.exito){
+      let objNuevo = await read('register', res.id);
+      console.log(objNuevo);
+      if(!objNuevo){
+      alert("Error en lectura de registro nuevo")
+      }else if (objNuevo.mensaje){
+        alert(objNuevo.mensaje)
+      }else{
+        console.log("Se grabo");
+        reloadTable(objNuevo);
+        enableCategories();
+        resetFeedback();
+        refreshMoveBalance(recordBuffer.accTo, recordBuffer.accFrom, recordBuffer.amount);
+        document.getElementById("form-add-reg").reset();
+      }
+      }else{
+        console.error(res.mensaje);
+      }
+  }else{
 
-  };  
+  }
+}
 
 const checkData = async (event, recordBuffer) => {
   let selectedCategory = document.querySelector(".pressed");
@@ -575,6 +628,11 @@ const checkData = async (event, recordBuffer) => {
   let isValidAmount = await validateAmount(enteredAmount, accValue, moveType);
 
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
+
+  console.log(isValidAccount,
+  isValidType,
+  isValidAmount );
+
 
   if (
     isValidAccount === true &&
@@ -638,13 +696,19 @@ const validateAmount = async (amt, account, type) => {
 
   if(moveFlag){
     accTo = await read('account',account);
-    if(accTo != null){
+    if(!accTo){
+      return"Error en verificacion de cuenta"
+    }else if(accTo.mensaje){
+      return objNuevo.mensaje
+    }else{
       if(parseFloat(accTo.balance) < amtInt){
         return "Sin fondos"
+      }else{
+        return true;
       }
-    }else{
-      return "Error"
+     
     }
+
 
   }
 
@@ -657,11 +721,14 @@ const validateAccount = async (accValue) => {
   
   
   let res = await read('account', accValue);
-    if(res != null){
-      return true;
+    if(!res){
+      return "Error en verificacion de cuenta"
+    }else if (res.mensaje){
+      return res.mensaje;
     }else{
-      return "Cuenta no existe";
+      return true;
     }
+
 
 
 
@@ -672,17 +739,21 @@ const validateMove = async (accValue, accToValue) => {
 
   acc = await read('account',accValue);
   accTo = await read('account',accToValue);
-  if(acc != null && accTo != null){
+  if(!acc || !accTo ){
+    return "Error en la verificacion de cuentas";
+  }else if (accTo.mensaje ){
+    return accTo.mensaje
+  }else if (acc.mensaje){
+    return acc.mensaje
+  }else{
     if(acc.currency != accTo.currency){
       return "Diferentes monedas"
     }else{
         return true;
     }
   }
-   
-  return "Error"
+  }
 
-};
 
 // const realoadSavingAccount = (enteredAmount) => {
 //   let savingAccountElement = document.getElementById("cajaDeAhorro");
@@ -698,73 +769,87 @@ const refreshMoveBalance =  async (accTo, accFrom, amount) => {
   amount = parseInt(amount)
   if(accTo != null ){
     let accToBuffer = await read('account',accTo);
+
+    if(!accToBuffer){
+      alert("Error en lectura de cuenta nueva")
+    }else if (accToBuffer.mensaje){
+      alert(accToBuffer.mensaje)
+    }else{
     
     let pAccountBalance = document.getElementById("acc-balance-p-id" + accToBuffer.id);
     pAccountBalance.innerText = accToBuffer.balance.toFixed(0);
 
-    if(accToBuffer.currency == "ARS"){
+    if(accToBuffer.currency.toUpperCase() == "ARS"){
       console.log(balance)
       console.log(accToBuffer.balance)
       balance = balance + amount;
       console.log(balance)
 
-    }else if (accToBuffer.currency == "USD"){
+    }else if (accToBuffer.currency.toUpperCase() == "USD"){
       balance = balance + amount * ARS_USD;
     }
 
     balanceContainer.innerText = balance.toFixed(0);
-
+    }
   }
 
   if(accFrom != null){
 
-      let accFromBuffer = await read('account',accFrom)
-      let balanceContainer = document.getElementById("balance");
-      let balance = parseFloat(balanceContainer.innerHTML);
-      let pAccountBalance = document.getElementById("acc-balance-p-id" + accFromBuffer.id);
+      let accFromBuffer = await read('account',accFrom);
+      if(!accFromBuffer){
+        alert("Error en lectura de cuenta nueva")
+      }else if (accFromBuffer.mensaje){
+        alert(accFromBuffer.mensaje)
+      }else{
 
-      pAccountBalance.innerText = accFromBuffer.balance.toFixed(0);
+        let balanceContainer = document.getElementById("balance");
+        let balance = parseFloat(balanceContainer.innerHTML);
+        let pAccountBalance = document.getElementById("acc-balance-p-id" + accFromBuffer.id);
 
-      if(accFromBuffer.currency == "ARS"){
-        balance = balance - amount;
-      }else if (accFromBuffer.currency == "USD"){
-        balance = balance - amount * ARS_USD;
+        pAccountBalance.innerText = accFromBuffer.balance.toFixed(0);
+
+        if(accFromBuffer.currency == "ARS"){
+          balance = balance - amount;
+        }else if (accFromBuffer.currency == "USD"){
+          balance = balance - amount * ARS_USD;
+        }
+
+        balanceContainer.innerText = balance.toFixed(0);
       }
-
-      balanceContainer.innerText = balance.toFixed(0);
-  } 
-    
-    
+    }
     
 };
 
 
-const reloadTable = (recordBuffer) => {
-  //arreglar esto para no repetir codigo. Si hay categoria, mostrarla, sino no.
+const reloadTable = async (recordBuffer) => {
   const table = document.querySelector("table");
   let row = document.createElement("tr");
-  if (recordBuffer.category) {
+  let accFromName = "None";
+  let accToName = "None";
+
+   if(recordBuffer.id_acc_to){
+    let accTo = await read("account",recordBuffer.id_acc_to);
+    accToName = accTo.name;
+   }
+   if(recordBuffer.id_acc_from){
+    let accFrom = await read("account",recordBuffer.id_acc_from);
+    accFromName = accFrom.name;
+   }
+
     row.innerHTML = `
     <th>${table.rows.length}</th>
-    <td>${new Date().toISOString().split("T")[0]}</td>
-    <td>${recordBuffer.MoveType}</td>
-    <td>$${recordBuffer.Value}</td>
+    <td>${recordBuffer.reg_date}</td>
+    <td>${recordBuffer.type}</td>
+    <td>${recordBuffer.amount}</td>
+    <td>${accToName}</td>
+    <td>${accFromName}</td>
     <td>${recordBuffer.category}</td>
-    <td><button class="btn bg-dark text-white "><i class="fas fa-pencil-alt"></i>
-    </button></td>
-`;
-  } else {
-    row.innerHTML = `
-    <th>${table.rows.length}</th>
-    <td>${new Date().toISOString().split("T")[0]}</td>
-    <td>${recordBuffer.MoveType}</td>
-    <td>$${recordBuffer.Value}</td>
-    <td></td>
-    <td><button class="btn bg-dark text-white "><i class="fas fa-pencil-alt"></i>
-    </button></td>
-`;
-  }
-  table.querySelector("tbody").appendChild(row);
+    <td><button class="btn btn-outline-dark text-white "><i class="fas fa-pencil-alt"></i>
+    </button>
+    <button class="btn btn-outline-danger text-white "><i class="fas fa-pencil-alt"></i>
+    </button></td>`;
+  
+  table.querySelector("tbody").append(row);
 };
 
 const closeModal = () => {

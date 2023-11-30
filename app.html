@@ -433,7 +433,10 @@
               <button
                 id="btn-save-acc-modal"
                 type="submit"
-                class="btn bg-dark text-white"
+                class="btn btn-dark"
+                data-bs-toggle="modal"
+                data-bs-target="#modal-add-acc"
+                data-dismiss="modal"
               >
                 Save
               </button>
@@ -644,9 +647,10 @@
           <div
             id="tablita2"
             class="container"
-            style="height: 80%; margin-top: 10px; overflow: scroll"
+            style="height: 80%; max-height: 250px; margin-top: 10px; overflow: scroll"
           >
             <table
+              
               class="table table-responsive table-hover"
               style="border: 5px solid #102a43"
             >
@@ -656,92 +660,15 @@
                   <th>Date</th>
                   <th>Type</th>
                   <th>Amount</th>
+                  <th>Account To</th>
+                  <th>Account From</th>
                   <th>Category</th>
                   <th>Edit</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <th>1</th>
-                  <td>2023-09-01</td>
-                  <td>Income</td>
-                  <td>$14500.00</td>
-                  <td>Salary</td>
-                  <td>
-                    <button class="btn bg-dark text-white">
-                      <i class="fas fa-pencil-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-                <!-- Repite este bloque de <tr> para cada fila -->
-                <!-- Ejemplo:
-                            <tr>
-                                <td>Fecha</td>
-                                <td>Tipo</td>
-                                <td>Monto</td>
-                                <td>Categoría</td>
-                            </tr>
-                            -->
-                <tr>
-                  <th>2</th>
-                  <td>2023-09-01</td>
-                  <td>Spent</td>
-                  <td>$990.00</td>
-                  <td>Transport</td>
-                  <td>
-                    <button class="btn bg-dark text-white">
-                      <i class="fas fa-pencil-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <th>3</th>
-                  <td>2023-09-01</td>
-                  <td>Income</td>
-                  <td>$11230.00</td>
-                  <td>Salary</td>
-                  <td>
-                    <button class="btn bg-dark text-white">
-                      <i class="fas fa-pencil-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <th>4</th>
-                  <td>2023-09-01</td>
-                  <td>Income</td>
-                  <td>$1030.00</td>
-                  <td>Classes</td>
-                  <td>
-                    <button class="btn bg-dark text-white">
-                      <i class="fas fa-pencil-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <th>5</th>
-                  <td>2023-09-01</td>
-                  <td>Spent</td>
-                  <td>$850.00</td>
-                  <td>Sports</td>
-                  <td>
-                    <button class="btn bg-dark text-white">
-                      <i class="fas fa-pencil-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <th>6</th>
-                  <td>2023-09-01</td>
-                  <td>Spent</td>
-                  <td>$2300.00</td>
-                  <td>Coffee</td>
-                  <td>
-                    <button class="btn bg-dark text-white">
-                      <i class="fas fa-pencil-alt"></i>
-                    </button>
-                  </td>
-                </tr>
+                
+               
               </tbody>
             </table>
           </div>
