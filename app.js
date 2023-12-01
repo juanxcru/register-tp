@@ -280,7 +280,34 @@ const update = async (recordBuffer, type, id) => {
 
 };
 
-const deleteReg = async (id) => {};
+const deleteReg = async (id) => {
+  console.log('asd', id)
+
+  let moveTypeContainer = document.getElementById("type");
+  let accValueContainer = document.getElementById("account");
+  let accToValueContainer = document.getElementById("account-to");
+  let enteredAmountInput = document.getElementById("amount");
+
+  // const recordInfo = await read("register",id);
+
+  const url = `${backendServer}/controllers/entryPoint.php?type=register&id=${id}`;
+
+
+  const response = await fetch(url,{
+    method: "DELETE",
+  });
+  console.log('res',response)
+  if (response.ok) {
+    console.log('Target deleted successfully');
+    window.location.reload(true);
+
+  } else {
+    console.error('Failed to delete target:', response.status, response.statusText);
+  }
+
+
+}
+
 
 const read = async (type, id) => {
   /*

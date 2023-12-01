@@ -6,7 +6,7 @@ const beginEstadisticas = async () => {
     var ctx = document.getElementById('myPieChart').getContext('2d');
 
     let dataToUse= await read();
-
+    console.log('sss', dataToUse)
     let incomeAmount = 0;
     let spentAmount = 0;
 
@@ -14,14 +14,14 @@ const beginEstadisticas = async () => {
 
         if (dataAsd['type'] == 'Income'){
             incomeAmount += dataAsd['amount']
-        } else {
+        } else if(dataAsd['type'] == 'Spent') {
             spentAmount += dataAsd['amount']
         }
 
     }
 
     let totalMoney = incomeAmount + spentAmount;
-    document.getElementById('totalMoney').innerText = totalMoney
+    document.getElementById('totalMoney').innerText = `$${totalMoney}`
 
     var data = {
         labels: ['Ingresos', 'Egresos'],
@@ -50,6 +50,7 @@ const read = async () => {
     const url = "http://localhost/TP-LAB-PROG/register-tp/controllers/entryPoint.php/?type=register&id=adm";
     try {
       const response = await fetch(url);
+      console.log(response)
   
       if (response.status == 200) {
         let data =  await response.json();
