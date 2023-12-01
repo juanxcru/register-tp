@@ -81,6 +81,7 @@ const deleteReg = async (id) => {
     // const recordInfo = await read("register",id);
   
     // const url = `${backendServer}/controllers/entryPoint.php?type=register&id=${id}`;
+    console.log('id',id)
     const url = `http://localhost/TP-LAB-PROG/register-tp/controllers/entryPoint.php/?type=users&id=${id}`;
   
     const response = await fetch(url,{

@@ -481,16 +481,16 @@ switch ($typeReq) {
       }
       
       }else
-      if(isset($_GET['type']) && $_GET['type'] == 'users' && isset($_GET['id'])){ // cuenta por id
+      if(isset($_GET['type']) && $_GET['type'] == 'users' && isset($_GET['id'])){ //delete user
 
         if (isset($_SESSION['user_id'])){
           if($permissionController->tienePermiso('eliminar usuario', $_SESSION['user_id'])){
             
-            $data = $usersController->deleteUser($_GET['id'],$_SESSION['user_id']);
+            $data = $usersController->deleteUser($_GET['id']);
 
           $jsonData = json_encode($data);
+          http_response_code(200);
           echo $jsonData;
-
           break;
         } else {
           $respuesta = [

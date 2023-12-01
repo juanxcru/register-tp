@@ -18,7 +18,7 @@ class UsersController {
 
   }
 
-    public function deleteUser($id, $idUser) {
+    public function deleteUser($id) {
 
       require "../conf/conn_mysql.php";
   
