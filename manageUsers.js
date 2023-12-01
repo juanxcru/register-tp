@@ -46,7 +46,8 @@ const saveUser = async () => {
       let resjson = await res.json();
 
       if(resjson.exito){
-        location.assign("http://localhost/TP-LAB-PROG/register-tp/login.html");
+        // location.assign("http://localhost/TP-LAB-PROG/register-tp/login.html");
+        window.location.reload(true)
       }else{
         //invalids feedback
         console.log(resjson.mensaje)
