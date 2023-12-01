@@ -50,6 +50,7 @@ const read = async () => {
     const url = "http://localhost/TP-LAB-PROG/register-tp/controllers/entryPoint.php/?type=register&id=adm";
     try {
       const response = await fetch(url);
+      console.log(response)
   
       if (response.status == 200) {
         let data =  await response.json();

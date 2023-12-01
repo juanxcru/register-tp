@@ -4,6 +4,7 @@
   require_once 'RegController.php';
   require_once 'TargetController.php';
   require_once 'PermissionController.php';
+  require_once 'UsersController.php';
 
   session_start();
 
@@ -11,6 +12,7 @@
   $accController = new AccountController();
   $targetController = new TargetController();
   $permissionController = new PermissionController();
+  $usersController = new UsersController();
   
   $typeReq  = $_SERVER['REQUEST_METHOD'];
   header('Content-Type: application/json');
@@ -103,6 +105,42 @@
           break;
         }
       }else
+      if(isset($_GET['type']) && $_GET['type'] == 'users' && isset($_GET['id']) && $_GET['id'] == 'adm'){ // leer todos los users
+        
+
+        if (isset($_SESSION['user_id'])){
+
+          if($permissionController->tienePermiso('ver usuarios', $_SESSION['user_id'])){
+            
+           
+            $data = $usersController->readAllUsers();
+
+            $jsonData = json_encode($data);
+            http_response_code(200);
+            echo $jsonData;
+            break;
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
+
+        }else{
+          $respuesta = [
+            "exito" => false,
+            "mensaje" => "Unlogged"
+          ];
+          http_response_code(403);
+          echo json_encode($respuesta);
+          break;
+        }
+      }
+      
+      else
       if(isset($_GET['type']) && $_GET['type'] == 'account' && isset($_GET['id'])){ // cuenta por id
 
         if (isset($_SESSION['user_id'])){
@@ -419,6 +457,37 @@
           if($permissionController->tienePermiso('eliminar objetivo', $_SESSION['user_id'])){
             
             $data = $regController->deleteTarget($_GET['id'],$_SESSION['user_id']);
+
+            $jsonData = json_encode($data);
+            echo $jsonData;
+              
+            break;
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unlogged"
+        ];
+        http_response_code(403);
+        echo json_encode($respuesta);
+        break;
+      }
+      
+      }else
+      if(isset($_GET['type']) && $_GET['type'] == 'users' && isset($_GET['id'])){ // cuenta por id
+
+        if (isset($_SESSION['user_id'])){
+          if($permissionController->tienePermiso('eliminar usuario', $_SESSION['user_id'])){
+            
+            $data = $usersController->deleteUser($_GET['id'],$_SESSION['user_id']);
 
             $jsonData = json_encode($data);
             echo $jsonData;
