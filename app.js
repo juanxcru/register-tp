@@ -1,162 +1,136 @@
-
-
 const backendServer = "http://localhost/TP-LAB-PROG/register-tp";
 const ARS_USD = 1000;
-
+let modalEditFlag = false;
+let idRegAux = 0;
 const begin = async () => {
   let aut = await checkPermission();
 
-  if ( aut === true){
+  if (aut === true) {
+    let targetsLoaded;
+    let regLoaded = await loadRegisters();
+    let accountsLoaded = await loadAccounts();
+    if (accountsLoaded) {
+      targetsLoaded = await loadTargets();
+    } // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
 
-  let targetsLoaded;
-  let regLoaded = await loadRegisters();
-  let accountsLoaded = await loadAccounts();
-  if(accountsLoaded){
-    targetsLoaded = await loadTargets();
-  } // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
-  // loadReminders();
-  // loadStats();
-  document
-    .getElementById("btn-save-acc-modal")
-    .addEventListener("click", addAccount);
-  document
-    .getElementById("btn-close-modal")
-    .addEventListener("click", closeModal);
-  document
-    .getElementById("btn-save-modal")
-    .addEventListener("click", addRecord);
-  console.log(regLoaded)
-  if(regLoaded){
-    document.getElementById("table-reg").addEventListener('click', editDeleteReg);
-    
-  }
-  
-  document
-    .getElementById("div-categoria")
-    .addEventListener("click", selectCategory);
+    document
+      .getElementById("btn-save-acc-modal")
+      .addEventListener("click", addAccount);
+    document
+      .getElementById("btn-close-modal")
+      .addEventListener("click", closeModal);
+    document
+      .getElementById("btn-save-modal")
+      .addEventListener("click", addRecord);
 
-  // document
-  //   .getElementById("btn-show-record")
-  //   .addEventListener("mouseover", handleShowReminderHover);
-  // document
-  //   .getElementById("btn-show-record")
-  //   .addEventListener("mouseleave", handleHideReminderHover);
-  // document
-  //   .getElementById("recordatorios")
-  //   .addEventListener("mouseover", handleShowReminderHover);
-  // document
-  //   .getElementById("recordatorios")
-  //   .addEventListener("mouseleave", handleHideReminderHover);
+    if (regLoaded) {
+      document
+        .getElementById("table-reg")
+        .addEventListener("click", editDeleteReg);
+    }
 
-  document
-    .getElementById("btn-show-objetive")
-    .addEventListener("mouseover", handleShowObjetiveHover);
-  document
-    .getElementById("btn-show-objetive")
-    .addEventListener("mouseleave", handleHideObjetiveHover);
-  document
-    .getElementById("objetivos")
-    .addEventListener("mouseover", handleShowObjetiveHover);
-  document
-    .getElementById("objetivos")
-    .addEventListener("mouseleave", handleHideObjetiveHover);
-//this
-  document
-    .getElementById("btn-show-objetive")
-    .addEventListener("click", handleObjetiveModal);
-  // document
-  //   .getElementById("btn-show-record")
-  //   .addEventListener("click", handleReminderModal);
+    document
+      .getElementById("div-categoria")
+      .addEventListener("click", selectCategory);
 
-  document
-    .getElementById("btn-close-obj-modal")
-    .addEventListener("click", handleCloseObjModal);
-  document
-    .getElementById("btn-save-obj-modal")
-    .addEventListener("click", handleSaveObjModal);
+    document
+      .getElementById("btn-show-objetive")
+      .addEventListener("mouseover", handleShowObjetiveHover);
+    document
+      .getElementById("btn-show-objetive")
+      .addEventListener("mouseleave", handleHideObjetiveHover);
+    document
+      .getElementById("objetivos")
+      .addEventListener("mouseover", handleShowObjetiveHover);
+    document
+      .getElementById("objetivos")
+      .addEventListener("mouseleave", handleHideObjetiveHover);
+    //this
+    document
+      .getElementById("btn-show-objetive")
+      .addEventListener("click", handleObjetiveModal);
+    // document
+    //   .getElementById("btn-show-record")
+    //   .addEventListener("click", handleReminderModal);
 
-  if(targetsLoaded){
-    document.getElementById("btn-target").addEventListener("click", handleDeleteTarget)
-  }
+    document
+      .getElementById("btn-close-obj-modal")
+      .addEventListener("click", handleCloseObjModal);
+    document
+      .getElementById("btn-save-obj-modal")
+      .addEventListener("click", handleSaveObjModal);
 
+    if (targetsLoaded) {
+      document
+        .getElementById("btn-target")
+        .addEventListener("click", handleDeleteTarget);
+    }
 
-
-  // document
-  //   .getElementById("btn-close-recordatorio-modal")
-  //   .addEventListener("click", handleCloseRecordatorioModal);
-  // document
-  //   .getElementById("btn-save-recordatorio-modal")
-  //   .addEventListener("click", handleSaveRecordatorioModal);
-  document
-    .getElementById("type")
-    .addEventListener("change", handleAccountToFrom);
-  }else if(aut === "login"){
-
-    location.assign("http://localhost/TP-LAB-PROG/register-tp/registrarse.html");
-
-  }else if(aut === false){
-
+    // document
+    //   .getElementById("btn-close-recordatorio-modal")
+    //   .addEventListener("click", handleCloseRecordatorioModal);
+    // document
+    //   .getElementById("btn-save-recordatorio-modal")
+    //   .addEventListener("click", handleSaveRecordatorioModal);
+    document
+      .getElementById("type")
+      .addEventListener("change", handleAccountToFrom);
+  } else if (aut === "login") {
+    location.assign(
+      "http://localhost/TP-LAB-PROG/register-tp/registrarse.html"
+    );
+  } else if (aut === false) {
     location.assign("http://localhost/TP-LAB-PROG/register-tp/login.html");
-
   }
-
 };
 
-
 const checkPermission = async () => {
+  let res = await fetch(
+    backendServer + "/controllers/entryPoint.php?role=user"
+  );
 
-  let res = await fetch(backendServer + "/controllers/entryPoint.php?role=user");
+  let resjson = await res.json();
 
-  let resjson =  await res.json();
-  
   console.log(resjson);
-  
-  if(resjson.mensaje == "login"){
-    return "login"
-  }else if(resjson.exito){
+
+  if (resjson.mensaje == "login") {
+    return "login";
+  } else if (resjson.exito) {
     return true;
-  }else{
+  } else {
     return false;
   }
+};
 
-
-}
-
-const addAccount = async (event) =>  {
+const addAccount = async (event) => {
   event.preventDefault();
 
   let accName = document.getElementById("acc-name").value;
   let accDescr = document.getElementById("acc-descrip").value;
   let accBalance = document.getElementById("acc-init-balance").value;
 
-
   let obj = {
-    name : accName,
-    description : accDescr,
-    balance : accBalance
+    name: accName,
+    description: accDescr,
+    balance: accBalance,
   };
 
+  let resjson = await save(obj, "account");
 
-
-  let resjson = await save(obj, 'account');
-
-  if(resjson.exito){
+  if (resjson.exito) {
     document.getElementById("form-add-reg").reset();
     objNuevo = await read("account", resjson.id);
-    if(!objNuevo){
-      alert("Error en lectura de cuenta nueva")
-    }else if (objNuevo.mensaje){
-      alert(objNuevo.mensaje)
-    }else{
+    if (!objNuevo) {
+      alert("Error en lectura de cuenta nueva");
+    } else if (objNuevo.mensaje) {
+      alert(objNuevo.mensaje);
+    } else {
       insertAccount(objNuevo);
     }
-  }else{
+  } else {
     console.error(resjson.mensaje);
   }
-
-
-}
-
+};
 
 const testConn = async () => {
   try {
@@ -178,133 +152,135 @@ const testConn = async () => {
 const loadBalance = (acc) => {
   let balanceScroll = document.getElementById("balance-scroll");
 
-  
-    let divPill = document.createElement("div");
-    divPill.classList.add("pill-div", "col-2");
+  let divPill = document.createElement("div");
+  divPill.classList.add("pill-div", "col-2");
 
-    let pTitle = document.createElement("p");
-    pTitle.classList.add("pill-p-title");
-    pTitle.append(acc.name);
-    divPill.appendChild(pTitle);
+  let pTitle = document.createElement("p");
+  pTitle.classList.add("pill-p-title");
+  pTitle.append(acc.name);
+  divPill.appendChild(pTitle);
 
-    let divAccountBalance = document.createElement("div");
-    divAccountBalance.classList.add(
-      "account-balance-div",
-      "text-white",
-      "bg-dark"
-    );
+  let divAccountBalance = document.createElement("div");
+  divAccountBalance.classList.add(
+    "account-balance-div",
+    "text-white",
+    "bg-dark"
+  );
 
-    let pBalance = document.createElement("p");
-    pBalance.classList.add("account-balance-p", "text-center");
-    //ojo aca: ID en html == acc.id
-    pBalance.setAttribute("id", "acc-balance-p-id" + acc.id);
-    pBalance.append(acc.balance.toFixed(0));
+  let pBalance = document.createElement("p");
+  pBalance.classList.add("account-balance-p", "text-center");
+  //ojo aca: ID en html == acc.id
+  pBalance.setAttribute("id", "acc-balance-p-id" + acc.id);
+  pBalance.append(acc.balance.toFixed(0));
 
-    divAccountBalance.appendChild(pBalance);
-    divPill.appendChild(divAccountBalance);
-    balanceScroll.appendChild(divPill);
-  
+  divAccountBalance.appendChild(pBalance);
+  divPill.appendChild(divAccountBalance);
+  balanceScroll.appendChild(divPill);
 
   let balanceContainer = document.getElementById("balance");
   let balance = 0;
-  if(balanceContainer.innerText != "0"){ 
+  if (balanceContainer.innerText != "0") {
     balance = parseInt(balanceContainer.innerHTML);
   }
-    //hacerlo bien X2
-    if (acc.currency.toUpperCase() == "USD") {
-      balance = balance + acc.balance * ARS_USD;
-    } else if (acc.currency.toUpperCase() == "ARS") {
-      balance += acc.balance;
-    }
-    //hacerlo bien X2
-  
+  //hacerlo bien X2
+  if (acc.currency.toUpperCase() == "USD") {
+    balance = balance + acc.balance * ARS_USD;
+  } else if (acc.currency.toUpperCase() == "ARS") {
+    balance += acc.balance;
+  }
+  //hacerlo bien X2
 
   balanceContainer.innerText = balance.toFixed(0);
 };
 
 const editDeleteReg = async (event) => {
-
   const targetBtn = event.target;
-  if (targetBtn.classList.contains('edit-btn')) {
+  if (targetBtn.classList.contains("edit-btn")) {
     const regId = targetBtn.dataset.id;
-    editReg(regId)
-  } else if (targetBtn.classList.contains('delete-btn')) {
+    editReg(regId);
+  } else if (targetBtn.classList.contains("delete-btn")) {
     const regId = targetBtn.dataset.id;
-    deleteReg(regId)
+    deleteReg(regId);
   }
-   
 };
 
 const editReg = async (id) => {
-
   let moveTypeContainer = document.getElementById("type");
   let accValueContainer = document.getElementById("account");
   let accToValueContainer = document.getElementById("account-to");
   let enteredAmountInput = document.getElementById("amount");
-  
-  
-  
-  const recordInfo = await read("register",id);
-  
-  let selectedCategory = document.getElementById(recordInfo.category);
-  selectedCategory.classList.add("pressed");
+
+  const recordInfo = await read("register", id);
+  if(recordInfo.category = ""){
+    let selectedCategory = document.getElementById(recordInfo.category);
+    selectedCategory.classList.add("pressed");
+  }
+ 
   moveTypeContainer.value = recordInfo.type;
   enteredAmountInput.value = recordInfo.amount;
-  console.log(recordInfo.id_acc_to)
+  console.log(recordInfo.id_acc_to);
 
-  if((recordInfo.id_acc_to) && (recordInfo.id_acc_from) ){ // move
+  if (recordInfo.id_acc_to && recordInfo.id_acc_from) {
+    // move
     for (let i = 0; i < accToValueContainer.options.length; i++) {
       if (accToValueContainer.options[i].value == recordInfo.id_acc_to) {
         accToValueContainer.options[i].selected = true;
-        
-        break; 
+
+        break;
       }
-  }
+    }
     for (let i = 0; i < accValueContainer.options.length; i++) {
       if (accValueContainer.options[i].value == recordInfo.id_acc_from) {
         accValueContainer.options[i].selected = true;
-        break; 
+        break;
       }
-
-  }}else if(recordInfo.id_acc_to){ // income
+    }
+  } else if (recordInfo.id_acc_to) {
+    // income
     for (let i = 0; i < accValueContainer.options.length; i++) {
       if (accValueContainer.options[i].value == recordInfo.id_acc_to) {
         accValueContainer.options[i].selected = true;
-        break; 
+        break;
       }
-  }}else{ // spent
+    }
+  } else {
+    // spent
     for (let i = 0; i < accValueContainer.options.length; i++) {
       if (accValueContainer.options[i].value == recordInfo.id_acc_from) {
         accValueContainer.options[i].selected = true;
-        break; 
+        break;
       }
+    }
   }
-  }
-  
-  handleAccountToFrom(); 
 
+  handleAccountToFrom();
 
-  const modal = new bootstrap.Modal(document.getElementById('modal-add-reg'));
+  const modal = new bootstrap.Modal(document.getElementById("modal-add-reg"));
   modal.show();
+  modalEditFlag = true;
+  idRegAux = id;
+};
 
-  let res = await checkData(recordInfo);
+const update = async (recordBuffer, type, id) => {
+  
+  let full = backendServer + "/controllers/entryPoint.php?type=" + type +"&id=" + id;
+  console.log(recordBuffer)
+  let res = await fetch(full, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(recordBuffer),
+  });
 
-  if(res){
-    
-  }
+ 
+  modalEditFlag = false;
+  return await res.json();
+  
 
-  // // Agregar un evento al botón "Save" dentro del modal para llamar a la función de actualización
-  // document.getElementById('btn-save-modal').addEventListener('click', () => {
-  //   // Lógica para enviar la actualización a la base de datos usando 'recordId' y los valores de los campos del modal
-  //   updateRecordInDB(recordId, /* valores de los campos del modal */); // Implementa esta función de actualización
-  // });
-}
+};
 
-
-const deleteReg = async (id) => {
-
-}
-
+const deleteReg = async (id) => {};
 
 const read = async (type, id) => {
   /*
@@ -333,32 +309,25 @@ const read = async (type, id) => {
     const response = await fetch(full);
 
     if (response.status == 200) {
-
       const data = await response.json();
-      if(id === "all"){
-        if(!data[0].id){
+      if (id === "all") {
+        if (!data[0].id) {
           return null;
-        }else{
+        } else {
           return data;
         }
-      }else{
-        if(!data.id){
+      } else {
+        if (!data.id) {
           return null;
-        }else{
+        } else {
           return data;
         }
       }
-      
-
-    } else if (response.status == 401){
-      
+    } else if (response.status == 401) {
       return await response.json();
-
-    }else if(response.status == 403){
-
+    } else if (response.status == 403) {
       return await response.json();
-    }
-    else {
+    } else {
       return null;
     }
   } catch (error) {
@@ -368,187 +337,192 @@ const read = async (type, id) => {
 };
 
 const save = async (obj, type) => {
-// agregar argumento para reutilizar.
-   const full =
-    backendServer +
-    "/controllers/entryPoint.php?type=" + type;
+  // agregar argumento para reutilizar.
+  const full = backendServer + "/controllers/entryPoint.php?type=" + type;
 
-    try {
-      const response = await fetch(full, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(obj)
-        
-      });
-        
-      resjson = await response.json();
-      
-      return resjson;
-      
-    } catch (error) { 
-      console.error(error.message);
-      return null;
-    }
- 
+  try {
+    const response = await fetch(full, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(obj),
+    });
+
+    resjson = await response.json();
+
+    return resjson;
+  } catch (error) {
+    console.error(error.message);
+    return null;
+  }
 };
 
-
 const loadAccounts = async () => {
-  
   await read("account", "all").then((accountsBuffer) => {
-    console.log(accountsBuffer)
-    if(!accountsBuffer){
-      alert("No hay cuentas para el usuario")
-    }else if (accountsBuffer.mensaje){
-      alert(accountsBuffer.mensaje)
-    }else{ // podriamos preguntar / vlaidar q sea array, pero por def va a haber dos cuentas.
-    for (let acc of accountsBuffer) {
-      //cargamos el drop del modal
-      //se cargan las pills
-      insertAccount(acc)
+    console.log(accountsBuffer);
+    if (!accountsBuffer) {
+      alert("No hay cuentas para el usuario");
+    } else if (accountsBuffer.mensaje) {
+      alert(accountsBuffer.mensaje);
+    } else {
+      // podriamos preguntar / vlaidar q sea array, pero por def va a haber dos cuentas.
+      for (let acc of accountsBuffer) {
+        //cargamos el drop del modal
+        //se cargan las pills
+        insertAccount(acc);
+      }
     }
-  }
-
-
   });
-  return true
+  return true;
 };
 
 const insertAccount = (acc) => {
   let accountContainer = document.getElementById("account");
   let accountToContainer = document.getElementById("account-to");
 
-      //cargamos el drop del modal
-      let opt = document.createElement("option");
-      opt.value = acc.id; //alambre pero sirve: en el value dejamos el id de la cuenta. 
-      opt.appendChild(document.createTextNode(acc.name));
-      accountToContainer.appendChild(opt.cloneNode(true));
-      accountContainer.appendChild(opt);
-      
-      //se cargan las pills
-      loadBalance(acc);
-  }
+  //cargamos el drop del modal
+  let opt = document.createElement("option");
+  opt.value = acc.id; //alambre pero sirve: en el value dejamos el id de la cuenta.
+  opt.appendChild(document.createTextNode(acc.name));
+  accountToContainer.appendChild(opt.cloneNode(true));
+  accountContainer.appendChild(opt);
 
-  const loadTargets = async () => {
-    try {
-      const targetsBuffer = await read("target", "all");
-  
-      console.log(targetsBuffer);
-  
-      if (!targetsBuffer) {
-        console.log("No hay targets");
-      } else if (targetsBuffer.mensaje) {
-        alert(objNuevo.mensaje);
-      } else {
-        for (let target of targetsBuffer) {
-          let targetDiv = document.getElementById("objetivos");
-  
-          let rowDiv = document.createElement("div");
-          rowDiv.classList.add("row");
-          rowDiv.style.padding = "15px";
-          rowDiv.style.borderTop = "1px solid white";
-          rowDiv.style.borderBottom = "1px solid white";
-          rowDiv.style.textAlign = "center";
-          rowDiv.setAttribute("id", `target-${targetsBuffer.indexOf(target)}`);
-          rowDiv.setAttribute("key", target.id);
-  
-          let nameDiv = document.createElement("div");
-          nameDiv.classList.add("col-md-4");
-  
-          let amountDiv = document.createElement("div");
-          amountDiv.classList.add("col-md-4");
-  
-          let deleteDiv = document.createElement("div");
-          deleteDiv.classList.add("col-md-4");
-  
-          let deleteButton = document.createElement("button");
-          deleteButton.setAttribute("id", "btn-target");
-  
-          let deleteButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  
-          let path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          let path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  
-          deleteButton.style.backgroundColor = "white";
-          deleteButton.style.width = "40px";
-          deleteButton.style.height = "40px";
-          deleteButton.style.borderRadius = "50px";
-  
-          deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-          deleteButtonIcon.setAttribute("width", "16");
-          deleteButtonIcon.setAttribute("height", "16");
-          deleteButtonIcon.setAttribute("fill", "currentColor");
-          deleteButtonIcon.setAttribute("class", "bi bi-trash");
-          deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
-  
-          path1.setAttribute("d", "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z");
-          path2.setAttribute("d", "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z");
-  
-          deleteButtonIcon.appendChild(path1);
-          deleteButtonIcon.appendChild(path2);
-  
-          deleteButton.appendChild(deleteButtonIcon);
-          deleteDiv.appendChild(deleteButton);
-  
-          //ver si ahorros usd es más alto que algún target
-  
-          let ahorrosUsdElement = document.getElementById("acc-balance-p-id12");
-          let ahorrosUsdValue = ahorrosUsdElement.textContent;
-  
-          let tgName = document.createElement("p");
-          tgName.appendChild(document.createTextNode(target.name));
-  
-          let tgAmount = document.createElement("p");
-          tgAmount.appendChild(document.createTextNode(target.amount));
-  
-          if (target.amount > ahorrosUsdValue) {
-            tgName.style.color = "green";
-            tgAmount.style.color = "green";
-          } else {
-            tgName.style.color = "red";
-            tgAmount.style.color = "red";
-          }
-  
-          nameDiv.appendChild(tgName);
-          amountDiv.appendChild(tgAmount);
-  
-          rowDiv.appendChild(nameDiv);
-          rowDiv.appendChild(amountDiv);
-          rowDiv.appendChild(deleteDiv);
-  
-          targetDiv.appendChild(rowDiv);
+  //se cargan las pills
+  loadBalance(acc);
+};
+
+const loadTargets = async () => {
+  try {
+    const targetsBuffer = await read("target", "all");
+
+    console.log(targetsBuffer);
+
+    if (!targetsBuffer) {
+      console.log("No hay targets");
+    } else if (targetsBuffer.mensaje) {
+      alert(objNuevo.mensaje);
+    } else {
+      for (let target of targetsBuffer) {
+        let targetDiv = document.getElementById("objetivos");
+
+        let rowDiv = document.createElement("div");
+        rowDiv.classList.add("row");
+        rowDiv.style.padding = "15px";
+        rowDiv.style.borderTop = "1px solid white";
+        rowDiv.style.borderBottom = "1px solid white";
+        rowDiv.style.textAlign = "center";
+        rowDiv.setAttribute("id", `target-${targetsBuffer.indexOf(target)}`);
+        rowDiv.setAttribute("key", target.id);
+
+        let nameDiv = document.createElement("div");
+        nameDiv.classList.add("col-md-4");
+
+        let amountDiv = document.createElement("div");
+        amountDiv.classList.add("col-md-4");
+
+        let deleteDiv = document.createElement("div");
+        deleteDiv.classList.add("col-md-4");
+
+        let deleteButton = document.createElement("button");
+        deleteButton.setAttribute("id", "btn-target");
+
+        let deleteButtonIcon = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "svg"
+        );
+
+        let path1 = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path"
+        );
+        let path2 = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path"
+        );
+
+        deleteButton.style.backgroundColor = "white";
+        deleteButton.style.width = "40px";
+        deleteButton.style.height = "40px";
+        deleteButton.style.borderRadius = "50px";
+
+        deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        deleteButtonIcon.setAttribute("width", "16");
+        deleteButtonIcon.setAttribute("height", "16");
+        deleteButtonIcon.setAttribute("fill", "currentColor");
+        deleteButtonIcon.setAttribute("class", "bi bi-trash");
+        deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
+
+        path1.setAttribute(
+          "d",
+          "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+        );
+        path2.setAttribute(
+          "d",
+          "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+        );
+
+        deleteButtonIcon.appendChild(path1);
+        deleteButtonIcon.appendChild(path2);
+
+        deleteButton.appendChild(deleteButtonIcon);
+        deleteDiv.appendChild(deleteButton);
+
+        //ver si ahorros usd es más alto que algún target
+
+        let ahorrosUsdElement = document.getElementById("acc-balance-p-id12");
+        let ahorrosUsdValue = ahorrosUsdElement.textContent;
+
+        let tgName = document.createElement("p");
+        tgName.appendChild(document.createTextNode(target.name));
+
+        let tgAmount = document.createElement("p");
+        tgAmount.appendChild(document.createTextNode(target.amount));
+
+        if (target.amount > ahorrosUsdValue) {
+          tgName.style.color = "green";
+          tgAmount.style.color = "green";
+        } else {
+          tgName.style.color = "red";
+          tgAmount.style.color = "red";
         }
+
+        nameDiv.appendChild(tgName);
+        amountDiv.appendChild(tgAmount);
+
+        rowDiv.appendChild(nameDiv);
+        rowDiv.appendChild(amountDiv);
+        rowDiv.appendChild(deleteDiv);
+
+        targetDiv.appendChild(rowDiv);
+      }
+    }
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+const loadRegisters = async () => {
+  try {
+    const regsBuffer = await read("register", "all");
+    console.log(regsBuffer);
+
+    if (!regsBuffer) {
+      console.log("No hay registros para el usuario");
+    } else if (regsBuffer.mensaje) {
+      alert(regsBuffer.mensaje);
+    } else {
+      for (let reg of regsBuffer) {
+        reloadTable(reg);
       }
       return true;
-    } catch (error) {
-      console.error(error);
-      return false;
     }
-  };
-  
-
-  const loadRegisters = async () => {
-    try {
-      const regsBuffer = await read("register", "all");
-      console.log(regsBuffer);
-  
-      if (!regsBuffer) {
-        console.log("No hay registros para el usuario");
-      } else if (regsBuffer.mensaje) {
-        alert(regsBuffer.mensaje);
-      } else {
-        for (let reg of regsBuffer) {
-          reloadTable(reg);
-        }
-        return true;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 // const loadReminders = () => {
 
@@ -557,7 +531,7 @@ const insertAccount = (acc) => {
 //     for (let acc of accountsBuffer) {
 //       //cargamos el drop del modal
 //       let opt = document.createElement("option");
-//       opt.value = acc.id; //alambre pero sirve: en el value dejamos el id de la cuenta. 
+//       opt.value = acc.id; //alambre pero sirve: en el value dejamos el id de la cuenta.
 //       opt.appendChild(document.createTextNode(acc.name));
 //       accountToContainer.appendChild(opt.cloneNode(true));
 //       accountContainer.appendChild(opt);
@@ -567,14 +541,12 @@ const insertAccount = (acc) => {
 //   });
 // };
 
-
 //-----------------------------LOAD FIRST TIME---------------------
-
 
 const handleAccountToFrom = () => {
   let accountToDiv = document.getElementById("account-to-div");
   let type = document.getElementById("type").value;
-  console.log(type)
+  console.log(type);
 
   if (type === "Move") {
     if (accountToDiv.classList.contains("d-none")) {
@@ -627,52 +599,66 @@ const disableCategories = () => {
 
 const addRecord = async (event) => {
   event.preventDefault();
-  console.log(event.target);
-//fecha
-  let fecha = new Date();
-  let fechaSegundosIso = new Date((new Date(fecha)).toISOString() );
-  // diferencia entre utc/iso y local. milis - (minOfset*60000)
-  let milisLocal = new Date(fechaSegundosIso.getTime()-(fecha.getTimezoneOffset()*60000));
-  let formateoMysql = milisLocal.toISOString().slice(0, 19).replace('T', ' ');
-
-
 
   let recordBuffer = {
     type: "",
-    regDate: formateoMysql,
+    regDate: "",
     amount: 0,
     category: "",
-    accFrom: "", 
-    accTo: "" 
+    accFrom: "",
+    accTo: "",
   };
 
-  let verif = await checkData(event, recordBuffer);
-  console.log(verif);
-  if(verif == true){
-    console.log("truely", recordBuffer)
-    let res = await save(recordBuffer,'register');
-    if(res.exito){
-      let objNuevo = await read('register', res.id);
-      console.log(objNuevo);
-      if(!objNuevo){
-      alert("Error en lectura de registro nuevo")
-      }else if (objNuevo.mensaje){
-        alert(objNuevo.mensaje)
-      }else{
-        console.log("Se grabo");
-        reloadTable(objNuevo);
-        enableCategories();
-        resetFeedback();
-        refreshMoveBalance(recordBuffer.accTo, recordBuffer.accFrom, recordBuffer.amount);
-        document.getElementById("form-add-reg").reset();
-      }
-      }else{
+  let fecha = new Date();
+  let fechaSegundosIso = new Date(new Date(fecha).toISOString());
+  // diferencia entre utc/iso y local. milis - (minOfset*60000)
+  let milisLocal = new Date(
+    fechaSegundosIso.getTime() - fecha.getTimezoneOffset() * 60000
+  );
+  let formateoMysql = milisLocal.toISOString().slice(0, 19).replace("T", " ");
+  recordBuffer.regDate = formateoMysql;
+
+    //sea save o update, le actualizo la fecha. 
+
+  let verif = await checkData(recordBuffer);
+
+  if (verif == true) {
+    if (!modalEditFlag) {
+      let res = await save(recordBuffer, "register");
+      if (res.exito) {
+        let objNuevo = await read("register", res.id);
+        console.log(objNuevo);
+        if (!objNuevo) {
+          alert("Error en lectura de registro nuevo");
+        } else if (objNuevo.mensaje) {
+          alert(objNuevo.mensaje);
+        } else {
+          console.log("Se grabo");
+          reloadTable(objNuevo);
+          enableCategories();
+          resetFeedback();
+          refreshMoveBalance(
+            recordBuffer.accTo,
+            recordBuffer.accFrom,
+            recordBuffer.amount
+          );
+          document.getElementById("form-add-reg").reset();
+        }
+      } else {
         console.error(res.mensaje);
       }
-  }else{
-
+    } else {
+      // es update
+      let res = await update(recordBuffer, 'register', idRegAux);
+      if(res.exito){
+        window.location.reload(true);
+      }
+    
+    }
+  } else {
+    console.error("Verifacion fallo");
   }
-}
+};
 
 const checkData = async (recordBuffer) => {
   let selectedCategory = document.querySelector(".pressed");
@@ -693,9 +679,9 @@ const checkData = async (recordBuffer) => {
   let accValue = accValueContainer.value;
   let accToValue = accToValueContainer.value;
 
-  let accToText = accToValueContainer.options[accToValueContainer.selectedIndex].text;
+  let accToText =
+    accToValueContainer.options[accToValueContainer.selectedIndex].text;
   let accText = accValueContainer.options[accValueContainer.selectedIndex].text;
-
 
   let isValidType = validateField(moveType);
   messageValidation(moveTypeContainer, moveTypeFeedback, isValidType);
@@ -716,10 +702,7 @@ const checkData = async (recordBuffer) => {
 
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
 
-  console.log(isValidAccount,
-  isValidType,
-  isValidAmount );
-
+  console.log(isValidAccount, isValidType, isValidAmount);
 
   if (
     isValidAccount === true &&
@@ -781,66 +764,54 @@ const validateAmount = async (amt, account, type) => {
     return "El monto no debe ser cero";
   }
 
-  if(moveFlag){
-    accTo = await read('account',account);
-    if(!accTo){
-      return"Error en verificacion de cuenta"
-    }else if(accTo.mensaje){
-      return objNuevo.mensaje
-    }else{
-      if(parseFloat(accTo.balance) < amtInt){
-        return "Sin fondos"
-      }else{
+  if (moveFlag) {
+    accTo = await read("account", account);
+    if (!accTo) {
+      return "Error en verificacion de cuenta";
+    } else if (accTo.mensaje) {
+      return objNuevo.mensaje;
+    } else {
+      if (parseFloat(accTo.balance) < amtInt) {
+        return "Sin fondos";
+      } else {
         return true;
       }
-     
     }
-
-
   }
 
   return true;
-  
 };
 
-
 const validateAccount = async (accValue) => {
-  
-  
-  let res = await read('account', accValue);
-    if(!res){
-      return "Error en verificacion de cuenta"
-    }else if (res.mensaje){
-      return res.mensaje;
-    }else{
-      return true;
-    }
-
-
-
-
+  let res = await read("account", accValue);
+  if (!res) {
+    return "Error en verificacion de cuenta";
+  } else if (res.mensaje) {
+    return res.mensaje;
+  } else {
+    return true;
+  }
 };
 
 const validateMove = async (accValue, accToValue) => {
   if (accValue === accToValue) return "Cuenta to igual a cuenta from";
 
-  acc = await read('account',accValue);
-  accTo = await read('account',accToValue);
-  if(!acc || !accTo ){
+  acc = await read("account", accValue);
+  accTo = await read("account", accToValue);
+  if (!acc || !accTo) {
     return "Error en la verificacion de cuentas";
-  }else if (accTo.mensaje ){
-    return accTo.mensaje
-  }else if (acc.mensaje){
-    return acc.mensaje
-  }else{
-    if(acc.currency != accTo.currency){
-      return "Diferentes monedas"
-    }else{
-        return true;
+  } else if (accTo.mensaje) {
+    return accTo.mensaje;
+  } else if (acc.mensaje) {
+    return acc.mensaje;
+  } else {
+    if (acc.currency != accTo.currency) {
+      return "Diferentes monedas";
+    } else {
+      return true;
     }
   }
-  }
-
+};
 
 // const realoadSavingAccount = (enteredAmount) => {
 //   let savingAccountElement = document.getElementById("cajaDeAhorro");
@@ -849,64 +820,61 @@ const validateMove = async (accValue, accToValue) => {
 //   savingAccountElement.innerText = newValue;
 // };
 
-const refreshMoveBalance =  async (accTo, accFrom, amount) => {
-  
+const refreshMoveBalance = async (accTo, accFrom, amount) => {
   let balanceContainer = document.getElementById("balance");
   let balance = parseInt(balanceContainer.innerHTML);
-  amount = parseInt(amount)
-  if(accTo != null ){
-    let accToBuffer = await read('account',accTo);
+  amount = parseInt(amount);
+  if (accTo != null) {
+    let accToBuffer = await read("account", accTo);
 
-    if(!accToBuffer){
-      alert("Error en lectura de cuenta nueva")
-    }else if (accToBuffer.mensaje){
-      alert(accToBuffer.mensaje)
-    }else{
-    
-    let pAccountBalance = document.getElementById("acc-balance-p-id" + accToBuffer.id);
-    pAccountBalance.innerText = accToBuffer.balance.toFixed(0);
+    if (!accToBuffer) {
+      alert("Error en lectura de cuenta nueva");
+    } else if (accToBuffer.mensaje) {
+      alert(accToBuffer.mensaje);
+    } else {
+      let pAccountBalance = document.getElementById(
+        "acc-balance-p-id" + accToBuffer.id
+      );
+      pAccountBalance.innerText = accToBuffer.balance.toFixed(0);
 
-    if(accToBuffer.currency.toUpperCase() == "ARS"){
-      console.log(balance)
-      console.log(accToBuffer.balance)
-      balance = balance + amount;
-      console.log(balance)
+      if (accToBuffer.currency.toUpperCase() == "ARS") {
+        console.log(balance);
+        console.log(accToBuffer.balance);
+        balance = balance + amount;
+        console.log(balance);
+      } else if (accToBuffer.currency.toUpperCase() == "USD") {
+        balance = balance + amount * ARS_USD;
+      }
 
-    }else if (accToBuffer.currency.toUpperCase() == "USD"){
-      balance = balance + amount * ARS_USD;
-    }
-
-    balanceContainer.innerText = balance.toFixed(0);
+      balanceContainer.innerText = balance.toFixed(0);
     }
   }
 
-  if(accFrom != null){
+  if (accFrom != null) {
+    let accFromBuffer = await read("account", accFrom);
+    if (!accFromBuffer) {
+      alert("Error en lectura de cuenta nueva");
+    } else if (accFromBuffer.mensaje) {
+      alert(accFromBuffer.mensaje);
+    } else {
+      let balanceContainer = document.getElementById("balance");
+      let balance = parseFloat(balanceContainer.innerHTML);
+      let pAccountBalance = document.getElementById(
+        "acc-balance-p-id" + accFromBuffer.id
+      );
 
-      let accFromBuffer = await read('account',accFrom);
-      if(!accFromBuffer){
-        alert("Error en lectura de cuenta nueva")
-      }else if (accFromBuffer.mensaje){
-        alert(accFromBuffer.mensaje)
-      }else{
+      pAccountBalance.innerText = accFromBuffer.balance.toFixed(0);
 
-        let balanceContainer = document.getElementById("balance");
-        let balance = parseFloat(balanceContainer.innerHTML);
-        let pAccountBalance = document.getElementById("acc-balance-p-id" + accFromBuffer.id);
-
-        pAccountBalance.innerText = accFromBuffer.balance.toFixed(0);
-
-        if(accFromBuffer.currency == "ARS"){
-          balance = balance - amount;
-        }else if (accFromBuffer.currency == "USD"){
-          balance = balance - amount * ARS_USD;
-        }
-
-        balanceContainer.innerText = balance.toFixed(0);
+      if (accFromBuffer.currency == "ARS") {
+        balance = balance - amount;
+      } else if (accFromBuffer.currency == "USD") {
+        balance = balance - amount * ARS_USD;
       }
-    }
-    
-};
 
+      balanceContainer.innerText = balance.toFixed(0);
+    }
+  }
+};
 
 const reloadTable = async (recordBuffer) => {
   const table = document.querySelector("table");
@@ -914,15 +882,15 @@ const reloadTable = async (recordBuffer) => {
   let accFromName = "None";
   let accToName = "None";
 
-   if(recordBuffer.id_acc_to){
-    let accTo = await read("account",recordBuffer.id_acc_to);
+  if (recordBuffer.id_acc_to) {
+    let accTo = await read("account", recordBuffer.id_acc_to);
     accToName = accTo.name;
-   }
-   if(recordBuffer.id_acc_from){
-    let accFrom = await read("account",recordBuffer.id_acc_from);
+  }
+  if (recordBuffer.id_acc_from) {
+    let accFrom = await read("account", recordBuffer.id_acc_from);
     accFromName = accFrom.name;
-   }
-    row.innerHTML = `
+  }
+  row.innerHTML = `
     <th>${table.rows.length}</th>
     <td>${recordBuffer.reg_date}</td>
     <td>${recordBuffer.type}</td>
@@ -934,7 +902,7 @@ const reloadTable = async (recordBuffer) => {
     </button>
     <button class="btn btn-danger text-white delete-btn" data-id="${recordBuffer.id}" > Delete
     </button></td>`;
-  
+
   table.querySelector("tbody").append(row);
 };
 
@@ -992,28 +960,25 @@ const handleCloseObjModal = () => {
   //ARREGLAR
   // let objModal = new bootstrap.Modal(document.getElementById("objModal"));
   objModal.hide();
-  console.log('Modal cerrado')
+  console.log("Modal cerrado");
 };
 
 const handleSaveObjModal = async (event) => {
-  event.preventDefault()
+  event.preventDefault();
   //Hacer validacion de campos vacios
 
-
-  let nombreObjetivo = document.getElementById('nombre-objetivo')
-  let montoObjetivo = document.getElementById('monto-objetivo')
-  let nombreObjetivoValue = nombreObjetivo.value
-  let montoObjetivoValue = montoObjetivo.value
+  let nombreObjetivo = document.getElementById("nombre-objetivo");
+  let montoObjetivo = document.getElementById("monto-objetivo");
+  let nombreObjetivoValue = nombreObjetivo.value;
+  let montoObjetivoValue = montoObjetivo.value;
 
   let testObj = {
-    name : nombreObjetivoValue,
+    name: nombreObjetivoValue,
     amount: montoObjetivoValue,
     //currency
   };
 
-  const full =
-  backendServer +
-  "/controllers/entryPoint.php?type=target";
+  const full = backendServer + "/controllers/entryPoint.php?type=target";
 
   try {
     const response = await fetch(full, {
@@ -1021,38 +986,42 @@ const handleSaveObjModal = async (event) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(testObj)
+      body: JSON.stringify(testObj),
     });
-  } catch (error) { 
-    alert('ERROR: ', error.message)
+  } catch (error) {
+    alert("ERROR: ", error.message);
   }
   objModal.hide();
 };
 
 const handleDeleteTarget = async (event) => {
-  event.preventDefault()
+  event.preventDefault();
   //Hacer validacion de campos vacios
-  let elementToDelete = event.target
-  let deleteTarget = elementToDelete.parentNode.parentNode
-  let keyToDelete = deleteTarget.getAttribute('key')
+  let elementToDelete = event.target;
+  let deleteTarget = elementToDelete.parentNode.parentNode;
+  let keyToDelete = deleteTarget.getAttribute("key");
 
-  const full =`${backendServer}/controllers/entryPoint.php?type=target&id=${keyToDelete}`;
+  const full = `${backendServer}/controllers/entryPoint.php?type=target&id=${keyToDelete}`;
 
   try {
-    console.log('entre')
-    const response = await fetch(full,{
+    console.log("entre");
+    const response = await fetch(full, {
       method: "DELETE",
     });
-    console.log('res',response)
+    console.log("res", response);
     if (response.ok) {
-      console.log('Target deleted successfully');
+      console.log("Target deleted successfully");
     } else {
-      console.error('Failed to delete target:', response.status, response.statusText);
+      console.error(
+        "Failed to delete target:",
+        response.status,
+        response.statusText
+      );
     }
   } catch (error) {
-    alert('ERROR: ', error.message)
+    alert("ERROR: ", error.message);
   }
-}
+};
 
 //-------------------------------------------
 
@@ -1068,7 +1037,6 @@ const handleDeleteTarget = async (event) => {
 //   reminderModal.show();
 //   return;
 // };
-
 
 // const handleCloseRecordatorioModal = () => {
 //   console.log("test 3");
@@ -1098,7 +1066,7 @@ const resetFeedback = () => {
 //       console.log("No hay registros para el usuario")
 //     }else if (regsBuffer.mensaje){
 //       alert(regsBuffer.mensaje)
-//     }else{ 
+//     }else{
 //       console.log(regsBuffer)
 //     }
 //   });
