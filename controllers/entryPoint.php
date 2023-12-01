@@ -346,7 +346,7 @@ switch ($typeReq) {
       if (isset($_SESSION['user_id'])) {
         if ($permissionController->tienePermiso('crear cuenta', $_SESSION['user_id'])) {
           $data = json_decode(file_get_contents('php://input'), true);
-          $resu = $accController->save($data, $_SESSION['user_id']);
+          $resu = $accController->save($data, $_SESSION['user_id'], "ARS");
           if ($resu) {
             $respuesta = [
               "exito" => true,

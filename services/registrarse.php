@@ -1,7 +1,13 @@
 <?php
 
 require_once "../conf/conn_mysql.php";
+require_once "../controllers/AccountController.php";
+
+$accController = new AccountController();
+
 header("Content-Type: application/json");
+
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -38,13 +44,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $consulta->bindParam(4, $hash, PDO::PARAM_STR);
 
         if($consulta->execute()){
-            $respuesta = [
-                "exito" => true,
-                "mensaje" => "Creado exitosamente"
-            ];
 
-            http_response_code(200);
-            echo json_encode($respuesta);
+            $id = $conn->lastInsertId();
+            $accARS = [
+                "name" => "Ahorros ARS",
+                "description" => "Ahorro",
+                "balance" => 0
+            ];
+            $accUSD = [
+                "name" => "Ahorros USD",
+                "description" => "Ahorro",
+                "balance" => 0
+            ];
+            $role = 1;
+            if($accController->save($accUSD, $id, "USD") && 
+                $accController->save($accARS, $id, "ARS")) {
+
+                    $consulta = $conn->prepare("INSERT INTO roles_usuarios (id_user, id_role) VALUES (?,?)");
+                    $consulta->bindParam(1, $id, PDO::PARAM_INT);
+                    $consulta->bindParam(2, $role, PDO::PARAM_INT);
+
+                    $consulta->execute();
+                    
+                    $respuesta = [
+                        "exito" => true,
+                        "mensaje" => "Creado exitosamente"
+                    ];
+        
+                    http_response_code(200);
+                    echo json_encode($respuesta);
+
+                }else{
+                    $respuesta = [
+                        "exito" => false,
+                        "mensaje" => "ERROR"
+                    ];
+        
+                    http_response_code(200);
+                    echo json_encode($respuesta);
+                }   
+
+
+
+
+
+            
         }else{
             $respuesta = [
                 "exito" => false,

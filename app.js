@@ -169,8 +169,7 @@ const loadBalance = (acc) => {
 
   let pBalance = document.createElement("p");
   pBalance.classList.add("account-balance-p", "text-center");
-  //ojo aca: ID en html == acc.id
-  pBalance.setAttribute("id", "acc-balance-p-id" + acc.id);
+  pBalance.setAttribute("id", "acc-balance-p-" + acc.name.split(' ').join(''));
   pBalance.append(acc.balance.toFixed(0));
 
   divAccountBalance.appendChild(pBalance);
@@ -497,7 +496,7 @@ const loadTargets = async () => {
 
         //ver si ahorros usd es más alto que algún target
 
-        let ahorrosUsdElement = document.getElementById("acc-balance-p-id12");
+        let ahorrosUsdElement = document.getElementById("acc-balance-p-AhorrosUSD");
         let ahorrosUsdValue = ahorrosUsdElement.textContent;
 
         let tgName = document.createElement("p");
@@ -860,7 +859,7 @@ const refreshMoveBalance = async (accTo, accFrom, amount) => {
       alert(accToBuffer.mensaje);
     } else {
       let pAccountBalance = document.getElementById(
-        "acc-balance-p-id" + accToBuffer.id
+        "acc-balance-p-" + accToBuffer.name.split(' ').join('')
       );
       pAccountBalance.innerText = accToBuffer.balance.toFixed(0);
 
@@ -887,7 +886,7 @@ const refreshMoveBalance = async (accTo, accFrom, amount) => {
       let balanceContainer = document.getElementById("balance");
       let balance = parseFloat(balanceContainer.innerHTML);
       let pAccountBalance = document.getElementById(
-        "acc-balance-p-id" + accFromBuffer.id
+        "acc-balance-p-" + accToBuffer.name.split(' ').join('')
       );
 
       pAccountBalance.innerText = accFromBuffer.balance.toFixed(0);
