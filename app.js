@@ -91,7 +91,6 @@ const checkPermission = async () => {
 
   let resjson = await res.json();
 
-  console.log(resjson);
 
   if (resjson.mensaje == "login") {
     return "login";
@@ -217,7 +216,6 @@ const editReg = async (id) => {
  
   moveTypeContainer.value = recordInfo.type;
   enteredAmountInput.value = recordInfo.amount;
-  console.log(recordInfo.id_acc_to);
 
   if (recordInfo.id_acc_to && recordInfo.id_acc_from) {
     // move
@@ -263,7 +261,6 @@ const editReg = async (id) => {
 const update = async (recordBuffer, type, id) => {
   
   let full = backendServer + "/controllers/entryPoint.php?type=" + type +"&id=" + id;
-  console.log(recordBuffer)
   let res = await fetch(full, {
     method: "PUT",
     headers: {
@@ -280,7 +277,6 @@ const update = async (recordBuffer, type, id) => {
 };
 
 const deleteReg = async (id) => {
-  console.log('asd', id)
 
   let moveTypeContainer = document.getElementById("type");
   let accValueContainer = document.getElementById("account");
@@ -295,10 +291,10 @@ const deleteReg = async (id) => {
   const response = await fetch(url,{
     method: "DELETE",
   });
-  console.log('res',response)
   if (response.ok) {
-    console.log('Target deleted successfully');
-    window.location.reload(true);
+    let a  = await response.json();
+
+   window.location.reload(true);
 
   } else {
     console.error('Failed to delete target:', response.status, response.statusText);
@@ -386,7 +382,6 @@ const save = async (obj, type) => {
 
 const loadAccounts = async () => {
   await read("account", "all").then((accountsBuffer) => {
-    console.log(accountsBuffer);
     if (!accountsBuffer) {
       alert("No hay cuentas para el usuario");
     } else if (accountsBuffer.mensaje) {
@@ -422,7 +417,6 @@ const loadTargets = async () => {
   try {
     const targetsBuffer = await read("target", "all");
 
-    console.log(targetsBuffer);
 
     if (!targetsBuffer) {
       console.log("No hay targets");
@@ -533,10 +527,10 @@ const loadTargets = async () => {
 const loadRegisters = async () => {
   try {
     const regsBuffer = await read("register", "all");
-    console.log(regsBuffer);
 
     if (!regsBuffer) {
       console.log("No hay registros para el usuario");
+      return true;
     } else if (regsBuffer.mensaje) {
       alert(regsBuffer.mensaje);
     } else {
@@ -572,7 +566,6 @@ const loadRegisters = async () => {
 const handleAccountToFrom = () => {
   let accountToDiv = document.getElementById("account-to-div");
   let type = document.getElementById("type").value;
-  console.log(type);
 
   if (type === "Move") {
     if (accountToDiv.classList.contains("d-none")) {
@@ -653,7 +646,6 @@ const addRecord = async (event) => {
       let res = await save(recordBuffer, "register");
       if (res.exito) {
         let objNuevo = await read("register", res.id);
-        console.log(objNuevo);
         if (!objNuevo) {
           alert("Error en lectura de registro nuevo");
         } else if (objNuevo.mensaje) {
@@ -728,7 +720,6 @@ const checkData = async (recordBuffer) => {
 
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
 
-  console.log(isValidAccount, isValidType, isValidAmount);
 
   if (
     isValidAccount === true &&
@@ -864,10 +855,8 @@ const refreshMoveBalance = async (accTo, accFrom, amount) => {
       pAccountBalance.innerText = accToBuffer.balance.toFixed(0);
 
       if (accToBuffer.currency.toUpperCase() == "ARS") {
-        console.log(balance);
-        console.log(accToBuffer.balance);
+
         balance = balance + amount;
-        console.log(balance);
       } else if (accToBuffer.currency.toUpperCase() == "USD") {
         balance = balance + amount * ARS_USD;
       }
@@ -1030,11 +1019,9 @@ const handleDeleteTarget = async (event) => {
   const full = `${backendServer}/controllers/entryPoint.php?type=target&id=${keyToDelete}`;
 
   try {
-    console.log("entre");
     const response = await fetch(full, {
       method: "DELETE",
     });
-    console.log("res", response);
     if (response.ok) {
       console.log("Target deleted successfully");
     } else {

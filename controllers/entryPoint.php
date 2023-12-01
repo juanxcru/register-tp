@@ -139,7 +139,6 @@ switch ($typeReq) {
           break;
         }
       }
-      
       else
       if(isset($_GET['type']) && $_GET['type'] == 'account' && isset($_GET['id'])){ // cuenta por id
 
@@ -454,7 +453,7 @@ switch ($typeReq) {
       if(isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id'])){ // cuenta por id
 
         if (isset($_SESSION['user_id'])){
-          if($permissionController->tienePermiso('eliminar objetivo', $_SESSION['user_id'])){
+          if($permissionController->tienePermiso('eliminar registro', $_SESSION['user_id'])){
             
             $data = $regController->deleteTarget($_GET['id'],$_SESSION['user_id']);
 
@@ -513,7 +512,7 @@ switch ($typeReq) {
       }
 
     }
-
+    break;
   case 'PUT':
     if (isset($_GET['type']) && $_GET['type'] == "register" && isset($_GET['id'])) {
       if (isset($_SESSION['user_id'])) {

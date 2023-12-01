@@ -61,7 +61,11 @@ public function deleteTarget($id, $idUser) {
 
   require "../conf/conn_mysql.php";
 
-  $query = 'DELETE FROM reg WHERE id = ?';
+
+  $actualReg = $this->readOneById($id, $idUser);
+  if($this->reverseReg($actualReg['id_acc_to'], $actualReg['id_acc_from'], $actualReg['amount'], $idUser)){
+    $query = 'DELETE FROM reg WHERE id = ?';
+
 
     $consulta = $conn->prepare($query);
 
@@ -74,6 +78,13 @@ public function deleteTarget($id, $idUser) {
     }catch(Exception $e){
       return false;
     }
+
+  }
+
+
+
+
+  
     
   }
 
