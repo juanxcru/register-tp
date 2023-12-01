@@ -36,10 +36,9 @@ class AccountController {
 
   }
 
-  public function save($data, $idUser){
+  public function save($data, $idUser, $crcy){
     
     require "../conf/conn_mysql.php";
-    $crcy = "ARS";
     
     $consulta = $conn->prepare("INSERT INTO accounts (name, description, currency, balance, id_user) VALUES (?, ?, ?, ?, ?);");
     
