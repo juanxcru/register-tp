@@ -2,6 +2,14 @@ const backendServer = "http://localhost/TP-LAB-PROG/register-tp";
 const ARS_USD = 1000;
 let modalEditFlag = false;
 let idRegAux = 0;
+
+//obj modal target
+let modalTarget = new bootstrap.Modal(document.getElementById("modalTarget"));
+//obj modal reg 
+let modalReg = new bootstrap.Modal(document.getElementById("modal-add-reg"));
+
+
+
 const begin = async () => {
   let aut = await checkPermission();
 
@@ -66,15 +74,10 @@ const begin = async () => {
         .addEventListener("click", handleDeleteTarget);
     }
 
-    // document
-    //   .getElementById("btn-close-recordatorio-modal")
-    //   .addEventListener("click", handleCloseRecordatorioModal);
-    // document
-    //   .getElementById("btn-save-recordatorio-modal")
-    //   .addEventListener("click", handleSaveRecordatorioModal);
     document
       .getElementById("type")
       .addEventListener("change", handleAccountToFrom);
+
   } else if (aut === "login") {
     location.assign(
       "http://localhost/TP-LAB-PROG/register-tp/registrarse.html"
@@ -252,8 +255,7 @@ const editReg = async (id) => {
 
   handleAccountToFrom();
 
-  const modal = new bootstrap.Modal(document.getElementById("modal-add-reg"));
-  modal.show();
+  modalReg.show();
   modalEditFlag = true;
   idRegAux = id;
 };
@@ -564,6 +566,7 @@ const loadRegisters = async () => {
 //-----------------------------LOAD FIRST TIME---------------------
 
 const handleAccountToFrom = () => {
+  console.log("A")
   let accountToDiv = document.getElementById("account-to-div");
   let type = document.getElementById("type").value;
 
@@ -661,6 +664,7 @@ const addRecord = async (event) => {
             recordBuffer.amount
           );
           document.getElementById("form-add-reg").reset();
+          modalReg.hide();
         }
       } else {
         console.error(res.mensaje);
@@ -935,15 +939,6 @@ const closeModal = () => {
   enableCategories();
 };
 
-// const handleShowReminderHover = () => {
-//   let recordElement = document.getElementById("recordatorios");
-//   recordElement.classList.remove("d-none");
-// };
-
-// const handleHideReminderHover = () => {
-//   let recordElement = document.getElementById("recordatorios");
-//   recordElement.classList.add("d-none");
-// };
 
 //-----------OBJ FUNC--------------------------------
 
@@ -961,20 +956,16 @@ const handleObjetiveModal = () => {
   handleObjModalOpen();
 };
 
-//ARREGLAR ESTA COSA HORRIBLE DEL MODAL
 
-let objModal = new bootstrap.Modal(document.getElementById("objModal"));
 
 const handleObjModalOpen = () => {
-  objModal.show();
+  modalTarget.show();
   return;
 };
 
 const handleCloseObjModal = () => {
-  // console.log("test 1");
-  //ARREGLAR
-  // let objModal = new bootstrap.Modal(document.getElementById("objModal"));
-  objModal.hide();
+  
+  modalTarget.hide();
   console.log("Modal cerrado");
 };
 
@@ -1006,7 +997,7 @@ const handleSaveObjModal = async (event) => {
   } catch (error) {
     alert("ERROR: ", error.message);
   }
-  objModal.hide();
+  modalTarget.hide();
 };
 
 const handleDeleteTarget = async (event) => {
