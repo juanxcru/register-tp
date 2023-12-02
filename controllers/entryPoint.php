@@ -268,7 +268,7 @@ switch ($typeReq) {
                   if (isset($_SESSION['user_id'])) {
                     if ($permissionController->tienePermiso('ver registro', $_SESSION['user_id'])) {
 
-                      $data = $regController->readOneById($_GET['id'], $_SESSION['user_id']);
+                      $data = $regController->readOneByIdAccName($_GET['id'], $_SESSION['user_id']);
 
                       $jsonData = json_encode($data);
                       header('Content-Type: application/json');
@@ -345,21 +345,12 @@ switch ($typeReq) {
       if (isset($_SESSION['user_id'])) {
         if ($permissionController->tienePermiso('crear cuenta', $_SESSION['user_id'])) {
           $data = json_decode(file_get_contents('php://input'), true);
-          $resu = $accController->save($data, $_SESSION['user_id'], "ARS");
-          if ($resu) {
-            $respuesta = [
-              "exito" => true,
-              "mensaje" => "Save OK",
-              "id" => $resu
-            ];
+          $respuesta = $accController->save($data, $_SESSION['user_id']);
+          if ($respuesta['exito'] == true) {
             http_response_code(200);
             echo json_encode($respuesta);
           } else {
-            $respuesta = [
-              "exito" => false,
-              "mensaje" => "BBDD error"
-            ];
-            http_response_code(500);
+            http_response_code(400);
             echo json_encode($respuesta);
           }
         } else {
@@ -369,7 +360,6 @@ switch ($typeReq) {
           ];
           http_response_code(401);
           echo json_encode($respuesta);
-
         }
       } else {
         $respuesta = [

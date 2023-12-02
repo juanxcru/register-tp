@@ -7,76 +7,87 @@ let idRegAux = 0;
 let modalTarget = new bootstrap.Modal(document.getElementById("modalTarget"));
 //obj modal reg 
 let modalReg = new bootstrap.Modal(document.getElementById("modal-add-reg"));
-
+// obj modal-add-acc
+let modalAcc = new bootstrap.Modal(document.getElementById("modal-add-acc"));
 
 
 const begin = async () => {
   let aut = await checkPermission();
 
   if (aut === true) {
-    let targetsLoaded;
-    let regLoaded = await loadRegisters();
-    let accountsLoaded = await loadAccounts();
-    if (accountsLoaded) {
-      targetsLoaded = await loadTargets();
-    } // se cargan todas las cuentas en el modal de nuevo registro y en las pills con el balance
+
+    
+    document
+    .getElementById("type")
+    .addEventListener("change", handleAccountToFrom);
 
     document
-      .getElementById("btn-save-acc-modal")
-      .addEventListener("click", addAccount);
-    document
-      .getElementById("btn-close-modal")
-      .addEventListener("click", closeModal);
-    document
-      .getElementById("btn-save-modal")
-      .addEventListener("click", addRecord);
+    .getElementById("btn-save-acc-modal")
+    .addEventListener("click", addAccount);
+  document
+    .getElementById("btn-close-modal")
+    .addEventListener("click", closeModal);
+  document
+    .getElementById("btn-save-modal")
+    .addEventListener("click", addRecord);
 
-    if (regLoaded) {
-      document
+  document
+    .getElementById("div-categoria")
+    .addEventListener("click", selectCategory);
+
+  document
+    .getElementById("btn-show-objetive")
+    .addEventListener("mouseover", handleShowObjetiveHover);
+  document
+    .getElementById("btn-show-objetive")
+    .addEventListener("mouseleave", handleHideObjetiveHover);
+  document
+    .getElementById("objetivos")
+    .addEventListener("mouseover", handleShowObjetiveHover);
+  document
+    .getElementById("objetivos")
+    .addEventListener("mouseleave", handleHideObjetiveHover);
+  //this
+  document
+    .getElementById("btn-show-objetive")
+    .addEventListener("click", handleObjetiveModal);
+  // document
+  //   .getElementById("btn-show-record")
+  //   .addEventListener("click", handleReminderModal);
+
+  document
+    .getElementById("btn-close-obj-modal")
+    .addEventListener("click", handleCloseObjModal);
+  document
+    .getElementById("btn-save-obj-modal")
+    .addEventListener("click", handleSaveObjModal);
+    document
         .getElementById("table-reg")
         .addEventListener("click", editDeleteReg);
-    }
 
-    document
-      .getElementById("div-categoria")
-      .addEventListener("click", selectCategory);
+    let targetsLoaded;  
+    let regLoaded = await loadRegisters();
+    let accountsLoaded = await loadAccounts();
+    // if (accountsLoaded) {
+      targetsLoaded = await loadTargets();
+    // } 
 
-    document
-      .getElementById("btn-show-objetive")
-      .addEventListener("mouseover", handleShowObjetiveHover);
-    document
-      .getElementById("btn-show-objetive")
-      .addEventListener("mouseleave", handleHideObjetiveHover);
-    document
-      .getElementById("objetivos")
-      .addEventListener("mouseover", handleShowObjetiveHover);
-    document
-      .getElementById("objetivos")
-      .addEventListener("mouseleave", handleHideObjetiveHover);
-    //this
-    document
-      .getElementById("btn-show-objetive")
-      .addEventListener("click", handleObjetiveModal);
-    // document
-    //   .getElementById("btn-show-record")
-    //   .addEventListener("click", handleReminderModal);
-
-    document
-      .getElementById("btn-close-obj-modal")
-      .addEventListener("click", handleCloseObjModal);
-    document
-      .getElementById("btn-save-obj-modal")
-      .addEventListener("click", handleSaveObjModal);
-
-    if (targetsLoaded) {
+    // if (targetsLoaded) {
       document
         .getElementById("btn-target")
         .addEventListener("click", handleDeleteTarget);
-    }
+    // }
 
-    document
-      .getElementById("type")
-      .addEventListener("change", handleAccountToFrom);
+    // if (regLoaded) {
+      
+    // }
+
+
+    
+   
+
+
+    
 
   } else if (aut === "login") {
     location.assign(
@@ -111,27 +122,77 @@ const addAccount = async (event) => {
   let accDescr = document.getElementById("acc-descrip").value;
   let accBalance = document.getElementById("acc-init-balance").value;
 
-  let obj = {
-    name: accName,
-    description: accDescr,
-    balance: accBalance,
-  };
+  let accNameContainer = document.getElementById("acc-name");
+  let accDescrContainer = document.getElementById("acc-descrip");
+  let accBalanceContainer = document.getElementById("acc-init-balance");
+  //valudar campos:
+  // nombre: 12 ch
+  // balance: numero 
+  // descr: 50
 
-  let resjson = await save(obj, "account");
+  let accNameFdbk = document.getElementById("accNameFeedback");
+  let accDescrFdbk =  document.getElementById("accDescrFeedback");
+  let accBalanceFdbk =  document.getElementById("accInitBalanceFeedback");
 
-  if (resjson.exito) {
-    document.getElementById("form-add-reg").reset();
-    objNuevo = await read("account", resjson.id);
-    if (!objNuevo) {
-      alert("Error en lectura de cuenta nueva");
-    } else if (objNuevo.mensaje) {
-      alert(objNuevo.mensaje);
-    } else {
-      insertAccount(objNuevo);
-    }
-  } else {
-    console.error(resjson.mensaje);
+  if( accBalance.includes(',')){
+    console.log(accBalance)
+    accBalance = accBalance.split(',').join('.')  
+    console.log(accBalance)
+    console.log(parseFloat(accBalance));
   }
+
+  let isValidName = validateField(accName, 12);
+  let isValidDescr = validateField(accDescr, 50);
+  let isValidBalance = await validateAmount(accBalance); // anda porque el arg3 depende del arg2 en la fun.
+
+  messageValidation(accNameContainer, accNameFdbk , isValidName);
+  messageValidation(accDescrContainer, accDescrFdbk , isValidDescr);
+  messageValidation(accBalanceContainer, accBalanceFdbk , isValidBalance);
+
+  if (isValidBalance == true &&
+      isValidName == true &&
+      isValidDescr == true ){
+
+        let obj = {
+          name: accName,
+          description: accDescr,
+          balance: parseFloat(accBalance),
+          currency : "ARS" // va hardcode porque no es userinput
+        };
+        console.log(obj)
+        let resjson = await save(obj, "account");
+        if (resjson.exito) {
+          objNuevo = await read("account", resjson.id);
+          if (!objNuevo) {
+            alert("Error en lectura de cuenta nueva");
+          } else if (objNuevo.mensaje) {
+            alert(objNuevo.mensaje);
+          } else {
+            insertAccount(objNuevo);
+            document.getElementById("form-add-acc").reset();
+            modalAcc.hide();           
+          }
+        } else {
+          if(resjson.err == "name"){
+            messageValidation(accNameContainer, accNameFdbk, resjson.mensaje);
+          }else 
+          if(resjson.err == "descr"){
+            messageValidation(accDescrContainer, accDescrFdbk , resjson.mensaje);
+          }else
+          if(resjson.err == "balance"){
+            messageValidation(accBalanceContainer, accBalanceFdbk , resjson.mensaje);
+          }else
+          if(resjson.err == "sys"){
+            alert("Error de sistema :" + resjson.mensaje);
+          }else
+          if(resjson.err == "db"){
+            alert("Error al grabar: " + resjson.mensaje)
+          }else{
+            alert("Error: " + resjson.mensaje)
+          }
+          console.error(resjson.mensaje);
+        }
+      }
 };
 
 const testConn = async () => {
@@ -212,9 +273,10 @@ const editReg = async (id) => {
   let enteredAmountInput = document.getElementById("amount");
 
   const recordInfo = await read("register", id);
-  if(recordInfo.category = ""){
+  if(recordInfo.category != ""){
     let selectedCategory = document.getElementById(recordInfo.category);
     selectedCategory.classList.add("pressed");
+     disableCategories();
   }
  
   moveTypeContainer.value = recordInfo.type;
@@ -252,7 +314,6 @@ const editReg = async (id) => {
       }
     }
   }
-
   handleAccountToFrom();
 
   modalReg.show();
@@ -361,7 +422,6 @@ const read = async (type, id) => {
 };
 
 const save = async (obj, type) => {
-  // agregar argumento para reutilizar.
   const full = backendServer + "/controllers/entryPoint.php?type=" + type;
 
   try {
@@ -537,7 +597,7 @@ const loadRegisters = async () => {
       alert(regsBuffer.mensaje);
     } else {
       for (let reg of regsBuffer) {
-        reloadTable(reg);
+        await reloadTable(reg);
       }
       return true;
     }
@@ -655,10 +715,10 @@ const addRecord = async (event) => {
           alert(objNuevo.mensaje);
         } else {
           console.log("Se grabo");
-          reloadTable(objNuevo);
+          await reloadTable(objNuevo);
           enableCategories();
           resetFeedback();
-          refreshMoveBalance(
+          await refreshMoveBalance(
             recordBuffer.accTo,
             recordBuffer.accFrom,
             recordBuffer.amount
@@ -719,7 +779,10 @@ const checkData = async (recordBuffer) => {
     }
     messageValidation(accToValueContainer, accToFeedback, isValidAccount);
   }
-
+  // si tiene una , le pongo un punto:
+  if( enteredAmount.includes(',')){
+    enteredAmount = enteredAmount.split(',').join('.')  
+  }
   let isValidAmount = await validateAmount(enteredAmount, accValue, moveType);
 
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
@@ -731,7 +794,7 @@ const checkData = async (recordBuffer) => {
     isValidAmount === true
   ) {
     recordBuffer.type = moveType;
-    recordBuffer.amount = enteredAmount;
+    recordBuffer.amount = parseFloat(enteredAmount);
     if (moveType === "Income") {
       recordBuffer.accFrom = null;
       recordBuffer.accTo = accValue;
@@ -766,14 +829,20 @@ const messageValidation = (container, containerFeedback, isValid) => {
   }
 };
 
-const validateField = (field) => {
+const validateField = (field, long) => {
   if (field == "") {
-    return "Tiene que elegir una opcion";
+    return "Tiene que completar este campo";
+  }else if (long){
+    if( field.length > long){
+      return `Debe tener como maximo ${long} caracteres`;
+    }
   }
+
   return true;
 };
 
 const validateAmount = async (amt, account, type) => {
+  
   let amtInt = parseFloat(amt);
   let moveFlag = type === "Spent" || type === "Move" ? true : false;
 
@@ -843,8 +912,8 @@ const validateMove = async (accValue, accToValue) => {
 
 const refreshMoveBalance = async (accTo, accFrom, amount) => {
   let balanceContainer = document.getElementById("balance");
-  let balance = parseInt(balanceContainer.innerHTML);
-  amount = parseInt(amount);
+  let balance = parseFloat(balanceContainer.innerHTML);
+  amount = parseFloat(amount);
   if (accTo != null) {
     let accToBuffer = await read("account", accTo);
 
@@ -859,7 +928,6 @@ const refreshMoveBalance = async (accTo, accFrom, amount) => {
       pAccountBalance.innerText = accToBuffer.balance.toFixed(0);
 
       if (accToBuffer.currency.toUpperCase() == "ARS") {
-
         balance = balance + amount;
       } else if (accToBuffer.currency.toUpperCase() == "USD") {
         balance = balance + amount * ARS_USD;
@@ -876,10 +944,8 @@ const refreshMoveBalance = async (accTo, accFrom, amount) => {
     } else if (accFromBuffer.mensaje) {
       alert(accFromBuffer.mensaje);
     } else {
-      let balanceContainer = document.getElementById("balance");
-      let balance = parseFloat(balanceContainer.innerHTML);
       let pAccountBalance = document.getElementById(
-        "acc-balance-p-" + accToBuffer.name.split(' ').join('')
+        "acc-balance-p-" + accFromBuffer.name.split(' ').join('')
       );
 
       pAccountBalance.innerText = accFromBuffer.balance.toFixed(0);
@@ -898,24 +964,14 @@ const refreshMoveBalance = async (accTo, accFrom, amount) => {
 const reloadTable = async (recordBuffer) => {
   const table = document.querySelector("table");
   let row = document.createElement("tr");
-  let accFromName = "None";
-  let accToName = "None";
-
-  if (recordBuffer.id_acc_to) {
-    let accTo = await read("account", recordBuffer.id_acc_to);
-    accToName = accTo.name;
-  }
-  if (recordBuffer.id_acc_from) {
-    let accFrom = await read("account", recordBuffer.id_acc_from);
-    accFromName = accFrom.name;
-  }
+ 
   row.innerHTML = `
     <th>${table.rows.length}</th>
     <td>${recordBuffer.reg_date}</td>
     <td>${recordBuffer.type}</td>
     <td>${recordBuffer.amount}</td>
-    <td>${accToName}</td>
-    <td>${accFromName}</td>
+    <td>${recordBuffer.name_acc_to ? recordBuffer.name_acc_to : "N/A" }</td>
+    <td>${recordBuffer.name_acc_from ? recordBuffer.name_acc_from : "N/A" }</td>
     <td>${recordBuffer.category}</td>
     <td><button class="btn btn-dark text-white edit-btn" data-id="${recordBuffer.id}" > Edit
     </button>
@@ -1063,17 +1119,5 @@ const resetFeedback = () => {
   }
 };
 
-// const loadStats = () => {
-//   read("stats", "all").then((regsBuffer) => {
-//     console.log(regsBuffer)
-//     if(!regsBuffer){
-//       console.log("No hay registros para el usuario")
-//     }else if (regsBuffer.mensaje){
-//       alert(regsBuffer.mensaje)
-//     }else{
-//       console.log(regsBuffer)
-//     }
-//   });
-// }
 
 window.onload = begin;

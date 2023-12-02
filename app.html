@@ -392,7 +392,7 @@
          <div class="modal-body">
            <div class="container-fluid text-center">
              <form
-               id="form-add-reg"
+               id="form-add-acc"
                class="needs-validation row g-3 justify-content-md-center"
                               novalidate
              >
@@ -402,8 +402,8 @@
                <div class="mb-3">
                 <label for="acc-name" class="form-label">Name</label>
                  <input type="text" class="form-control" id="acc-name" placeholder="">
+                 <div id="accNameFeedback" class="invalid-feedback"></div>
                </div>
-               <div id="accNameFeedback" class="invalid-feedback"></div>
              </div>
              
              <div class="col-md-6">
@@ -417,7 +417,7 @@
              <div class="col-md-12">
               <label for="acc-descrip" class="form-label">Description</label>
                  <textarea class="form-control" id="acc-descrip" rows="3"></textarea>
-              <div id="accDescripFeedback" class="invalid-feedback"></div>
+              <div id="accDescrFeedback" class="invalid-feedback"></div>
             </div>
             <div class="modal-footer">
               <button
@@ -434,9 +434,7 @@
                 id="btn-save-acc-modal"
                 type="submit"
                 class="btn btn-dark"
-                data-bs-toggle="modal"
-                data-bs-target="#modal-add-acc"
-                data-dismiss="modal"
+              
               >
                 Save
               </button>

@@ -62,7 +62,7 @@ public function deleteTarget($id, $idUser) {
   require "../conf/conn_mysql.php";
 
 
-  $actualReg = $this->readOneById($id, $idUser);
+  $actualReg = $this->readOneByIdAccName($id, $idUser);
   if($this->reverseReg($actualReg['id_acc_to'], $actualReg['id_acc_from'], $actualReg['amount'], $idUser)){
     $query = 'DELETE FROM reg WHERE id = ?';
 
@@ -128,12 +128,24 @@ public function deleteTarget($id, $idUser) {
   }
 
 
-  public function readOneById($id, $iduser)
+  public function readOneByIdAccName($id, $iduser)
   {
 
     require "../conf/conn_mysql.php";
 
-    $consulta = $conn->prepare("SELECT * FROM reg WHERE id_user_reg = :iduser AND id = :id");
+    $consulta = $conn->prepare("SELECT reg.id,
+                                    accounts_to.name AS name_acc_to,
+                                    accounts_from.name AS name_acc_from,
+                                    reg.category,
+                                    reg.amount,
+                                    reg.reg_date,
+                                    reg.type,
+                                    reg.id_acc_to,
+                                    reg.id_acc_from
+                                FROM reg
+                                LEFT JOIN accounts AS accounts_to ON reg.id_acc_to = accounts_to.id
+                                LEFT JOIN accounts AS accounts_from ON reg.id_acc_from = accounts_from.id
+                                WHERE reg.id_user_reg = :iduser AND reg.id = :id ;");
     $consulta->bindParam(':iduser', $iduser);
     $consulta->bindParam(':id', $id);
 
@@ -150,7 +162,18 @@ public function deleteTarget($id, $idUser) {
 
     require "../conf/conn_mysql.php";
 
-    $consulta = $conn->prepare("SELECT * FROM reg WHERE id_user_reg = :iduser");
+    $consulta = $conn->prepare("SELECT reg.id,
+                                    accounts_to.name AS name_acc_to,
+                                    accounts_from.name AS name_acc_from,
+                                    reg.category,
+                                    reg.amount,
+                                    reg.reg_date,
+                                    reg.type
+                                FROM reg
+                                LEFT JOIN accounts AS accounts_to ON reg.id_acc_to = accounts_to.id
+                                LEFT JOIN accounts AS accounts_from ON reg.id_acc_from = accounts_from.id
+                                WHERE reg.id_user_reg = :iduser;");
+
     $consulta->bindParam(':iduser', $iduser);
 
     $consulta->execute();
@@ -159,12 +182,29 @@ public function deleteTarget($id, $idUser) {
 
     return $data;
   }
+
+  // public function readOneById($idReg, $iduser){
+
+  //   require "../conf/conn_mysql.php";
+
+  //   $consulta = $conn->prepare("SELECT * FROM reg
+  //                               WHERE id_user_reg = :iduser AND id = :id ;");
+  //   $consulta->bindParam(':iduser', $iduser);
+  //   $consulta->bindParam(':id', $id);
+
+  //   $consulta->execute();
+
+  //   $data = $consulta->fetch(PDO::FETCH_ASSOC);
+
+  //   return $data;
+
+  // }
   public function update($updReg, $iduser, $idReg)
   {
 
     require "../conf/conn_mysql.php";
 
-    $actualReg = $this->readOneById($idReg, $iduser);
+    $actualReg = $this->readOneByIdAccName($idReg, $iduser);
 
     if($this->reverseReg($actualReg['id_acc_to'], $actualReg['id_acc_from'], $actualReg['amount'], $iduser)){
       
@@ -225,7 +265,6 @@ public function deleteTarget($id, $idUser) {
   }
 
 }
-
 
 
 
