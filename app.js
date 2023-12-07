@@ -173,6 +173,7 @@ const addAccount = async (event) => {
             modalAcc.hide();           
           }
         } else {
+          resetFeedback();
           if(resjson.err == "name"){
             messageValidation(accNameContainer, accNameFdbk, resjson.mensaje);
           }else 
@@ -184,9 +185,6 @@ const addAccount = async (event) => {
           }else
           if(resjson.err == "sys"){
             alert("Error de sistema :" + resjson.mensaje);
-          }else
-          if(resjson.err == "db"){
-            alert("Error al grabar: " + resjson.mensaje)
           }else{
             alert("Error: " + resjson.mensaje)
           }
@@ -814,32 +812,32 @@ const checkData = async (recordBuffer) => {
   }
 };
 
-const messageValidation = (container, containerFeedback, isValid) => {
-  if (isValid === true) {
-    if (container.classList.contains("is-invalid")) {
-      container.classList.remove("is-invalid");
-    }
-    container.classList.add("is-valid");
-  } else {
-    if (container.classList.contains("is-valid")) {
-      container.classList.remove("is-valid");
-    }
-    container.classList.add("is-invalid");
-    containerFeedback.innerHTML = isValid;
-  }
-};
+// const messageValidation = (container, containerFeedback, isValid) => {
+//   if (isValid === true) {
+//     if (container.classList.contains("is-invalid")) {
+//       container.classList.remove("is-invalid");
+//     }
+//     container.classList.add("is-valid");
+//   } else {
+//     if (container.classList.contains("is-valid")) {
+//       container.classList.remove("is-valid");
+//     }
+//     container.classList.add("is-invalid");
+//     containerFeedback.innerHTML = isValid;
+//   }
+// };
 
-const validateField = (field, long) => {
-  if (field == "") {
-    return "Tiene que completar este campo";
-  }else if (long){
-    if( field.length > long){
-      return `Debe tener como maximo ${long} caracteres`;
-    }
-  }
+// const validateField = (field, long) => {
+//   if (field == "") {
+//     return "Tiene que completar este campo";
+//   }else if (long){
+//     if( field.length > long){
+//       return `Debe tener como maximo ${long} caracteres`;
+//     }
+//   }
 
-  return true;
-};
+//   return true;
+// };
 
 const validateAmount = async (amt, account, type) => {
   
@@ -903,12 +901,6 @@ const validateMove = async (accValue, accToValue) => {
   }
 };
 
-// const realoadSavingAccount = (enteredAmount) => {
-//   let savingAccountElement = document.getElementById("cajaDeAhorro");
-//   let savingAccountValue = savingAccountElement.textContent;
-//   let newValue = parseInt(savingAccountValue) + parseInt(enteredAmount);
-//   savingAccountElement.innerText = newValue;
-// };
 
 const refreshMoveBalance = async (accTo, accFrom, amount) => {
   let balanceContainer = document.getElementById("balance");
@@ -1106,18 +1098,17 @@ const handleDeleteTarget = async (event) => {
 //   console.log("test 4");
 // };
 
-const resetFeedback = () => {
-  let valid = document.getElementsByClassName("is-valid");
-  let invalid = document.getElementsByClassName("is-invalid");
+// const resetFeedback = () => {
+//   let valid = document.getElementsByClassName("is-valid");
+//   let invalid = document.getElementsByClassName("is-invalid");
 
-  while (valid.length > 0) {
-    valid[0].classList.remove("is-valid");
-  }
+//   while (valid.length > 0) {
+//     valid[0].classList.remove("is-valid");
+//   }
 
-  while (invalid.length > 0) {
-    invalid[0].classList.remove("is-invalid");
-  }
-};
-
+//   while (invalid.length > 0) {
+//     invalid[0].classList.remove("is-invalid");
+//   }
+// };
 
 window.onload = begin;

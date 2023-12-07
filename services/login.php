@@ -22,32 +22,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $user = $consulta->fetch(PDO::FETCH_ASSOC);
 
 
-  if ($user && password_verify($password, $user['password'])) {
+  if ($user){ 
     
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['name'] = $user['lastname'];
-        $_SESSION['lastname'] = $user['lastname'];
+    if(password_verify($password, $user['password'])) {
+    
+      
+      
+      $role = $permissionController->getRoleNameIdByidUser($_SESSION['user_id']);
+      
+      if($role){
 
-        $role = $permissionController->getRoleNameIdByidUser($_SESSION['user_id']);
-          
+        
+        $_SESSION['user_id'] = $user['id'];
+        
         $respuesta = [
           "exito" => true,
           "mensaje" => "Login OK",
           "role" => $role,
         ];
+        
+        http_response_code(200);
+        echo json_encode($respuesta);
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Rol invalido",
+          "err" => "role",
+        ];
+          http_response_code(400);
+          echo json_encode($respuesta);
+      }
+    }else {
 
-      http_response_code(200);
+      $respuesta = [
+        "exito" => false,
+        "mensaje" => "Contraseña invalida",
+        "err" => "password",
+      ];
+        http_response_code(400);
 
-      echo json_encode($respuesta);
-  }else {
+        echo json_encode($respuesta);
 
+    }
+  }else{
     $respuesta = [
       "exito" => false,
-      "mensaje" => "Usuario o contraseña invalidos"
-  ];
+      "mensaje" => "Email no registrado",
+      "err" => "email"
+    ];
       http_response_code(400);
 
       echo json_encode($respuesta);
-
   }
 }

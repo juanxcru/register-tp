@@ -40,60 +40,60 @@ class AccountController {
     
     require "../conf/conn_mysql.php";
 
-    try{
     
     if( !isset($data['name'])  || !isset($data['description']) || 
-        !isset($data['balance']) || !isset($data['currency'])){
+    !isset($data['balance']) || !isset($data['currency'])){
       return [
         'exito' => false,
         'mensaje' => "Solicitud Erronea",
         'err' => 'sys'
       ];
-
+      
     }
     
     $name = $data['name'];
     $description = $data['description'];
     $balance = $data['balance'];
     $crcy = $data['currency']; 
-
-    if (!is_string($name) || empty($name)){
+    
+    if (!is_string($name) || empty($name) || strlen($name) > 12){
       return [
         'exito' => false,
         'mensaje' => "Nombre no valido",
         'err' => 'name'
       ];
     }
-
-    if (!is_string($description) || empty($description)){
+    
+    if (!is_string($description) || empty($description) || strlen($description) > 50){
       return [
         'exito' => false,
         'mensaje' => "Descripcion no valida",
         'err' => 'descr'
       ];
     }
-    // la moneda, solo en ARS
-
-    if(empty($crcy) || $crcy !== "ARS"){
+    // la moneda, solo en ARS o USD (solamente para ahorro) no es userinput
+    
+    if(empty($crcy) || ($crcy !== "ARS" && $crcy !== "USD") || strlen($crcy) > 3){
       return [
         'exito' => false,
         'mensaje' => "Moneda no valida",
         'err' => 'sys' // va de sys porque no es input de usuario
       ];
     }
-
-    if(empty($balance) || !is_numeric($balance) || $balance <= 0 || !is_float($balance * 1.0) ){
+    
+    if(!is_numeric($balance) || $balance < 0 || !is_float($balance * 1.0) ){
       return [
         'exito' => false,
         'mensaje' => "Balance no valido ",
         'err' => 'balance'
       ];
-
+      
     }
-
-
+    
+    
+    try{
     // si llego aca, porque ta ok
-
+    
     $consulta = $conn->prepare("INSERT INTO accounts (name, description, currency, balance, id_user) VALUES (?, ?, ?, ?, ?);");
     
     $consulta->bindParam(1, $name,PDO::PARAM_STR);
@@ -101,7 +101,7 @@ class AccountController {
     $consulta->bindParam(3, $crcy ,PDO::PARAM_STR);
     $consulta->bindParam(4, $balance,PDO::PARAM_STR);
     $consulta->bindParam(5, $idUser,PDO::PARAM_INT);
-
+    
     $consulta->execute();
     // uso last insert id que me devuleve el id de la ultima insercion 
     $id = $conn->lastInsertId();
@@ -114,7 +114,7 @@ class AccountController {
       return [
         'exito' => false,
         'mensaje' => $e->getMessage(),
-        'err' => 'db'
+        'err' => 'sys'
       ];
     }
 

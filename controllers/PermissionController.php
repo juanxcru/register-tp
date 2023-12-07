@@ -114,7 +114,21 @@ class PermissionController{
 
     }
     
-    
+    public function getRoleIdByRoleName($roleName){
+
+        require "../conf/conn_mysql.php";
+        
+        $consulta = $conn->prepare("SELECT id FROM roles WHERE role = ?");
+        $consulta->bindParam(1, $roleName, PDO::PARAM_STR);
+        $consulta->execute();
+        $user = $consulta->fetch(PDO::FETCH_ASSOC);
+        if($user > 0){
+            return $idRole;
+        }else{
+            return -1;
+        }
+
+    }
 
 }
 

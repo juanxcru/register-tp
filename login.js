@@ -1,4 +1,6 @@
 
+
+
 const begin = () => {
     document.getElementById('btn-login').addEventListener('click', checkLogin);
 }
@@ -6,32 +8,60 @@ const begin = () => {
 const checkLogin = async (event) => {
     event.preventDefault();
    
-    
+    let emailContainer = document.getElementById("email");
+    let passwordContainer = document.getElementById("password");
+
+    let emailFdbk = document.getElementById("emailFeedback");
+    let passwordFdbk = document.getElementById("passwordFeedback");
+
     let obj = {
         email : document.getElementById('email').value,
         password : document.getElementById('password').value
     }
 
 
-    let res = await fetch("http://localhost/TP-LAB-PROG/register-tp/services/login.php",{
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(obj)
-        
-      });
+    let isValidEmail = validateEmail(obj.email);
+    let isValidPassword = validatePassword(obj.password);
 
-      let resjson = await res.json();
+    messageValidation(emailContainer, emailFdbk, isValidEmail);
+    messageValidation(passwordContainer,passwordFdbk, isValidPassword);
 
-      resjson.role == 'admin' ? location.assign("http://localhost/TP-LAB-PROG/register-tp/estadisticas.html") : location.assign("http://localhost/TP-LAB-PROG/register-tp/app.html")
+    // encriptar en el viaje la pwd?
+    if( isValidEmail === true && isValidPassword === true){
+      let res = await fetch("./services/login.php",{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(obj)
+          
+        });
 
-      // if(resjson.exito){
-      //   console.log(resjson.mensaje);
-      //   location.assign("http://localhost/TP-LAB-PROG/register-tp/app.html")
-      // }else{
-      //   console.log(resjson.mensaje)
-      // }
+        let resjson = await res.json();
+
+      if(resjson.exito){
+        resetFeedback();
+        console.log(resjson.mensaje);
+        if(resjson.role == 'admin'){
+          //location.assign("./admin.html")
+        }else if(resjson.role == 'user'){
+          location.assign("./app.html")
+        } alert("ERROR")// si el role no es uno de estos, se tuvo que haber ido antes por el resjson.exito = false.
+       }else{
+        resetFeedback();
+        if (resjson.err == 'password'){
+          messageValidation(passwordContainer, passwordFdbk, resjson.mensaje);
+        }else if(resjson.err == 'email'){
+          messageValidation(emailContainer, emailFdbk, resjson.mensaje);
+        }else{
+          alert("Error: " + resjson.mensaje)
+        }
+        console.error("Error: ", resjson.mensaje);
+       
+       }
+
+    }
+      
 
 
 
