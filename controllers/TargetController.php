@@ -7,15 +7,27 @@ class TargetController {
 
     
     require "../conf/conn_mysql.php";
-
-    //ver relacion con user : cuentas de un usuario tabla accounts + id de user?
+    try {
     $consulta = $conn->prepare("SELECT * FROM targets WHERE id_user = :id");
     $consulta->bindParam(':id', $id);
     $consulta->execute();
   
     $data = $consulta->fetchAll(PDO::FETCH_ASSOC);
 
-    return $data;
+
+     return [
+        'exito' => true,
+        'mensaje' => "ok",
+        'data' => $data
+      ];
+
+  }catch(Exception $e){
+    return [
+      'exito' => false,
+      'mensaje' => $e->getMessage(),
+      'err' => 'sys'
+    ];
+  }
 
   }
 

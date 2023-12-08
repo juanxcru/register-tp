@@ -7,6 +7,7 @@ const begin = () => {
 
 const sendForm = async (event) => {
     event.preventDefault();
+    resetFeedback();
 
     let nombreContainer = document.getElementById('nombre');
     let apellidoContainer = document.getElementById('apellido');

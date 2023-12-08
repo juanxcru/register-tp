@@ -40,31 +40,36 @@ class PermissionController{
     
     require "../conf/conn_mysql.php";
 
+    if($idRol != null){
 
-    $sql = "
+        
+        $sql = "
         SELECT 
-            permisos.permiso
+        permisos.permiso
         FROM 
-            permisos
+        permisos
         INNER JOIN
-            roles_permisos
-                ON
-                    roles_permisos.id_permiso = permisos.id
+        roles_permisos
+        ON
+        roles_permisos.id_permiso = permisos.id
         WHERE 
-            roles_permisos.id_role = :idRol;
-    ";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindValue(':idRol', $idRol); 
-    $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $permisos = [];
-
-    foreach ($result as $row) {
-        $permisos[] = $row['permiso'];
+        roles_permisos.id_role = :idRol;
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':idRol', $idRol); 
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $permisos = [];
+        
+        foreach ($result as $row) {
+            $permisos[] = $row['permiso'];
+        }
+        
+        return $permisos;
+    }else{
+        return null;
     }
-
-    return $permisos;
 
 }
 
@@ -72,14 +77,16 @@ class PermissionController{
     public function tienePermiso($permiso, $idUsuario){
 
     $permisosUsuario = $this->getPermisosById($idUsuario); // Obtiene los permisos del usuario
-
-    foreach ($permisosUsuario as $p) {
-        if ($p === $permiso) {
-            return true;
+    
+    if ($permisosUsuario != null){ // si el us no existe devuelve null
+        foreach ($permisosUsuario as $p) {
+            if ($p === $permiso) {
+                return true;
+            }
         }
     }
-
-    return false;
+        return false;
+    
     }
 
 

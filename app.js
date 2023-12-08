@@ -1,94 +1,87 @@
 const backendServer = "http://localhost/TP-LAB-PROG/register-tp";
 const ARS_USD = 1000;
 let modalEditFlag = false;
+let modalEditAccFlag = false;
 let idRegAux = 0;
 
 //obj modal target
 let modalTarget = new bootstrap.Modal(document.getElementById("modalTarget"));
-//obj modal reg 
+//obj modal reg
 let modalReg = new bootstrap.Modal(document.getElementById("modal-add-reg"));
 // obj modal-add-acc
 let modalAcc = new bootstrap.Modal(document.getElementById("modal-add-acc"));
-
 
 const begin = async () => {
   let aut = await checkPermission();
 
   if (aut === true) {
-
-    
     document
-    .getElementById("type")
-    .addEventListener("change", handleAccountToFrom);
+      .getElementById("type")
+      .addEventListener("change", handleAccountToFrom);
 
     document
-    .getElementById("btn-save-acc-modal")
-    .addEventListener("click", addAccount);
-  document
-    .getElementById("btn-close-modal")
-    .addEventListener("click", closeModal);
-  document
-    .getElementById("btn-save-modal")
-    .addEventListener("click", addRecord);
-
-  document
-    .getElementById("div-categoria")
-    .addEventListener("click", selectCategory);
-
-  document
-    .getElementById("btn-show-objetive")
-    .addEventListener("mouseover", handleShowObjetiveHover);
-  document
-    .getElementById("btn-show-objetive")
-    .addEventListener("mouseleave", handleHideObjetiveHover);
-  document
-    .getElementById("objetivos")
-    .addEventListener("mouseover", handleShowObjetiveHover);
-  document
-    .getElementById("objetivos")
-    .addEventListener("mouseleave", handleHideObjetiveHover);
-  //this
-  document
-    .getElementById("btn-show-objetive")
-    .addEventListener("click", handleObjetiveModal);
-  // document
-  //   .getElementById("btn-show-record")
-  //   .addEventListener("click", handleReminderModal);
-
-  document
-    .getElementById("btn-close-obj-modal")
-    .addEventListener("click", handleCloseObjModal);
-  document
-    .getElementById("btn-save-obj-modal")
-    .addEventListener("click", handleSaveObjModal);
+      .getElementById("btn-save-acc-modal")
+      .addEventListener("click", addAccount);
     document
-        .getElementById("table-reg")
-        .addEventListener("click", editDeleteReg);
+      .getElementById("btn-close-modal")
+      .addEventListener("click", closeModal);
+    document
+      .getElementById("btn-save-modal")
+      .addEventListener("click", addRecord);
 
-    let targetsLoaded;  
-    let regLoaded = await loadRegisters();
-    let accountsLoaded = await loadAccounts();
+    document
+      .getElementById("div-categoria")
+      .addEventListener("click", selectCategory);
+
+    document
+      .getElementById("btn-show-objetive")
+      .addEventListener("mouseover", handleShowObjetiveHover);
+    document
+      .getElementById("btn-show-objetive")
+      .addEventListener("mouseleave", handleHideObjetiveHover);
+    document
+      .getElementById("objetivos")
+      .addEventListener("mouseover", handleShowObjetiveHover);
+    document
+      .getElementById("objetivos")
+      .addEventListener("mouseleave", handleHideObjetiveHover);
+    //this
+    document
+      .getElementById("btn-show-objetive")
+      .addEventListener("click", handleObjetiveModal);
+    // document
+    //   .getElementById("btn-show-record")
+    //   .addEventListener("click", handleReminderModal);
+
+    document
+      .getElementById("btn-close-obj-modal")
+      .addEventListener("click", handleCloseObjModal);
+    document
+      .getElementById("btn-save-obj-modal")
+      .addEventListener("click", handleSaveObjModal);
+    document
+      .getElementById("table-reg")
+      .addEventListener("click", editDeleteReg);
+
+    document
+      .getElementById("balance-scroll")
+      .addEventListener("click", editDeleteAcc);
+
+    await loadRegisters();
+    await loadAccounts();
     // if (accountsLoaded) {
-      targetsLoaded = await loadTargets();
-    // } 
+    await loadTargets();
+    // }
 
     // if (targetsLoaded) {
-      document
-        .getElementById("btn-target")
-        .addEventListener("click", handleDeleteTarget);
+    document
+      .getElementById("btn-target")
+      .addEventListener("click", handleDeleteTarget);
     // }
 
     // if (regLoaded) {
-      
+
     // }
-
-
-    
-   
-
-
-    
-
   } else if (aut === "login") {
     location.assign(
       "http://localhost/TP-LAB-PROG/register-tp/registrarse.html"
@@ -104,7 +97,6 @@ const checkPermission = async () => {
   );
 
   let resjson = await res.json();
-
 
   if (resjson.mensaje == "login") {
     return "login";
@@ -127,17 +119,17 @@ const addAccount = async (event) => {
   let accBalanceContainer = document.getElementById("acc-init-balance");
   //valudar campos:
   // nombre: 12 ch
-  // balance: numero 
+  // balance: numero
   // descr: 50
 
   let accNameFdbk = document.getElementById("accNameFeedback");
-  let accDescrFdbk =  document.getElementById("accDescrFeedback");
-  let accBalanceFdbk =  document.getElementById("accInitBalanceFeedback");
+  let accDescrFdbk = document.getElementById("accDescrFeedback");
+  let accBalanceFdbk = document.getElementById("accInitBalanceFeedback");
 
-  if( accBalance.includes(',')){
-    console.log(accBalance)
-    accBalance = accBalance.split(',').join('.')  
-    console.log(accBalance)
+  if (accBalance.includes(",")) {
+    console.log(accBalance);
+    accBalance = accBalance.split(",").join(".");
+    console.log(accBalance);
     console.log(parseFloat(accBalance));
   }
 
@@ -145,52 +137,46 @@ const addAccount = async (event) => {
   let isValidDescr = validateField(accDescr, 50);
   let isValidBalance = await validateAmount(accBalance); // anda porque el arg3 depende del arg2 en la fun.
 
-  messageValidation(accNameContainer, accNameFdbk , isValidName);
-  messageValidation(accDescrContainer, accDescrFdbk , isValidDescr);
-  messageValidation(accBalanceContainer, accBalanceFdbk , isValidBalance);
+  messageValidation(accNameContainer, accNameFdbk, isValidName);
+  messageValidation(accDescrContainer, accDescrFdbk, isValidDescr);
+  messageValidation(accBalanceContainer, accBalanceFdbk, isValidBalance);
 
-  if (isValidBalance == true &&
-      isValidName == true &&
-      isValidDescr == true ){
-
-        let obj = {
-          name: accName,
-          description: accDescr,
-          balance: parseFloat(accBalance),
-          currency : "ARS" // va hardcode porque no es userinput
-        };
-        console.log(obj)
-        let resjson = await save(obj, "account");
-        if (resjson.exito) {
-          objNuevo = await read("account", resjson.id);
-          if (!objNuevo) {
-            alert("Error en lectura de cuenta nueva");
-          } else if (objNuevo.mensaje) {
-            alert(objNuevo.mensaje);
-          } else {
-            insertAccount(objNuevo);
-            document.getElementById("form-add-acc").reset();
-            modalAcc.hide();           
-          }
-        } else {
-          resetFeedback();
-          if(resjson.err == "name"){
-            messageValidation(accNameContainer, accNameFdbk, resjson.mensaje);
-          }else 
-          if(resjson.err == "descr"){
-            messageValidation(accDescrContainer, accDescrFdbk , resjson.mensaje);
-          }else
-          if(resjson.err == "balance"){
-            messageValidation(accBalanceContainer, accBalanceFdbk , resjson.mensaje);
-          }else
-          if(resjson.err == "sys"){
-            alert("Error de sistema :" + resjson.mensaje);
-          }else{
-            alert("Error: " + resjson.mensaje)
-          }
-          console.error(resjson.mensaje);
-        }
+  if (isValidBalance == true && isValidName == true && isValidDescr == true) {
+    let obj = {
+      name: accName,
+      description: accDescr,
+      balance: parseFloat(accBalance),
+      currency: "ARS", // va hardcode porque no es userinput
+    };
+    console.log(obj);
+    let resjson = await save(obj, "account");
+    if (resjson.exito) {
+      objNuevo = await read("account", resjson.id);
+      if (!objNuevo) {
+        alert("Error en lectura de cuenta nueva");
+      } else if (objNuevo.mensaje) {
+        alert(objNuevo.mensaje);
+      } else {
+        insertAccount(objNuevo);
+        document.getElementById("form-add-acc").reset();
+        modalAcc.hide();
       }
+    } else {
+      resetFeedback();
+      if (resjson.err == "name") {
+        messageValidation(accNameContainer, accNameFdbk, resjson.mensaje);
+      } else if (resjson.err == "descr") {
+        messageValidation(accDescrContainer, accDescrFdbk, resjson.mensaje);
+      } else if (resjson.err == "balance") {
+        messageValidation(accBalanceContainer, accBalanceFdbk, resjson.mensaje);
+      } else if (resjson.err == "sys") {
+        alert("Error de sistema :" + resjson.mensaje);
+      } else {
+        alert("Error: " + resjson.mensaje);
+      }
+      console.error(resjson.mensaje);
+    }
+  }
 };
 
 const testConn = async () => {
@@ -230,7 +216,11 @@ const loadBalance = (acc) => {
 
   let pBalance = document.createElement("p");
   pBalance.classList.add("account-balance-p", "text-center");
-  pBalance.setAttribute("id", "acc-balance-p-" + acc.name.split(' ').join(''));
+  pBalance.setAttribute("id", "acc-balance-p-" + acc.name.split(" ").join(""));
+  pBalance.setAttribute("role", "button");
+  // pBalance.setAttribute("data-bs-toggle", "modal");
+  // pBalance.setAttribute("data-bs-target", "#modal-new-acc");
+  pBalance.setAttribute("data-id", acc.id);
   pBalance.append(acc.balance.toFixed(0));
 
   divAccountBalance.appendChild(pBalance);
@@ -242,13 +232,11 @@ const loadBalance = (acc) => {
   if (balanceContainer.innerText != "0") {
     balance = parseInt(balanceContainer.innerHTML);
   }
-  //hacerlo bien X2
   if (acc.currency.toUpperCase() == "USD") {
     balance = balance + acc.balance * ARS_USD;
   } else if (acc.currency.toUpperCase() == "ARS") {
     balance += acc.balance;
   }
-  //hacerlo bien X2
 
   balanceContainer.innerText = balance.toFixed(0);
 };
@@ -264,6 +252,31 @@ const editDeleteReg = async (event) => {
   }
 };
 
+const editDeleteAcc = async (e) => {
+  // el data-id solo lo tienen las pills dinamicas. otra manera de hacer lo de editDeleteReg
+  if (e.target.hasAttribute("data-id")) {
+
+    let idAcc = e.target.getAttribute("data-id");
+
+    let accNameContainer = document.getElementById("acc-name");
+    let accDescrContainer = document.getElementById("acc-descrip");
+    let accBalanceContainer = document.getElementById("acc-init-balance");
+
+    let accName = accNameContainer.value;
+    let accDescr = accDescrContainer.value;
+    let accBalance = accBalanceContainer.value;
+
+    let accActual = await read("account", idAcc);
+
+    accName = accActual.name;
+    accDescr = accActual.Descr;
+    accBalance = accActual.balance;
+
+    
+
+  }
+}
+
 const editReg = async (id) => {
   let moveTypeContainer = document.getElementById("type");
   let accValueContainer = document.getElementById("account");
@@ -271,12 +284,12 @@ const editReg = async (id) => {
   let enteredAmountInput = document.getElementById("amount");
 
   const recordInfo = await read("register", id);
-  if(recordInfo.category != ""){
+  if (recordInfo.category != "") {
     let selectedCategory = document.getElementById(recordInfo.category);
     selectedCategory.classList.add("pressed");
-     disableCategories();
+    disableCategories();
   }
- 
+
   moveTypeContainer.value = recordInfo.type;
   enteredAmountInput.value = recordInfo.amount;
 
@@ -320,8 +333,8 @@ const editReg = async (id) => {
 };
 
 const update = async (recordBuffer, type, id) => {
-  
-  let full = backendServer + "/controllers/entryPoint.php?type=" + type +"&id=" + id;
+  let full =
+    backendServer + "/controllers/entryPoint.php?type=" + type + "&id=" + id;
   let res = await fetch(full, {
     method: "PUT",
     headers: {
@@ -330,15 +343,11 @@ const update = async (recordBuffer, type, id) => {
     body: JSON.stringify(recordBuffer),
   });
 
- 
   modalEditFlag = false;
   return await res.json();
-  
-
 };
 
 const deleteReg = async (id) => {
-
   let moveTypeContainer = document.getElementById("type");
   let accValueContainer = document.getElementById("account");
   let accToValueContainer = document.getElementById("account-to");
@@ -348,22 +357,21 @@ const deleteReg = async (id) => {
 
   const url = `${backendServer}/controllers/entryPoint.php?type=register&id=${id}`;
 
-
-  const response = await fetch(url,{
+  const response = await fetch(url, {
     method: "DELETE",
   });
   if (response.ok) {
-    let a  = await response.json();
+    let a = await response.json();
 
-   window.location.reload(true);
-
+    window.location.reload(true);
   } else {
-    console.error('Failed to delete target:', response.status, response.statusText);
+    console.error(
+      "Failed to delete target:",
+      response.status,
+      response.statusText
+    );
   }
-
-
-}
-
+};
 
 const read = async (type, id) => {
   /*
@@ -375,7 +383,7 @@ const read = async (type, id) => {
                     id      = 'all'     -->  traer todos
                     id      = '1'       -->  traer id especificado
 
-                    iduser  = id del usuario (ver mejor manera)
+                    
   */
 
   const params = new URLSearchParams();
@@ -391,28 +399,9 @@ const read = async (type, id) => {
   try {
     const response = await fetch(full);
 
-    if (response.status == 200) {
-      const data = await response.json();
-      if (id === "all") {
-        if (!data[0].id) {
-          return null;
-        } else {
-          return data;
-        }
-      } else {
-        if (!data.id) {
-          return null;
-        } else {
-          return data;
-        }
-      }
-    } else if (response.status == 401) {
-      return await response.json();
-    } else if (response.status == 403) {
-      return await response.json();
-    } else {
-      return null;
-    }
+    resjson = await response.json();
+
+    return resjson;
   } catch (error) {
     console.error("Error: ", error);
     return null;
@@ -441,21 +430,23 @@ const save = async (obj, type) => {
 };
 
 const loadAccounts = async () => {
-  await read("account", "all").then((accountsBuffer) => {
-    if (!accountsBuffer) {
-      alert("No hay cuentas para el usuario");
-    } else if (accountsBuffer.mensaje) {
+  const accountsBuffer = await read("account", "all");
+  if (accountsBuffer != null) {
+    if (!accountsBuffer.exito) {
       alert(accountsBuffer.mensaje);
-    } else {
-      // podriamos preguntar / vlaidar q sea array, pero por def va a haber dos cuentas.
-      for (let acc of accountsBuffer) {
-        //cargamos el drop del modal
-        //se cargan las pills
+    } else if (accountsBuffer.data.length != 0) {
+      // la info leida viene en un array en campo data del json, si ta vacio mostramos que no hay nada.
+      for (let acc of accountsBuffer.data) {
+        // cargar el drop del modal
+        // cargar las pills
         insertAccount(acc);
       }
+    } else {
+      alert("No hay cuentas para el usuario");
     }
-  });
-  return true;
+  } else {
+    alert("Error del sistema");
+  }
 };
 
 const insertAccount = (acc) => {
@@ -477,107 +468,122 @@ const loadTargets = async () => {
   try {
     const targetsBuffer = await read("target", "all");
 
+    if (targetsBuffer != null) {
+      if (!targetsBuffer.exito) {
+        alert(targetsBuffer.mensaje);
+      } else if (targetsBuffer.data.length != 0) {
+        // si hay targets:
+        for (let target of targetsBuffer.data) {
+          // mete los targets
+          let targetDiv = document.getElementById("objetivos");
 
-    if (!targetsBuffer) {
-      console.log("No hay targets");
-    } else if (targetsBuffer.mensaje) {
-      alert(objNuevo.mensaje);
-    } else {
-      for (let target of targetsBuffer) {
-        let targetDiv = document.getElementById("objetivos");
+          let rowDiv = document.createElement("div");
+          rowDiv.classList.add("row");
+          rowDiv.style.padding = "15px";
+          rowDiv.style.borderTop = "1px solid white";
+          rowDiv.style.borderBottom = "1px solid white";
+          rowDiv.style.textAlign = "center";
+          rowDiv.setAttribute(
+            "id",
+            `target-${targetsBuffer.data.indexOf(target)}`
+          );
+          rowDiv.setAttribute("key", target.id);
 
-        let rowDiv = document.createElement("div");
-        rowDiv.classList.add("row");
-        rowDiv.style.padding = "15px";
-        rowDiv.style.borderTop = "1px solid white";
-        rowDiv.style.borderBottom = "1px solid white";
-        rowDiv.style.textAlign = "center";
-        rowDiv.setAttribute("id", `target-${targetsBuffer.indexOf(target)}`);
-        rowDiv.setAttribute("key", target.id);
+          let nameDiv = document.createElement("div");
+          nameDiv.classList.add("col-md-4");
 
-        let nameDiv = document.createElement("div");
-        nameDiv.classList.add("col-md-4");
+          let amountDiv = document.createElement("div");
+          amountDiv.classList.add("col-md-4");
 
-        let amountDiv = document.createElement("div");
-        amountDiv.classList.add("col-md-4");
+          let deleteDiv = document.createElement("div");
+          deleteDiv.classList.add("col-md-4");
 
-        let deleteDiv = document.createElement("div");
-        deleteDiv.classList.add("col-md-4");
+          let deleteButton = document.createElement("button");
+          deleteButton.setAttribute("id", "btn-target");
 
-        let deleteButton = document.createElement("button");
-        deleteButton.setAttribute("id", "btn-target");
+          let deleteButtonIcon = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "svg"
+          );
 
-        let deleteButtonIcon = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "svg"
-        );
+          let path1 = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "path"
+          );
+          let path2 = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "path"
+          );
 
-        let path1 = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "path"
-        );
-        let path2 = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "path"
-        );
+          deleteButton.style.backgroundColor = "white";
+          deleteButton.style.width = "40px";
+          deleteButton.style.height = "40px";
+          deleteButton.style.borderRadius = "50px";
 
-        deleteButton.style.backgroundColor = "white";
-        deleteButton.style.width = "40px";
-        deleteButton.style.height = "40px";
-        deleteButton.style.borderRadius = "50px";
+          deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+          deleteButtonIcon.setAttribute("width", "16");
+          deleteButtonIcon.setAttribute("height", "16");
+          deleteButtonIcon.setAttribute("fill", "currentColor");
+          deleteButtonIcon.setAttribute("class", "bi bi-trash");
+          deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
 
-        deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        deleteButtonIcon.setAttribute("width", "16");
-        deleteButtonIcon.setAttribute("height", "16");
-        deleteButtonIcon.setAttribute("fill", "currentColor");
-        deleteButtonIcon.setAttribute("class", "bi bi-trash");
-        deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
+          path1.setAttribute(
+            "d",
+            "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+          );
+          path2.setAttribute(
+            "d",
+            "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+          );
 
-        path1.setAttribute(
-          "d",
-          "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
-        );
-        path2.setAttribute(
-          "d",
-          "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
-        );
+          deleteButtonIcon.appendChild(path1);
+          deleteButtonIcon.appendChild(path2);
 
-        deleteButtonIcon.appendChild(path1);
-        deleteButtonIcon.appendChild(path2);
+          deleteButton.appendChild(deleteButtonIcon);
+          deleteDiv.appendChild(deleteButton);
 
-        deleteButton.appendChild(deleteButtonIcon);
-        deleteDiv.appendChild(deleteButton);
+          //ver si ahorros usd es más alto que algún target
 
-        //ver si ahorros usd es más alto que algún target
+          // revisar si refactorizar para que lo haga el be.
 
-        let ahorrosUsdElement = document.getElementById("acc-balance-p-AhorrosUSD");
-        let ahorrosUsdValue = ahorrosUsdElement.textContent;
+          let ahorrosUsdElement = document.getElementById(
+            "acc-balance-p-AhorrosUSD"
+          );
+          let ahorrosUsdValue = ahorrosUsdElement.textContent;
 
-        let tgName = document.createElement("p");
-        tgName.appendChild(document.createTextNode(target.name));
+          let tgName = document.createElement("p");
+          tgName.appendChild(document.createTextNode(target.name));
 
-        let tgAmount = document.createElement("p");
-        tgAmount.appendChild(document.createTextNode(target.amount));
+          let tgAmount = document.createElement("p");
+          tgAmount.appendChild(document.createTextNode(target.amount));
 
-        if (target.amount > ahorrosUsdValue) {
-          tgName.style.color = "green";
-          tgAmount.style.color = "green";
-        } else {
-          tgName.style.color = "red";
-          tgAmount.style.color = "red";
+          if (target.amount > ahorrosUsdValue) {
+            tgName.style.color = "green";
+            tgAmount.style.color = "green";
+          } else {
+            tgName.style.color = "red";
+            tgAmount.style.color = "red";
+          }
+
+          nameDiv.appendChild(tgName);
+          amountDiv.appendChild(tgAmount);
+
+          rowDiv.appendChild(nameDiv);
+          rowDiv.appendChild(amountDiv);
+          rowDiv.appendChild(deleteDiv);
+
+          targetDiv.appendChild(rowDiv);
         }
-
-        nameDiv.appendChild(tgName);
-        amountDiv.appendChild(tgAmount);
-
-        rowDiv.appendChild(nameDiv);
-        rowDiv.appendChild(amountDiv);
-        rowDiv.appendChild(deleteDiv);
-
-        targetDiv.appendChild(rowDiv);
+        document
+          .getElementById("btn-target")
+          .addEventListener("click", handleDeleteTarget);
+      } else {
+        //si no hay targets
+        alert("No hay targets para el usuario");
       }
+    } else {
+      alert("Error de sistema");
     }
-    return true;
   } catch (error) {
     console.error(error);
     return false;
@@ -588,16 +594,17 @@ const loadRegisters = async () => {
   try {
     const regsBuffer = await read("register", "all");
 
-    if (!regsBuffer) {
-      console.log("No hay registros para el usuario");
-      return true;
-    } else if (regsBuffer.mensaje) {
+    if (!regsBuffer.exito) {
       alert(regsBuffer.mensaje);
-    } else {
-      for (let reg of regsBuffer) {
+    } else if (regsBuffer.data.length != 0) {
+      // si hay registross
+      for (let reg of regsBuffer.data) {
         await reloadTable(reg);
       }
       return true;
+    } else {
+      //si no hay
+      alert("No hay registros para le usario");
     }
   } catch (error) {
     console.error(error);
@@ -624,7 +631,7 @@ const loadRegisters = async () => {
 //-----------------------------LOAD FIRST TIME---------------------
 
 const handleAccountToFrom = () => {
-  console.log("A")
+  console.log("A");
   let accountToDiv = document.getElementById("account-to-div");
   let type = document.getElementById("type").value;
 
@@ -698,7 +705,7 @@ const addRecord = async (event) => {
   let formateoMysql = milisLocal.toISOString().slice(0, 19).replace("T", " ");
   recordBuffer.regDate = formateoMysql;
 
-    //sea save o update, le actualizo la fecha. 
+  //sea save o update, le actualizo la fecha.
 
   let verif = await checkData(recordBuffer);
 
@@ -729,11 +736,10 @@ const addRecord = async (event) => {
       }
     } else {
       // es update
-      let res = await update(recordBuffer, 'register', idRegAux);
-      if(res.exito){
+      let res = await update(recordBuffer, "register", idRegAux);
+      if (res.exito) {
         window.location.reload(true);
       }
-    
     }
   } else {
     console.error("Verifacion fallo");
@@ -778,13 +784,12 @@ const checkData = async (recordBuffer) => {
     messageValidation(accToValueContainer, accToFeedback, isValidAccount);
   }
   // si tiene una , le pongo un punto:
-  if( enteredAmount.includes(',')){
-    enteredAmount = enteredAmount.split(',').join('.')  
+  if (enteredAmount.includes(",")) {
+    enteredAmount = enteredAmount.split(",").join(".");
   }
   let isValidAmount = await validateAmount(enteredAmount, accValue, moveType);
 
   messageValidation(enteredAmountInput, enteredAmountFeedback, isValidAmount);
-
 
   if (
     isValidAccount === true &&
@@ -840,7 +845,6 @@ const checkData = async (recordBuffer) => {
 // };
 
 const validateAmount = async (amt, account, type) => {
-  
   let amtInt = parseFloat(amt);
   let moveFlag = type === "Spent" || type === "Move" ? true : false;
 
@@ -901,7 +905,6 @@ const validateMove = async (accValue, accToValue) => {
   }
 };
 
-
 const refreshMoveBalance = async (accTo, accFrom, amount) => {
   let balanceContainer = document.getElementById("balance");
   let balance = parseFloat(balanceContainer.innerHTML);
@@ -915,7 +918,7 @@ const refreshMoveBalance = async (accTo, accFrom, amount) => {
       alert(accToBuffer.mensaje);
     } else {
       let pAccountBalance = document.getElementById(
-        "acc-balance-p-" + accToBuffer.name.split(' ').join('')
+        "acc-balance-p-" + accToBuffer.name.split(" ").join("")
       );
       pAccountBalance.innerText = accToBuffer.balance.toFixed(0);
 
@@ -937,7 +940,7 @@ const refreshMoveBalance = async (accTo, accFrom, amount) => {
       alert(accFromBuffer.mensaje);
     } else {
       let pAccountBalance = document.getElementById(
-        "acc-balance-p-" + accFromBuffer.name.split(' ').join('')
+        "acc-balance-p-" + accFromBuffer.name.split(" ").join("")
       );
 
       pAccountBalance.innerText = accFromBuffer.balance.toFixed(0);
@@ -956,18 +959,22 @@ const refreshMoveBalance = async (accTo, accFrom, amount) => {
 const reloadTable = async (recordBuffer) => {
   const table = document.querySelector("table");
   let row = document.createElement("tr");
- 
+
   row.innerHTML = `
     <th>${table.rows.length}</th>
     <td>${recordBuffer.reg_date}</td>
     <td>${recordBuffer.type}</td>
     <td>${recordBuffer.amount}</td>
-    <td>${recordBuffer.name_acc_to ? recordBuffer.name_acc_to : "N/A" }</td>
-    <td>${recordBuffer.name_acc_from ? recordBuffer.name_acc_from : "N/A" }</td>
+    <td>${recordBuffer.name_acc_to ? recordBuffer.name_acc_to : "N/A"}</td>
+    <td>${recordBuffer.name_acc_from ? recordBuffer.name_acc_from : "N/A"}</td>
     <td>${recordBuffer.category}</td>
-    <td><button class="btn btn-dark text-white edit-btn" data-id="${recordBuffer.id}" > Edit
+    <td><button class="btn btn-dark text-white edit-btn" data-id="${
+      recordBuffer.id
+    }" > Edit
     </button>
-    <button class="btn btn-danger text-white delete-btn" data-id="${recordBuffer.id}" > Delete
+    <button class="btn btn-danger text-white delete-btn" data-id="${
+      recordBuffer.id
+    }" > Delete
     </button></td>`;
 
   table.querySelector("tbody").append(row);
@@ -987,7 +994,6 @@ const closeModal = () => {
   enableCategories();
 };
 
-
 //-----------OBJ FUNC--------------------------------
 
 const handleShowObjetiveHover = () => {
@@ -1004,15 +1010,12 @@ const handleObjetiveModal = () => {
   handleObjModalOpen();
 };
 
-
-
 const handleObjModalOpen = () => {
   modalTarget.show();
   return;
 };
 
 const handleCloseObjModal = () => {
-  
   modalTarget.hide();
   console.log("Modal cerrado");
 };

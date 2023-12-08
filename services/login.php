@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
       
       
-      $role = $permissionController->getRoleNameIdByidUser($_SESSION['user_id']);
+      $role = $permissionController->getRoleNameIdByidUser($user['id']);
       
       if($role){
 

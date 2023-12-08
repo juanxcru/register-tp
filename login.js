@@ -7,7 +7,8 @@ const begin = () => {
 
 const checkLogin = async (event) => {
     event.preventDefault();
-   
+    resetFeedback();
+
     let emailContainer = document.getElementById("email");
     let passwordContainer = document.getElementById("password");
 
@@ -43,10 +44,14 @@ const checkLogin = async (event) => {
         resetFeedback();
         console.log(resjson.mensaje);
         if(resjson.role == 'admin'){
-          //location.assign("./admin.html")
+          location.assign("./admin.html")
         }else if(resjson.role == 'user'){
           location.assign("./app.html")
-        } alert("ERROR")// si el role no es uno de estos, se tuvo que haber ido antes por el resjson.exito = false.
+          console.log("Hola,",resjson)
+        } else{
+          // si el role no es uno de estos, se tuvo que haber ido antes por el resjson.exito = false.
+          alert("ERROR")
+        }
        }else{
         resetFeedback();
         if (resjson.err == 'password'){

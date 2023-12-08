@@ -72,19 +72,20 @@ switch ($typeReq) {
       break;
     } else
       if (isset($_GET['type']) && $_GET['type'] == 'account' && isset($_GET['id']) && $_GET['id'] == 'all') { // leer todas las cuentas
-
-
         if (isset($_SESSION['user_id'])) {
-
           if ($permissionController->tienePermiso('ver cuenta', $_SESSION['user_id'])) {
-
 
             $data = $accController->readAll($_SESSION['user_id']);
 
-            $jsonData = json_encode($data);
-            http_response_code(200);
-            echo $jsonData;
-            break;
+            if($data['exito']){
+              http_response_code(200);
+              echo json_encode($data);
+              exit();
+            }else{
+              http_response_code(401);
+              echo json_encode($data);
+              exit();
+            }
           } else {
             $respuesta = [
               "exito" => false,
@@ -177,11 +178,15 @@ switch ($typeReq) {
 
                 $data = $targetController->readAll($_SESSION['user_id']);
 
-                $jsonData = json_encode($data);
-                header('Content-Type: application/json');
-                http_response_code(200);
-                echo $jsonData;
-                break;
+                if($data['exito']){
+                  http_response_code(200);
+                  echo json_encode($data);
+                  exit();
+                }else{
+                  http_response_code(401);
+                  echo json_encode($data);
+                  exit();
+                }
               } else {
                 $respuesta = [
                   "exito" => false,
@@ -209,11 +214,15 @@ switch ($typeReq) {
 
                   $data = $regController->readAll($_SESSION['user_id']);
 
-                  $jsonData = json_encode($data);
-                  header('Content-Type: application/json');
-                  echo $jsonData;
-
-                  break;
+                  if($data['exito']){
+                    http_response_code(200);
+                    echo json_encode($data);
+                    exit();
+                  }else{
+                    http_response_code(401);
+                    echo json_encode($data);
+                    exit();
+                  }
                 } else {
                   $respuesta = [
                     "exito" => false,
@@ -445,7 +454,7 @@ switch ($typeReq) {
         if (isset($_SESSION['user_id'])){
           if($permissionController->tienePermiso('eliminar registro', $_SESSION['user_id'])){
             
-            $data = $regController->deleteTarget($_GET['id'],$_SESSION['user_id']);
+            $data = $regController->delete($_GET['id'],$_SESSION['user_id']);
 
             $jsonData = json_encode($data);
             echo $jsonData;

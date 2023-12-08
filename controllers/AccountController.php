@@ -8,15 +8,28 @@ class AccountController {
     
     require "../conf/conn_mysql.php";
 
-    //ver relacion con user : cuentas de un usuario tabla accounts + id de user?
-    $consulta = $conn->prepare("SELECT * FROM accounts WHERE id_user = :id");
-    $consulta->bindParam(':id', $id);
-    $data = $consulta->execute();
-  
-    $data = $consulta->fetchAll(PDO::FETCH_ASSOC);
+    try{
 
-    
-    return $data;
+      $consulta = $conn->prepare("SELECT * FROM accounts WHERE id_user = :id");
+      $consulta->bindParam(':id', $id);
+      $data = $consulta->execute();
+      
+      $data = $consulta->fetchAll(PDO::FETCH_ASSOC);
+      
+      // si esta vacio, envio un array vacio en data, asi lo identifico en el front
+      return [
+        'exito' => true,
+        'mensaje' => "ok",
+        'data' => $data
+      ];
+      
+    }catch(Exception $e){
+      return [
+        'exito' => false,
+        'mensaje' => $e->getMessage(),
+        'err' => 'sys'
+      ];
+    }
   }
 
   public function readOneById($id,$iduser){

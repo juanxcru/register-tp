@@ -57,13 +57,13 @@
       aria-hidden="true">
         <div class="modal-content">
           <div class="modal-header">
-            <div class="modal-title" id="exampleModalCenterTitle">Add move</div>
+            <div class="modal-title" id="exampleModalCenterTitle">Agregar Registro</div>
           </div>
           <div class="modal-body">
             <div class="container-fluid text-center">
               <form id="form-add-reg" class="needs-validation row g-3 justify-content-md-center" novalidate>
                 <div class="col-md-4">
-                  <label for="type" class="form-label">Type</label>
+                  <label for="type" class="form-label">Tipo</label>
                   <select class="form-select" id="type">
                     <option selected></option>
                     <option value="Income">Income</option>
@@ -74,7 +74,7 @@
                   </div>
                 </div>
                 <div class="col-md">
-                  <label for="account" class="form-label">Account</label>
+                  <label for="account" class="form-label">Cuenta</label>
                   <select class="form-select" id="account">
                     <option selected></option>
                   </select>
@@ -82,7 +82,7 @@
                   </div>
                 </div>
                 <div class="col-md d-none" id="account-to-div">
-                  <label for="account-to" class="form-label">Account To</label>
+                  <label for="account-to" class="form-label">Cuenta To</label>
                   <select class="form-select" id="account-to">
                     <option selected></option>
                   </select>
@@ -90,7 +90,7 @@
                   </div>
                 </div>
                 <div class="col-md-12 mb-2">
-                  <label for="amount" class="form-label">Amount</label>
+                  <label for="amount" class="form-label">Monto</label>
                   <div class="input-group">
                     <span class="input-group-text">$</span>
                     <input type="text" class="form-control" id="amount" />
@@ -286,7 +286,7 @@
                     data-bs-target="#modal-add-reg"
                     data-dismiss="modal"
                   >
-                    Close
+                    Cerrar
                   </button>
                   <button
                     id="btn-save-modal"
@@ -294,7 +294,7 @@
                     class="btn bg-dark text-white"
                     
                   >
-                    Save
+                    Guardar
                   </button>
                 </div>
               </form>
@@ -310,7 +310,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">New objective</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Nuevo objective</h5>
           </div>
           <div class="modal-body">
             <form id="formularioTarget" novalidate>
@@ -326,8 +326,8 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button id="btn-close-obj-modal" type="button" class="btn btn-secondary">Close</button>
-            <button id="btn-save-obj-modal" type="submit" class="btn btn-primary">Save</button>
+            <button id="btn-close-obj-modal" type="button" class="btn btn-secondary">Cerrar</button>
+            <button id="btn-save-obj-modal" type="submit" class="btn btn-primary">Guardar</button>
           </div>
         </div>
       </div>
@@ -341,7 +341,7 @@
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">New reminder</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Nuevo reminder</h5>
               </div>
               <div class="modal-body">
                 <form>
@@ -356,8 +356,8 @@
                 </form>
               </div>
               <div class="modal-footer">
-                <button id="btn-close-recordatorio-modal" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="btn-save-recordatorio-modal" type="submit" class="btn btn-primary">Save</button>
+                <button id="btn-close-recordatorio-modal" type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button id="btn-save-recordatorio-modal" type="submit" class="btn btn-primary">Guardar</button>
               </div>
             </div>
           </div>
@@ -383,7 +383,7 @@
      >
        <div class="modal-content">
          <div class="modal-header">
-           <div class="modal-title">Add Account</div>
+           <div class="modal-title">Nueva Cuenta</div>
          </div>
          <div class="modal-body">
            <div class="container-fluid text-center">
@@ -396,14 +396,14 @@
              <div class="col-md-6">
                
                <div class="mb-3">
-                <label for="acc-name" class="form-label">Name</label>
+                <label for="acc-name" class="form-label">Nombre</label>
                  <input type="text" class="form-control" id="acc-name" placeholder="">
                  <div id="accNameFeedback" class="invalid-feedback"></div>
                </div>
              </div>
              
              <div class="col-md-6">
-               <label for="acc-init-balance" class="form-label">Initial Balance</label>
+               <label for="acc-init-balance" class="form-label">Balance inicial</label>
                <div class="input-group">
                  <span class="input-group-text">$</span>
                  <input type="text" class="form-control" id="acc-init-balance"/>
@@ -411,7 +411,7 @@
                </div>
              </div>
              <div class="col-md-12">
-              <label for="acc-descrip" class="form-label">Description</label>
+              <label for="acc-descrip" class="form-label">Descripcion</label>
                  <textarea class="form-control" id="acc-descrip" rows="3"></textarea>
               <div id="accDescrFeedback" class="invalid-feedback"></div>
             </div>
@@ -424,7 +424,7 @@
                 data-bs-target="#modal-add-acc"
                 data-dismiss="modal"
               >
-                Close
+                Cerrar
               </button>
               <button
                 id="btn-save-acc-modal"
@@ -432,7 +432,7 @@
                 class="btn btn-dark"
               
               >
-                Save
+                Guardar
               </button>
             </div>
            </form>
@@ -467,10 +467,10 @@
           "
           id="balance-scroll"
         >
-          <div class="pill-div col-2" >
-            <p class="pill-p-title">New Account</p>
-            <div role="button" data-bs-toggle="modal" data-bs-target="#modal-add-acc" class="account-balance-div text-white bg-dark" style="min-width: 200px;" >
-            <p class="account-balance-p text-center" >Add</p>
+          <div class="pill-div col-2 justify-content-center" >
+            <p class="pill-p-title">&nbsp;</p>
+            <div  class="account-balance-div text-white bg-dark" style="min-width: 200px;" >
+            <p role="button" data-bs-toggle="modal" data-bs-target="#modal-add-acc" class="account-balance-p text-center">Nueva cuenta</p>
             </div>  
           </div>
       
@@ -652,13 +652,13 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Account To</th>
-                  <th>Account From</th>
-                  <th>Category</th>
-                  <th>Edit</th>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th>Monto</th>
+                  <th>Cuenta To</th>
+                  <th>Cuenta From</th>
+                  <th>Categoria</th>
+                  <th>Opcion</th>
                 </tr>
               </thead>
               <tbody>

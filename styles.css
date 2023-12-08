@@ -21,10 +21,11 @@
 }
 
 .account-balance-p{
-  font-size: 2.5vh; 
+  text-align: center;
+  font-size: 1.8vh; 
   font-weight: bold;
   /* KE TRUKAZO NO */
-  margin: -3px;
+  /* margin: -3px; */
 }
 
 .account-balance-div{

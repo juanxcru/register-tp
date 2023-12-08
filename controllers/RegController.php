@@ -57,7 +57,7 @@ class RegController
     return $data;
   }
 
-public function deleteTarget($id, $idUser) {
+public function delete($id, $idUser) {
 
   require "../conf/conn_mysql.php";
 
@@ -161,26 +161,40 @@ public function deleteTarget($id, $idUser) {
   {
 
     require "../conf/conn_mysql.php";
+    try{
+      
+      $consulta = $conn->prepare("SELECT reg.id,
+                                      accounts_to.name AS name_acc_to,
+                                      accounts_from.name AS name_acc_from,
+                                      reg.category,
+                                      reg.amount,
+                                      reg.reg_date,
+                                      reg.type
+                                  FROM reg
+                                  LEFT JOIN accounts AS accounts_to ON reg.id_acc_to = accounts_to.id
+                                  LEFT JOIN accounts AS accounts_from ON reg.id_acc_from = accounts_from.id
+                                  WHERE reg.id_user_reg = :iduser;");
 
-    $consulta = $conn->prepare("SELECT reg.id,
-                                    accounts_to.name AS name_acc_to,
-                                    accounts_from.name AS name_acc_from,
-                                    reg.category,
-                                    reg.amount,
-                                    reg.reg_date,
-                                    reg.type
-                                FROM reg
-                                LEFT JOIN accounts AS accounts_to ON reg.id_acc_to = accounts_to.id
-                                LEFT JOIN accounts AS accounts_from ON reg.id_acc_from = accounts_from.id
-                                WHERE reg.id_user_reg = :iduser;");
+      $consulta->bindParam(':iduser', $iduser);
 
-    $consulta->bindParam(':iduser', $iduser);
+      $consulta->execute();
 
-    $consulta->execute();
+      $data = $consulta->fetchAll(PDO::FETCH_ASSOC);
 
-    $data = $consulta->fetchAll(PDO::FETCH_ASSOC);
+      return [
+        'exito' => true,
+        'mensaje' => "ok",
+        'data' => $data
+      ];
 
-    return $data;
+  }catch(Exception $e){
+    return [
+      'exito' => false,
+      'mensaje' => $e->getMessage(),
+      'err' => 'sys'
+    ];
+  }
+
   }
 
   // public function readOneById($idReg, $iduser){
