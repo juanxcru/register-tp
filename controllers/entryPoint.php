@@ -1,21 +1,38 @@
 <?php
 
-  require_once 'AccountController.php';
-  require_once 'RegController.php';
-  require_once 'TargetController.php';
-  require_once 'PermissionController.php';
-  require_once 'UsersController.php';
+require_once 'AccountController.php';
+require_once 'RegController.php';
+require_once 'TargetController.php';
+require_once 'PermissionController.php';
+require_once 'UsersController.php';
+
+function validarCuenta($iduser, $acc, $accController)
+{
+
+
+  if ($acc !== null && !is_numeric($acc)) {
+    return false;
+  }
+  if ($acc !== null) {
+    $cuentaTo = $accController->readOneById($acc);
+    if (!$cuentaTo) {
+      return false;
+    }
+  }
+  return true;
+}
 
 session_start();
 
-  $regController = new RegController();
-  $accController = new AccountController();
-  $targetController = new TargetController();
-  $permissionController = new PermissionController();
-  $usersController = new UsersController();
-  
-  $typeReq  = $_SERVER['REQUEST_METHOD'];
-  header('Content-Type: application/json');
+$regController = new RegController();
+$accController = new AccountController();
+$targetController = new TargetController();
+$permissionController = new PermissionController();
+$usersController = new UsersController();
+
+$typeReq = $_SERVER['REQUEST_METHOD'];
+header('Content-Type: application/json');
+
 
 
 switch ($typeReq) {
@@ -77,11 +94,11 @@ switch ($typeReq) {
 
             $data = $accController->readAll($_SESSION['user_id']);
 
-            if($data['exito']){
+            if ($data['exito']) {
               http_response_code(200);
               echo json_encode($data);
               exit();
-            }else{
+            } else {
               http_response_code(401);
               echo json_encode($data);
               exit();
@@ -105,53 +122,20 @@ switch ($typeReq) {
           echo json_encode($respuesta);
           break;
         }
-      }else
-      if(isset($_GET['type']) && $_GET['type'] == 'users' && isset($_GET['id']) && $_GET['id'] == 'adm'){ // leer todos los users
-        
+      } else
+        if (isset($_GET['type']) && $_GET['type'] == 'users' && isset($_GET['id']) && $_GET['id'] == 'adm') { // leer todos los users
 
-        if (isset($_SESSION['user_id'])){
-
-          if($permissionController->tienePermiso('ver usuarios', $_SESSION['user_id'])){
-            
-           
-            $data = $usersController->readAllUsers();
-
-            $jsonData = json_encode($data);
-            http_response_code(200);
-            echo $jsonData;
-            break;
-          }else{
-            $respuesta = [
-              "exito" => false,
-              "mensaje" => "Unauthorized"
-            ];
-            http_response_code(401);
-            echo json_encode($respuesta);
-            break;
-          }
-
-        }else{
-          $respuesta = [
-            "exito" => false,
-            "mensaje" => "Unlogged"
-          ];
-          http_response_code(403);
-          echo json_encode($respuesta);
-          break;
-        }
-      }
-      else
-      if(isset($_GET['type']) && $_GET['type'] == 'account' && isset($_GET['id'])){ // cuenta por id
 
           if (isset($_SESSION['user_id'])) {
-            if ($permissionController->tienePermiso('ver cuenta', $_SESSION['user_id'])) {
 
-              $data = $accController->readOneById($_GET['id'], $_SESSION['user_id']);
+            if ($permissionController->tienePermiso('ver usuarios', $_SESSION['user_id'])) {
+
+
+              $data = $usersController->readAllUsers();
 
               $jsonData = json_encode($data);
-              header('Content-Type: application/json');
+              http_response_code(200);
               echo $jsonData;
-
               break;
             } else {
               $respuesta = [
@@ -162,6 +146,7 @@ switch ($typeReq) {
               echo json_encode($respuesta);
               break;
             }
+
           } else {
             $respuesta = [
               "exito" => false,
@@ -172,21 +157,18 @@ switch ($typeReq) {
             break;
           }
         } else
-          if (isset($_GET['type']) && $_GET['type'] == 'target' && isset($_GET['id']) && $_GET['id'] == 'all') { // objetivos todos
+          if (isset($_GET['type']) && $_GET['type'] == 'account' && isset($_GET['id'])) { // cuenta por id
+
             if (isset($_SESSION['user_id'])) {
-              if ($permissionController->tienePermiso('ver objetivo', $_SESSION['user_id'])) {
+              if ($permissionController->tienePermiso('ver cuenta', $_SESSION['user_id'])) {
 
-                $data = $targetController->readAll($_SESSION['user_id']);
+                $data = $accController->readOneById($_GET['id']);
 
-                if($data['exito']){
-                  http_response_code(200);
-                  echo json_encode($data);
-                  exit();
-                }else{
-                  http_response_code(401);
-                  echo json_encode($data);
-                  exit();
-                }
+                $jsonData = json_encode($data);
+                header('Content-Type: application/json');
+                echo $jsonData;
+
+                break;
               } else {
                 $respuesta = [
                   "exito" => false,
@@ -205,20 +187,18 @@ switch ($typeReq) {
               echo json_encode($respuesta);
               break;
             }
-
-
           } else
-            if (isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id']) && $_GET['id'] == 'all') { // leer todos los registros
+            if (isset($_GET['type']) && $_GET['type'] == 'target' && isset($_GET['id']) && $_GET['id'] == 'all') { // objetivos todos
               if (isset($_SESSION['user_id'])) {
-                if ($permissionController->tienePermiso('ver registro', $_SESSION['user_id'])) {
+                if ($permissionController->tienePermiso('ver objetivo', $_SESSION['user_id'])) {
 
-                  $data = $regController->readAll($_SESSION['user_id']);
+                  $data = $targetController->readAll($_SESSION['user_id']);
 
-                  if($data['exito']){
+                  if ($data['exito']) {
                     http_response_code(200);
                     echo json_encode($data);
                     exit();
-                  }else{
+                  } else {
                     http_response_code(401);
                     echo json_encode($data);
                     exit();
@@ -241,18 +221,24 @@ switch ($typeReq) {
                 echo json_encode($respuesta);
                 break;
               }
+
+
             } else
-              if (isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id']) && $_GET['id'] == 'adm') { // leer todos los registros ADMIN
-                if (isset($_SESSION['name']) && $_SESSION['name'] == 'admin') {
+              if (isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id']) && $_GET['id'] == 'all') { // leer todos los registros
+                if (isset($_SESSION['user_id'])) {
                   if ($permissionController->tienePermiso('ver registro', $_SESSION['user_id'])) {
 
-                    $data = $regController->readAllFromAllUsers();
+                    $data = $regController->readAll($_SESSION['user_id']);
 
-                    $jsonData = json_encode($data);
-                    header('Content-Type: application/json');
-                    echo $jsonData;
-
-                    break;
+                    if ($data['exito']) {
+                      http_response_code(200);
+                      echo json_encode($data);
+                      exit();
+                    } else {
+                      http_response_code(401);
+                      echo json_encode($data);
+                      exit();
+                    }
                   } else {
                     $respuesta = [
                       "exito" => false,
@@ -271,13 +257,12 @@ switch ($typeReq) {
                   echo json_encode($respuesta);
                   break;
                 }
-                
               } else
-                if (isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id'])) { // register por id
-                  if (isset($_SESSION['user_id'])) {
+                if (isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id']) && $_GET['id'] == 'adm') { // leer todos los registros ADMIN
+                  if (isset($_SESSION['name']) && $_SESSION['name'] == 'admin') {
                     if ($permissionController->tienePermiso('ver registro', $_SESSION['user_id'])) {
 
-                      $data = $regController->readOneByIdAccName($_GET['id'], $_SESSION['user_id']);
+                      $data = $regController->readAllFromAllUsers();
 
                       $jsonData = json_encode($data);
                       header('Content-Type: application/json');
@@ -302,7 +287,38 @@ switch ($typeReq) {
                     echo json_encode($respuesta);
                     break;
                   }
-                }
+
+                } else
+                  if (isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id'])) { // register por id
+                    if (isset($_SESSION['user_id'])) {
+                      if ($permissionController->tienePermiso('ver registro', $_SESSION['user_id'])) {
+
+                        $data = $regController->readOneByIdAccName($_GET['id'], $_SESSION['user_id']);
+
+                        $jsonData = json_encode($data);
+                        header('Content-Type: application/json');
+                        echo $jsonData;
+
+                        break;
+                      } else {
+                        $respuesta = [
+                          "exito" => false,
+                          "mensaje" => "Unauthorized"
+                        ];
+                        http_response_code(401);
+                        echo json_encode($respuesta);
+                        break;
+                      }
+                    } else {
+                      $respuesta = [
+                        "exito" => false,
+                        "mensaje" => "Unlogged"
+                      ];
+                      http_response_code(403);
+                      echo json_encode($respuesta);
+                      break;
+                    }
+                  }
 
     break;
   case 'POST':
@@ -313,23 +329,41 @@ switch ($typeReq) {
 
           $data = json_decode(file_get_contents('php://input'), true);
 
-          $resu = $regController->save($data, $_SESSION['user_id']);
-          if ($resu) {
-            $respuesta = [
-              "exito" => true,
-              "mensaje" => "Save OK",
-              "id" => $resu
-            ];
-            http_response_code(200);
-            echo json_encode($respuesta);
-            break;
-          } else {
+          $validAccTo = validarCuenta($_SESSION['user_id'], $data['accTo'], $accController);
+          $validAccFrom = validarCuenta($_SESSION['user_id'], $data['accFrom'], $accController);
+
+          if (!$validAccFrom) {
             $respuesta = [
               "exito" => false,
-              "mensaje" => "BBDD error"
+              "mensaje" => "Cuenta invalida",
+              "err" => "accFrom"
             ];
-            http_response_code(500);
+            http_response_code(401);
             echo json_encode($respuesta);
+            exit();
+          }
+
+          if (!$validAccTo) {
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Cuenta invalida",
+              "err" => "accTo"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            exit();
+          }
+
+          $resu = $regController->save($data, $_SESSION['user_id']);
+
+          if ($resu['exito']) {
+            http_response_code(200);
+            echo json_encode($resu);
+            exit();
+          } else {
+            http_response_code(200);
+            echo json_encode($resu);
+            exit();
           }
         } else {
           $respuesta = [
@@ -349,7 +383,7 @@ switch ($typeReq) {
         echo json_encode($respuesta);
         break;
       }
-    }
+    }else
     if (isset($_GET['type']) && $_GET['type'] == 'account') {
       if (isset($_SESSION['user_id'])) {
         if ($permissionController->tienePermiso('crear cuenta', $_SESSION['user_id'])) {
@@ -378,7 +412,7 @@ switch ($typeReq) {
         http_response_code(403);
         echo json_encode($respuesta);
       }
-    }
+    }else
     if (isset($_GET['type']) && $_GET['type'] == 'target') {
       if (isset($_SESSION['user_id'])) {
         if ($permissionController->tienePermiso('crear objetivo', $_SESSION['user_id'])) {
@@ -420,76 +454,14 @@ switch ($typeReq) {
   case 'DELETE':
     if (isset($_GET['type']) && $_GET['type'] == 'target' && isset($_GET['id'])) { // cuenta por id
 
-        if (isset($_SESSION['user_id'])){
-          if($permissionController->tienePermiso('eliminar objetivo', $_SESSION['user_id'])){
-            
-            $data = $targetController->deleteTarget($_GET['id'],$_SESSION['user_id']);
+      if (isset($_SESSION['user_id'])) {
+        if ($permissionController->tienePermiso('eliminar objetivo', $_SESSION['user_id'])) {
 
-            $jsonData = json_encode($data);
-            echo $jsonData;
-              
-            break;
-          }else{
-            $respuesta = [
-              "exito" => false,
-              "mensaje" => "Unauthorized"
-            ];
-            http_response_code(401);
-            echo json_encode($respuesta);
-            break;
-          }
-      }else{
-        $respuesta = [
-          "exito" => false,
-          "mensaje" => "Unlogged"
-        ];
-        http_response_code(403);
-        echo json_encode($respuesta);
-        break;
-      }
-      
-      }else
-      if(isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id'])){ // cuenta por id
-
-        if (isset($_SESSION['user_id'])){
-          if($permissionController->tienePermiso('eliminar registro', $_SESSION['user_id'])){
-            
-            $data = $regController->delete($_GET['id'],$_SESSION['user_id']);
-
-            $jsonData = json_encode($data);
-            echo $jsonData;
-              
-            break;
-          }else{
-            $respuesta = [
-              "exito" => false,
-              "mensaje" => "Unauthorized"
-            ];
-            http_response_code(401);
-            echo json_encode($respuesta);
-            break;
-          }
-      }else{
-        $respuesta = [
-          "exito" => false,
-          "mensaje" => "Unlogged"
-        ];
-        http_response_code(403);
-        echo json_encode($respuesta);
-        break;
-      }
-      
-      }else
-      if(isset($_GET['type']) && $_GET['type'] == 'users' && isset($_GET['id'])){ //delete user
-
-        if (isset($_SESSION['user_id'])){
-          if($permissionController->tienePermiso('eliminar usuario', $_SESSION['user_id'])){
-            
-            $data = $usersController->deleteUser($_GET['id']);
+          $data = $targetController->deleteTarget($_GET['id'], $_SESSION['user_id']);
 
           $jsonData = json_encode($data);
-          http_response_code(200);
           echo $jsonData;
+
           break;
         } else {
           $respuesta = [
@@ -510,29 +482,148 @@ switch ($typeReq) {
         break;
       }
 
-    }
+    } else
+      if (isset($_GET['type']) && $_GET['type'] == 'register' && isset($_GET['id'])) { // cuenta por id
+
+        if (isset($_SESSION['user_id'])) {
+          if ($permissionController->tienePermiso('eliminar registro', $_SESSION['user_id'])) {
+
+            $data = $regController->delete($_GET['id'], $_SESSION['user_id']);
+
+            $jsonData = json_encode($data);
+            echo $jsonData;
+
+            break;
+          } else {
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unauthorized"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            break;
+          }
+        } else {
+          $respuesta = [
+            "exito" => false,
+            "mensaje" => "Unlogged"
+          ];
+          http_response_code(403);
+          echo json_encode($respuesta);
+          break;
+        }
+
+      } else
+        if (isset($_GET['type']) && $_GET['type'] == 'users' && isset($_GET['id'])) { //delete user
+
+          if (isset($_SESSION['user_id'])) {
+            if ($permissionController->tienePermiso('eliminar usuario', $_SESSION['user_id'])) {
+
+              $data = $usersController->deleteUser($_GET['id']);
+
+              $jsonData = json_encode($data);
+              http_response_code(200);
+              echo $jsonData;
+              break;
+            } else {
+              $respuesta = [
+                "exito" => false,
+                "mensaje" => "Unauthorized"
+              ];
+              http_response_code(401);
+              echo json_encode($respuesta);
+              break;
+            }
+          } else {
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Unlogged"
+            ];
+            http_response_code(403);
+            echo json_encode($respuesta);
+            break;
+          }
+
+        } else 
+          if (isset($_GET['type']) && $_GET['type'] == 'account' && isset($_GET['id'])) {
+            if (isset($_SESSION['user_id'])) {
+              if ($permissionController->tienePermiso('eliminar cuenta', $_SESSION['user_id'])) {
+                $res = $accController->delete($_GET['id']);
+
+                if ($res['exito']) {
+                  http_response_code(200);
+                  echo json_encode($res);
+                  exit();
+                } else {
+                  http_response_code(400);
+                  echo json_encode($res);
+                  exit();
+                }
+
+              }else{
+                $respuesta = [
+                  "exito" => false,
+                  "mensaje" => "Unauthorized"
+                ];
+                http_response_code(401);
+                echo json_encode($respuesta);
+                exit();
+              }
+            }else{
+              $respuesta = [
+                "exito" => false,
+                "mensaje" => "Unlogged"
+              ];
+              http_response_code(403);
+              echo json_encode($respuesta);
+              exit();
+            }
+
+          }
     break;
   case 'PUT':
     if (isset($_GET['type']) && $_GET['type'] == "register" && isset($_GET['id'])) {
       if (isset($_SESSION['user_id'])) {
         if ($permissionController->tienePermiso('modificar registro', $_SESSION['user_id'])) {
           $data = json_decode(file_get_contents('php://input'), true);
-          if ($regController->update($data, $_SESSION['user_id'], $_GET['id'])) {
-            $respuesta = [
-              "exito" => true,
-              "mensaje" => "update OK"
-            ];
-            http_response_code(200);
-            echo json_encode($respuesta);
-            break;
-          } else {
+
+          $validAccTo = validarCuenta($_SESSION['user_id'], $data['accTo'], $accController);
+          $validAccFrom = validarCuenta($_SESSION['user_id'], $data['accFrom'], $accController);
+
+          if (!$validAccFrom) {
             $respuesta = [
               "exito" => false,
-              "mensaje" => "BBDD error"
+              "mensaje" => "Cuenta invalida",
+              "err" => "accFrom"
             ];
-            http_response_code(500);
+            http_response_code(401);
             echo json_encode($respuesta);
+            exit();
           }
+
+          if (!$validAccTo) {
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Cuenta invalida",
+              "err" => "accTo"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            exit();
+          }
+
+          $res = $regController->update($data, $_SESSION['user_id'], $_GET['id']);
+
+          if ($res['exito']) {
+            http_response_code(200);
+            echo json_encode($res);
+            exit();
+          } else {
+            http_response_code(400);
+            echo json_encode($res);
+            exit();
+          }
+
         } else {
           $respuesta = [
             "exito" => false,
@@ -540,9 +631,9 @@ switch ($typeReq) {
           ];
           http_response_code(401);
           echo json_encode($respuesta);
-
+          exit();
         }
-      }else {
+      } else {
         $respuesta = [
           "exito" => false,
           "mensaje" => "Unlogged"
@@ -550,6 +641,55 @@ switch ($typeReq) {
         http_response_code(403);
         echo json_encode($respuesta);
         break;
+      }
+    }else 
+    if (isset($_GET['type']) && $_GET['type'] == "account" && isset($_GET['id'])){
+      if (isset($_SESSION['user_id'])) {
+        if ($permissionController->tienePermiso('modificar cuenta', $_SESSION['user_id'])) {
+          
+          $data = json_decode(file_get_contents('php://input'), true);
+
+          if(validarCuenta($_SESSION['user_id'], $_GET['id'], $accController)){
+          
+            $res = $accController->update($data, $_SESSION['user_id'],$_GET['id']);
+
+            if ($res['exito']) {
+              http_response_code(200);
+              echo json_encode($res);
+              exit();
+            } else {
+              http_response_code(400);
+              echo json_encode($res);
+              exit();
+            }
+
+          }else{
+            $respuesta = [
+              "exito" => false,
+              "mensaje" => "Cuenta no valida",
+              "err" => "acc"
+            ];
+            http_response_code(401);
+            echo json_encode($respuesta);
+            exit();
+          }
+        }else{
+          $respuesta = [
+            "exito" => false,
+            "mensaje" => "Unauthorized"
+          ];
+          http_response_code(401);
+          echo json_encode($respuesta);
+          exit();
+        }
+      }else{
+        $respuesta = [
+          "exito" => false,
+          "mensaje" => "Unlogged"
+        ];
+        http_response_code(403);
+        echo json_encode($respuesta);
+        exit();
       }
     }
     break;

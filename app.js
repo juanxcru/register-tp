@@ -3,6 +3,7 @@ const ARS_USD = 1000;
 let modalEditFlag = false;
 let modalEditAccFlag = false;
 let idRegAux = 0;
+let idAccAux = 0;
 
 //obj modal target
 let modalTarget = new bootstrap.Modal(document.getElementById("modalTarget"));
@@ -67,6 +68,24 @@ const begin = async () => {
       .getElementById("balance-scroll")
       .addEventListener("click", editDeleteAcc);
 
+    document.getElementById("btn-p-new-acc").addEventListener("click", () => {
+      let btnDeleteAccount = document.getElementById("btn-del-acc-modal");
+      let accNameContainer = document.getElementById("acc-name");
+      document.getElementById("form-add-acc").reset();
+      modalEditAccFlag = false;
+      accNameContainer.disabled = false;
+      if (!btnDeleteAccount.classList.contains("d-none")) {
+        btnDeleteAccount.classList.add("d-none");
+      }  
+    });
+
+    document.getElementById("btn-new-reg").addEventListener("click", () => {
+      modalEditFlag = false;
+    });
+
+    document.getElementById("btn-del-acc-modal").addEventListener("click", deleteAccount);
+
+
     await loadRegisters();
     await loadAccounts();
     // if (accountsLoaded) {
@@ -74,9 +93,9 @@ const begin = async () => {
     // }
 
     // if (targetsLoaded) {
-    document
-      .getElementById("btn-target")
-      .addEventListener("click", handleDeleteTarget);
+    // document
+    //   .getElementById("btn-target")
+    //   .addEventListener("click", handleDeleteTarget);
     // }
 
     // if (regLoaded) {
@@ -146,55 +165,127 @@ const addAccount = async (event) => {
       name: accName,
       description: accDescr,
       balance: parseFloat(accBalance),
-      currency: "ARS", // va hardcode porque no es userinput
+      currency: "", //
     };
-    console.log(obj);
-    let resjson = await save(obj, "account");
-    if (resjson.exito) {
-      objNuevo = await read("account", resjson.id);
-      if (!objNuevo) {
-        alert("Error en lectura de cuenta nueva");
-      } else if (objNuevo.mensaje) {
-        alert(objNuevo.mensaje);
+
+    if (!modalEditAccFlag) {
+      // es save
+      obj.currency = "ARS";  //va hardcode porque no es userinput
+      console.log(obj);
+      let resjson = await save(obj, "account");
+      if (resjson.exito) {
+        objNuevo = await read("account", resjson.id);
+        if (!objNuevo) {
+          alert("Error en lectura de cuenta nueva");
+        } else if (objNuevo.mensaje) {
+          alert(objNuevo.mensaje);
+        } else {
+          insertAccount(objNuevo);
+          document.getElementById("form-add-acc").reset();
+          modalAcc.hide();
+        }
       } else {
-        insertAccount(objNuevo);
+        resetFeedback();
+        if (resjson.err == "name") {
+          messageValidation(accNameContainer, accNameFdbk, resjson.mensaje);
+        } else if (resjson.err == "descr") {
+          messageValidation(accDescrContainer, accDescrFdbk, resjson.mensaje);
+        } else if (resjson.err == "balance") {
+          messageValidation(accBalanceContainer, accBalanceFdbk, resjson.mensaje);
+        } else if (resjson.err == "sys") {
+          alert("Error de sistema :" + resjson.mensaje);
+        } else {
+          alert("Error: " + resjson.mensaje);
+        }
+        console.error(resjson.mensaje);
+      }
+
+    } else { // es update
+      obj.currency = (obj.name == "Ahorros USD") ? "USD" : "ARS";
+
+      res = await update(obj, "account", idAccAux);
+
+      if (res.exito) {
+        modalEditAccFlag = false;
         document.getElementById("form-add-acc").reset();
         modalAcc.hide();
-      }
-    } else {
-      resetFeedback();
-      if (resjson.err == "name") {
-        messageValidation(accNameContainer, accNameFdbk, resjson.mensaje);
-      } else if (resjson.err == "descr") {
-        messageValidation(accDescrContainer, accDescrFdbk, resjson.mensaje);
-      } else if (resjson.err == "balance") {
-        messageValidation(accBalanceContainer, accBalanceFdbk, resjson.mensaje);
-      } else if (resjson.err == "sys") {
-        alert("Error de sistema :" + resjson.mensaje);
+        let pBotonBalance = document.querySelector(`[data-id='${idAccAux}']`);
+        pBotonBalance.innerText = obj.balance; 
+        //cuando refactorice los targets mejorara lo siguiente, por ahora queda asi:
+        let pNameAcc = pBotonBalance.closest('.pill-div').querySelector('.pill-p-title')
+        pNameAcc.innerText = obj.name;
+
+        let balanceContainer = document.getElementById("balance");
+        let balance = 0;
+        if (balanceContainer.innerText != "0") {
+          balance = parseInt(balanceContainer.innerHTML);
+        }
+        if (obj.currency.toUpperCase() == "USD") {
+          balance = balance + obj.balance * ARS_USD;
+        } else if (obj.currency.toUpperCase() == "ARS") {
+          balance += obj.balance;
+        }
+        balanceContainer.innerText = balance.toFixed(0);
+        
+        // por ahora actualizo todo con lo del front...
       } else {
-        alert("Error: " + resjson.mensaje);
+        resetFeedback();
+        if (res.err == "name") {
+          messageValidation(accNameContainer, accNameFdbk, res.mensaje);
+        } else if (res.err == "descr") {
+          messageValidation(accDescrContainer, accDescrFdbk, res.mensaje);
+        } else if (res.err == "balance") {
+          messageValidation(accBalanceContainer, accBalanceFdbk, res.mensaje);
+        } else if (res.err == "sys") {
+          alert("Error de sistema :" + res.mensaje);
+        } else {
+          alert("Error: " + res.mensaje);
+        }
+        console.error(res.mensaje);
       }
-      console.error(resjson.mensaje);
+
+
+
     }
   }
 };
 
-const testConn = async () => {
-  try {
-    const response = await fetch(backendServer + "/conf/conn_mysql.php");
+const deleteAccount = async () => {
 
-    if (response.ok) {
-      const message = await response.text();
-      return message;
-    } else {
-      console.error("No conectado");
-      throw new Error("Error de conexión");
+  let confDel = confirm("¿Estas segurx de eliminar la cuenta? Se eliminaran todos los regsitros asociados a ella.")
+  if(confDel){
+
+    let resjson = await del("account", idAccAux);
+
+    if(resjson.exito){
+
+    }else{
+      alert("Error: " + resjson.mensaje)
     }
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
+
   }
-};
+
+
+
+
+}
+
+
+const del = async (type, id) => {
+
+  let res = await fetch(`./controllers/entryPoint.php?type=${type}&id=${id}`,
+    {
+      method: "DELETE",
+    });
+  
+    let resjson = await res.json();
+
+    return resjson;
+  
+
+
+
+}
 
 const loadBalance = (acc) => {
   let balanceScroll = document.getElementById("balance-scroll");
@@ -252,31 +343,6 @@ const editDeleteReg = async (event) => {
   }
 };
 
-const editDeleteAcc = async (e) => {
-  // el data-id solo lo tienen las pills dinamicas. otra manera de hacer lo de editDeleteReg
-  if (e.target.hasAttribute("data-id")) {
-
-    let idAcc = e.target.getAttribute("data-id");
-
-    let accNameContainer = document.getElementById("acc-name");
-    let accDescrContainer = document.getElementById("acc-descrip");
-    let accBalanceContainer = document.getElementById("acc-init-balance");
-
-    let accName = accNameContainer.value;
-    let accDescr = accDescrContainer.value;
-    let accBalance = accBalanceContainer.value;
-
-    let accActual = await read("account", idAcc);
-
-    accName = accActual.name;
-    accDescr = accActual.Descr;
-    accBalance = accActual.balance;
-
-    
-
-  }
-}
-
 const editReg = async (id) => {
   let moveTypeContainer = document.getElementById("type");
   let accValueContainer = document.getElementById("account");
@@ -332,6 +398,47 @@ const editReg = async (id) => {
   idRegAux = id;
 };
 
+const editDeleteAcc = async (e) => {
+  // el data-id solo lo tienen las pills dinamicas. otra manera de hacer lo de editDeleteReg
+  if (e.target.hasAttribute("data-id")) {
+
+    let idAcc = e.target.getAttribute("data-id");
+
+    let accNameContainer = document.getElementById("acc-name");
+    let accDescrContainer = document.getElementById("acc-descrip");
+    let accBalanceContainer = document.getElementById("acc-init-balance");
+    let btnDeleteAccount = document.getElementById("btn-del-acc-modal");
+    
+    
+    let accActual = await read("account", idAcc);
+    
+    if(accActual.name == "Ahorros USD" || accActual.name == "Ahorros ARS"){
+      accNameContainer.disabled = true;
+      if (!btnDeleteAccount.classList.contains("d-none")) {
+        btnDeleteAccount.classList.add("d-none");
+      }
+    }else{
+      if (btnDeleteAccount.classList.contains("d-none")) {
+        accNameContainer.disabled = false;
+        btnDeleteAccount.classList.remove("d-none");
+      }
+    }
+    
+    accNameContainer.value = accActual.name;
+    
+    
+    accDescrContainer.value = accActual.description;
+    accBalanceContainer.value = accActual.balance;
+
+    modalAcc.show();
+    modalEditAccFlag = true;
+    idAccAux = idAcc;
+
+
+  }
+}
+
+
 const update = async (recordBuffer, type, id) => {
   let full =
     backendServer + "/controllers/entryPoint.php?type=" + type + "&id=" + id;
@@ -343,8 +450,11 @@ const update = async (recordBuffer, type, id) => {
     body: JSON.stringify(recordBuffer),
   });
 
-  modalEditFlag = false;
-  return await res.json();
+  // modalEditFlag = modalEditFlag ? false : modalEditFlag;
+  // modalEditAccFlag = modalEditAccFlag ? false : modalEditFlag;
+  let resjson = await res.json();
+  console.log(resjson)
+  return resjson;
 };
 
 const deleteReg = async (id) => {
@@ -687,6 +797,16 @@ const disableCategories = () => {
 const addRecord = async (event) => {
   event.preventDefault();
 
+  let moveTypeContainer = document.getElementById("type");
+  let moveTypeFeedback = document.getElementById("typeFeedback");
+  let enteredAmountInput = document.getElementById("amount");
+  let enteredAmountFeedback = document.getElementById("amountFeedback");
+  let accValueContainer = document.getElementById("account");
+  let accFeedback = document.getElementById("accountFeedback");
+
+  let accToValueContainer = document.getElementById("account-to");
+  let accToFeedback = document.getElementById("accountToFeedback");
+
   let recordBuffer = {
     type: "",
     regDate: "",
@@ -712,9 +832,11 @@ const addRecord = async (event) => {
   if (verif == true) {
     if (!modalEditFlag) {
       let res = await save(recordBuffer, "register");
+      console.log(res)
       if (res.exito) {
         let objNuevo = await read("register", res.id);
-        if (!objNuevo) {
+        if (!objNuevo.exito) {
+          console.log(objNuevo);
           alert("Error en lectura de registro nuevo");
         } else if (objNuevo.mensaje) {
           alert(objNuevo.mensaje);
@@ -738,7 +860,36 @@ const addRecord = async (event) => {
       // es update
       let res = await update(recordBuffer, "register", idRegAux);
       if (res.exito) {
+        modalReg.hide();
+        modalEditFlag = false;
+        //actualizar la fila (tengo idRegAux y la data en el buffer)
         window.location.reload(true);
+      } else {
+        resetFeedback();
+        if (res.err == 'type') {
+          messageValidation(moveTypeContainer, moveTypeFeedback, res.mensaje);
+        } else if (res.err == 'accFrom') {
+          if (recordBuffer.type == 'Spent' || recordBuffer.type == 'Move') {
+            messageValidation(accValueContainer, accFeedback, res.mensaje);
+          } else {
+            //si es un income y la cuenta from da error es pq hay algo mal
+            alert("Error de sistema al intepretar la cuenta del registro")
+          }
+        } else if (res.err == "accTo") {
+          if (recordBuffer.type == 'Income' || recordBuffer.type == 'Move') {
+            messageValidation(accToValueContainer, accToFeedback, res.mensaje);
+          } else {
+            alert("Error de sistema al intepretar la cuenta del registro")
+          }
+        } else if (res.err == "amount") {
+          messageValidation(enteredAmountInput, enteredAmountFeedback, res.mensaje);
+        } else if (res.err == "sys") {
+          alert("Error de sistema : " + res.mensaje)
+        } else {
+          alert("Error: " + res.mensaje);
+        }
+        console.error(res.mensaje);
+
       }
     }
   } else {
@@ -748,12 +899,11 @@ const addRecord = async (event) => {
 
 const checkData = async (recordBuffer) => {
   let selectedCategory = document.querySelector(".pressed");
+
   let moveTypeContainer = document.getElementById("type");
   let moveTypeFeedback = document.getElementById("typeFeedback");
-  // let isChecked = document.getElementById('checkCat').checked;
   let enteredAmountInput = document.getElementById("amount");
   let enteredAmountFeedback = document.getElementById("amountFeedback");
-  //let balanceElement = document.getElementById("balance");
   let accValueContainer = document.getElementById("account");
   let accFeedback = document.getElementById("accountFeedback");
 
@@ -968,12 +1118,10 @@ const reloadTable = async (recordBuffer) => {
     <td>${recordBuffer.name_acc_to ? recordBuffer.name_acc_to : "N/A"}</td>
     <td>${recordBuffer.name_acc_from ? recordBuffer.name_acc_from : "N/A"}</td>
     <td>${recordBuffer.category}</td>
-    <td><button class="btn btn-dark text-white edit-btn" data-id="${
-      recordBuffer.id
+    <td><button class="btn btn-dark text-white edit-btn" data-id="${recordBuffer.id
     }" > Edit
     </button>
-    <button class="btn btn-danger text-white delete-btn" data-id="${
-      recordBuffer.id
+    <button class="btn btn-danger text-white delete-btn" data-id="${recordBuffer.id
     }" > Delete
     </button></td>`;
 

@@ -383,7 +383,18 @@
      >
        <div class="modal-content">
          <div class="modal-header">
-           <div class="modal-title">Nueva Cuenta</div>
+          <div class="d-flex justify-content-between w-100">
+             Cuenta
+            <div>
+              <button
+                id="btn-del-acc-modal"
+                type="button"
+                class="btn btn-danger d-none"
+              >
+                Eliminar cuenta
+              </button>
+            </div>
+          </div>
          </div>
          <div class="modal-body">
            <div class="container-fluid text-center">
@@ -416,6 +427,7 @@
               <div id="accDescrFeedback" class="invalid-feedback"></div>
             </div>
             <div class="modal-footer">
+              
               <button
                 id="btn-close-modal-acc"
                 type="button"
@@ -434,6 +446,7 @@
               >
                 Guardar
               </button>
+  
             </div>
            </form>
            </div>
@@ -470,7 +483,7 @@
           <div class="pill-div col-2 justify-content-center" >
             <p class="pill-p-title">&nbsp;</p>
             <div  class="account-balance-div text-white bg-dark" style="min-width: 200px;" >
-            <p role="button" data-bs-toggle="modal" data-bs-target="#modal-add-acc" class="account-balance-p text-center">Nueva cuenta</p>
+            <p id="btn-p-new-acc" role="button" data-bs-toggle="modal" data-bs-target="#modal-add-acc" class="account-balance-p text-center">Nueva cuenta</p>
             </div>  
           </div>
       
