@@ -310,16 +310,27 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Nuevo objective</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Nuevo objectivo</h5>
           </div>
           <div class="modal-body">
-            <form id="formularioTarget" novalidate>
+            <form id="formularioTarget" class="needs-validation" novalidate>
               <div class="form-group">
-                <label for="nombre" class="col-form-label">Name:</label>
+                <label for="nombre" class="col-form-label">Nombre:</label>
                 <input type="text" class="form-control" id="nombre-objetivo" name="nombre-objetivo" placeholder="Ingresa el nombre del objetivo">
+                <div id="nombreObjetivoFeedback" class="invalid-feedback"></div>
+              </div>
+              <div class="form-group">
+                <label for="type" class="form-label">Moneda</label>
+                <select class="form-select" id="currency-objetivo">
+                  <option selected></option>
+                  <option value="USD">USD</option>
+                  <option value="ARS">ARS</option>
+                </select>
+                <div id="currencyObjetivoFeedback" class="invalid-feedback">
+                </div>
               </div>
                 <div class="form-group">
-                  <label for="monto" class="form-label mt-3">Amount:</label>
+                  <label for="monto" class="form-label mt-3">Monto:</label>
                   <input type="text" class="form-control" id="monto-objetivo" name="monto-objetivo" placeholder="Ingresa el monto del objetivo"/>
                   <div id="montoObjetivoFeedback" class="invalid-feedback"></div>
                 </div>

@@ -8,9 +8,9 @@ class RegController
 
     require "../conf/conn_mysql.php";
 
-    if ( // lasc uetnas tan verfi
-      // !isset($data['accTo']) || !isset($data['accFrom']) ||
-      !isset($data['amount']) || 
+    if ( 
+      // !isset($data['accTo']) || !isset($data['accFrom']) || 
+      !isset($data['amount']) || !isset($data['type']) ||
       !isset($data['regDate']) || !isset($data['category'])
     ) {
       return [
@@ -95,10 +95,13 @@ class RegController
         // uso last insert id que me devuleve el id de la ultima insercion 
         // como uso el sp, no me funciona el metodo de pdo
 
-        $consulta = $conn->prepare("SELECT LAST_INSERT_ID() AS id");
-        $consulta->execute();
-        $res = $consulta->fetch(PDO::FETCH_ASSOC);
-        if($res){
+        // $consulta = $conn->prepare("SELECT LAST_INSERT_ID() AS id");
+        // $consulta->execute();
+        // $res = $consulta->fetch(PDO::FETCH_ASSOC);
+
+        $id = $conn->lastInsertId();
+
+        if($id){
           return [
             "exito" => true,
             "id" => $id
@@ -149,24 +152,44 @@ class RegController
 
 
     $actualReg = $this->readOneByIdAccName($id, $idUser);
-    if ($this->reverseReg($actualReg['id_acc_to'], $actualReg['id_acc_from'], $actualReg['amount'], $idUser)) {
-      $query = 'DELETE FROM reg WHERE id = ?';
 
+    if($actualReg['exito']){
 
-      $consulta = $conn->prepare($query);
-
-      $consulta->bindParam(1, $id, PDO::PARAM_INT);
-
-
-      try {
-        $consulta->execute();
-        return true;
-      } catch (Exception $e) {
-        return false;
+      if ($this->reverseReg($actualReg['data']['id_acc_to'], $actualReg['data']['id_acc_from'], $actualReg['data']['amount'], $idUser)) {
+        $query = 'DELETE FROM reg WHERE id = ?';
+        $consulta = $conn->prepare($query);
+        
+        $consulta->bindParam(1, $id, PDO::PARAM_INT);
+        
+        
+        if($consulta->execute()){
+          return [
+            "exito" => true,
+            "mensaje" => "Ok"
+          ];
+        }else{
+          return [
+            "exito" => false,
+            "mensaje" => "Error al intentar borrar",
+            "err" => "sys"
+          ];
+        }
+        
+      }else{
+        return [
+          "exito" => false,
+          "mensaje" => "Error al reversar el registro",
+          "err" => "sys"
+        ];
       }
-
+    }else{
+      return [
+        "exito" => false,
+        "mensaje" => "El registro que quiere borrar no existe",
+        "err" => "sys"
+      ];
     }
-
+      
 
 
 
@@ -239,9 +262,18 @@ class RegController
 
       $data = $consulta->fetch(PDO::FETCH_ASSOC);
 
-      return $data;
+      return [
+        'exito' => true,
+        'mensaje' => "ok",
+        'data' => $data
+      ];
+
     } catch (Exception $e) {
-      return false;
+      return [
+        'exito' => false,
+        'mensaje' => $e->getMessage(),
+        'err' => 'sys'
+      ];
     }
   }
 
@@ -308,9 +340,9 @@ class RegController
     require "../conf/conn_mysql.php";
 
     if (
-      !isset($data['accTo']) || !isset($data['accFrom']) ||
-      !isset($data['amount']) || !isset($data['currency']) ||
-      !isset($data['regDate']) || !isset($data['category'])
+      // !isset($data['accTo']) || !isset($data['accFrom']) ||
+      !isset($updReg['amount']) ||  !isset($updReg['type']) ||
+      !isset($updReg['regDate']) || !isset($updReg['category'])
     ) {
       return [
         'exito' => false,
@@ -321,12 +353,12 @@ class RegController
     }
 
 
-    $type = $data['type'];
-    $accFrom = $data['accFrom'];
-    $accTo = $data['accTo'];
-    $regDate = $data['regDate'];
-    $amount = $data['amount'];
-    $category = $data['category'];
+    $type = $updReg['type'];
+    $accFrom = $updReg['accFrom'];
+    $accTo = $updReg['accTo'];
+    $regDate = $updReg['regDate'];
+    $amount = $updReg['amount'];
+    $category = $updReg['category'];
 
 
     if (
@@ -364,7 +396,7 @@ class RegController
     $actualReg = $this->readOneByIdAccName($idReg, $iduser);
     if ($actualReg) {
       try {
-        if ($this->reverseReg($actualReg['id_acc_to'], $actualReg['id_acc_from'], $actualReg['amount'], $iduser)) {
+        if ($this->reverseReg($actualReg['data']['id_acc_to'], $actualReg['data']['id_acc_from'], $actualReg['data']['amount'], $iduser)) {
 
           if ($this->refreshBalance($updReg['accTo'], $updReg['accFrom'], $updReg['amount'], $iduser)) {
 
@@ -408,7 +440,7 @@ class RegController
         } else {
           return [
             'exito' => false,
-            'mensaje' => "Error al reversar el balance al actualizar el registro",
+            'mensaje' => "Error al reversar el balance al actualizar el registro.",
             'err' => 'sys'
           ];
         }

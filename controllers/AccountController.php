@@ -158,7 +158,7 @@ class AccountController {
 
 
 
-    if (!is_string($name) || empty($name) || strlen($name) > 12){
+    if (!is_string($name) || empty($name) || strlen($name) > 12 || $name == "Ahorros USD" || $name == "Ahorros ARS"){
       return [
         'exito' => false,
         'mensaje' => "Nombre no valido",
@@ -271,6 +271,52 @@ class AccountController {
   
   }
 
+  public function getBalanceAhorros($iduser){
+
+    require "../conf/conn_mysql.php";
+
+    try {
+      
+      $consulta = $conn->prepare("SELECT balance FROM accounts WHERE name = 'Ahorros USD' AND id_user = ?");
+      $consulta->bindParam(1, $iduser, PDO::PARAM_INT);
+      if($consulta->execute()){
+        $usd = $consulta->fetch(PDO::FETCH_ASSOC);
+      }else{
+        return [
+          "exito"=> false,
+          "mensaje" => "Error al leer Ahorros USD"
+        ];
+      }
+
+      $consulta = $conn->prepare("SELECT balance FROM accounts WHERE name = 'Ahorros ARS' AND id_user = ?");
+      $consulta->bindParam(1, $iduser, PDO::PARAM_INT);
+      if($consulta->execute()){
+        $ars = $consulta->fetch(PDO::FETCH_ASSOC);
+      }else{
+        return [
+          "exito"=> false,
+          "mensaje" => "Error al leer Ahorros ARS"
+        ];
+      }
+
+      return [
+        "exito"=> true,
+        "USD" => $usd['balance'],
+        "ARS" => $ars['balance']
+      ];
+      
+
+    
+    } catch (Exception $e) {
+      return [
+        "exito"=> false,
+        "mensaje" => $e->getMessage()
+      ];
+    }
+
+
+
+  }
 
 
 

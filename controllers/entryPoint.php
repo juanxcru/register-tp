@@ -295,11 +295,15 @@ switch ($typeReq) {
 
                         $data = $regController->readOneByIdAccName($_GET['id'], $_SESSION['user_id']);
 
-                        $jsonData = json_encode($data);
-                        header('Content-Type: application/json');
-                        echo $jsonData;
-
-                        break;
+                        if ($data['exito']) {
+                          http_response_code(200);
+                          echo json_encode($data);
+                          exit();
+                        } else {
+                          http_response_code(401);
+                          echo json_encode($data);
+                          exit();
+                        }
                       } else {
                         $respuesta = [
                           "exito" => false,
@@ -323,7 +327,6 @@ switch ($typeReq) {
     break;
   case 'POST':
     if (isset($_GET['type']) && $_GET['type'] == 'register') {
-
       if (isset($_SESSION['user_id'])) {
         if ($permissionController->tienePermiso('crear registro', $_SESSION['user_id'])) {
 
@@ -338,7 +341,7 @@ switch ($typeReq) {
               "mensaje" => "Cuenta invalida",
               "err" => "accFrom"
             ];
-            http_response_code(401);
+            http_response_code(400);
             echo json_encode($respuesta);
             exit();
           }
@@ -349,7 +352,7 @@ switch ($typeReq) {
               "mensaje" => "Cuenta invalida",
               "err" => "accTo"
             ];
-            http_response_code(401);
+            http_response_code(400);
             echo json_encode($respuesta);
             exit();
           }
@@ -357,6 +360,40 @@ switch ($typeReq) {
           $resu = $regController->save($data, $_SESSION['user_id']);
 
           if ($resu['exito']) {
+
+            //refreshear status de los targets si se toco un ahorro
+            $regNuevo = $regController->readOneByIdAccName($resu['id'], $_SESSION['user_id']);
+            
+            if( $regNuevo['data']['name_acc_to'] == "Ahorros ARS" || $regNuevo['data']['name_acc_to'] == "Ahorros USD" ||
+                $regNuevo['data']['name_acc_from'] == "Ahorros ARS" || $regNuevo['data']['name_acc_from'] == "Ahorros USD") {
+                  $balanceAhorros = $accController->getBalanceAhorros($_SESSION['user_id']);
+                  if ($balanceAhorros['exito']){
+                    if(!$targetController->refreshTargetStatus($balanceAhorros, $_SESSION['user_id'])){
+                      $respuesta = [
+                        "exito" => false,
+                        "mensaje" => "Se grabo el registro, pero no pudo actualizarse el estado de los objetivos",
+                        "err" => "sys"
+                      ];
+                      http_response_code(400);
+                      echo json_encode($respuesta);
+                      exit();
+                    }
+
+                    $resu['target'] = true;
+                    
+                  }else{
+                    http_response_code(400);
+                    echo json_encode($balanceAhorros);
+                    exit();
+                  }
+                  
+            }else{
+              $resu['target'] = false;
+            }
+
+
+
+
             http_response_code(200);
             echo json_encode($resu);
             exit();
@@ -417,21 +454,30 @@ switch ($typeReq) {
       if (isset($_SESSION['user_id'])) {
         if ($permissionController->tienePermiso('crear objetivo', $_SESSION['user_id'])) {
           $data = json_decode(file_get_contents('php://input'), true);
-          if ($targetController->saveTarget($data, $_SESSION['user_id'])) {
-            $respuesta = [
-              "exito" => true,
-              "mensaje" => "Save OK"
-            ];
-            http_response_code(200);
-            echo json_encode($respuesta);
-          } else {
-            $respuesta = [
-              "exito" => false,
-              "mensaje" => "BBDD error"
-            ];
-            http_response_code(500);
-            echo json_encode($respuesta);
+
+          
+          $balanceAhorros = $accController->getBalanceAhorros($_SESSION['user_id']);
+          if($balanceAhorros['exito']){
+
+            $respuesta = $targetController->save($data, $_SESSION['user_id'], $balanceAhorros);
+            
+            
+            if ($respuesta['exito'] == true) {
+              http_response_code(200);
+              echo json_encode($respuesta);
+              exit();
+            } else {
+              http_response_code(400);
+              echo json_encode($respuesta);
+              exit();
+            }
+            
+          }else{
+            http_response_code(400);
+            echo json_encode($balanceAhorros);
+            exit();
           }
+          
         } else {
           $respuesta = [
             "exito" => false,
@@ -457,12 +503,18 @@ switch ($typeReq) {
       if (isset($_SESSION['user_id'])) {
         if ($permissionController->tienePermiso('eliminar objetivo', $_SESSION['user_id'])) {
 
-          $data = $targetController->deleteTarget($_GET['id'], $_SESSION['user_id']);
+          $res = $targetController->delete($_GET['id'], $_SESSION['user_id']);
 
-          $jsonData = json_encode($data);
-          echo $jsonData;
+          if ($res['exito']) {
+            http_response_code(200);
+            echo json_encode($res);
+            exit();
+          } else {
+            http_response_code(400);
+            echo json_encode($res);
+            exit();
+          }
 
-          break;
         } else {
           $respuesta = [
             "exito" => false,
@@ -546,6 +598,7 @@ switch ($typeReq) {
 
         } else 
           if (isset($_GET['type']) && $_GET['type'] == 'account' && isset($_GET['id'])) {
+            
             if (isset($_SESSION['user_id'])) {
               if ($permissionController->tienePermiso('eliminar cuenta', $_SESSION['user_id'])) {
                 $res = $accController->delete($_GET['id']);

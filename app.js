@@ -71,9 +71,12 @@ const begin = async () => {
     document.getElementById("btn-p-new-acc").addEventListener("click", () => {
       let btnDeleteAccount = document.getElementById("btn-del-acc-modal");
       let accNameContainer = document.getElementById("acc-name");
+      let accBalanceContainer = document.getElementById("acc-init-balance");
+
       document.getElementById("form-add-acc").reset();
       modalEditAccFlag = false;
       accNameContainer.disabled = false;
+      accBalanceContainer.disabled = false;
       if (!btnDeleteAccount.classList.contains("d-none")) {
         btnDeleteAccount.classList.add("d-none");
       }  
@@ -85,6 +88,7 @@ const begin = async () => {
 
     document.getElementById("btn-del-acc-modal").addEventListener("click", deleteAccount);
 
+    //document.getElementById("objetivos").addEventListener("click", editDeleteTarget)
 
     await loadRegisters();
     await loadAccounts();
@@ -146,10 +150,7 @@ const addAccount = async (event) => {
   let accBalanceFdbk = document.getElementById("accInitBalanceFeedback");
 
   if (accBalance.includes(",")) {
-    console.log(accBalance);
     accBalance = accBalance.split(",").join(".");
-    console.log(accBalance);
-    console.log(parseFloat(accBalance));
   }
 
   let isValidName = validateField(accName, 12);
@@ -206,10 +207,13 @@ const addAccount = async (event) => {
       res = await update(obj, "account", idAccAux);
 
       if (res.exito) {
+        resetFeedback();
         modalEditAccFlag = false;
         document.getElementById("form-add-acc").reset();
         modalAcc.hide();
         let pBotonBalance = document.querySelector(`[data-id='${idAccAux}']`);
+        let valorPrevio = parseInt(pBotonBalance.innerText);
+        console.log(valorPrevio);
         pBotonBalance.innerText = obj.balance; 
         //cuando refactorice los targets mejorara lo siguiente, por ahora queda asi:
         let pNameAcc = pBotonBalance.closest('.pill-div').querySelector('.pill-p-title')
@@ -221,8 +225,10 @@ const addAccount = async (event) => {
           balance = parseInt(balanceContainer.innerHTML);
         }
         if (obj.currency.toUpperCase() == "USD") {
+          balance = balance - valorPrevio * ARS_USD;
           balance = balance + obj.balance * ARS_USD;
         } else if (obj.currency.toUpperCase() == "ARS") {
+          balance = balance - valorPrevio;
           balance += obj.balance;
         }
         balanceContainer.innerText = balance.toFixed(0);
@@ -258,7 +264,8 @@ const deleteAccount = async () => {
     let resjson = await del("account", idAccAux);
 
     if(resjson.exito){
-
+      //remover la pill
+      window.location.reload();
     }else{
       alert("Error: " + resjson.mensaje)
     }
@@ -350,53 +357,58 @@ const editReg = async (id) => {
   let enteredAmountInput = document.getElementById("amount");
 
   const recordInfo = await read("register", id);
-  if (recordInfo.category != "") {
-    let selectedCategory = document.getElementById(recordInfo.category);
-    selectedCategory.classList.add("pressed");
-    disableCategories();
+  if(recordInfo.exito){
+
+    if (recordInfo.data.category != "") {
+      let selectedCategory = document.getElementById(recordInfo.data.category);
+      selectedCategory.classList.add("pressed");
+      disableCategories();
+    }
+    
+    moveTypeContainer.value = recordInfo.data.type;
+    enteredAmountInput.value = recordInfo.data.amount;
+    
+    if (recordInfo.data.id_acc_to && recordInfo.data.id_acc_from) {
+      // move
+      for (let i = 0; i < accToValueContainer.options.length; i++) {
+        if (accToValueContainer.options[i].value == recordInfo.data.id_acc_to) {
+          accToValueContainer.options[i].selected = true;
+          
+          break;
+        }
+      }
+      for (let i = 0; i < accValueContainer.options.length; i++) {
+        if (accValueContainer.options[i].value == recordInfo.data.id_acc_from) {
+          accValueContainer.options[i].selected = true;
+          break;
+        }
+      }
+    } else if (recordInfo.data.id_acc_to) {
+      // income
+      for (let i = 0; i < accValueContainer.options.length; i++) {
+        if (accValueContainer.options[i].value == recordInfo.data.id_acc_to) {
+          accValueContainer.options[i].selected = true;
+          break;
+        }
+      }
+    } else {
+      // spent
+      for (let i = 0; i < accValueContainer.options.length; i++) {
+        if (accValueContainer.options[i].value == recordInfo.data.id_acc_from) {
+          accValueContainer.options[i].selected = true;
+          break;
+        }
+      }
+    }
+    handleAccountToFrom();
+    
+    modalReg.show();
+    modalEditFlag = true;
+    idRegAux = id;
+  }else{
+    alert("Error al leer el registro seleccionado: " + recordInfo.mensaje);
   }
-
-  moveTypeContainer.value = recordInfo.type;
-  enteredAmountInput.value = recordInfo.amount;
-
-  if (recordInfo.id_acc_to && recordInfo.id_acc_from) {
-    // move
-    for (let i = 0; i < accToValueContainer.options.length; i++) {
-      if (accToValueContainer.options[i].value == recordInfo.id_acc_to) {
-        accToValueContainer.options[i].selected = true;
-
-        break;
-      }
-    }
-    for (let i = 0; i < accValueContainer.options.length; i++) {
-      if (accValueContainer.options[i].value == recordInfo.id_acc_from) {
-        accValueContainer.options[i].selected = true;
-        break;
-      }
-    }
-  } else if (recordInfo.id_acc_to) {
-    // income
-    for (let i = 0; i < accValueContainer.options.length; i++) {
-      if (accValueContainer.options[i].value == recordInfo.id_acc_to) {
-        accValueContainer.options[i].selected = true;
-        break;
-      }
-    }
-  } else {
-    // spent
-    for (let i = 0; i < accValueContainer.options.length; i++) {
-      if (accValueContainer.options[i].value == recordInfo.id_acc_from) {
-        accValueContainer.options[i].selected = true;
-        break;
-      }
-    }
-  }
-  handleAccountToFrom();
-
-  modalReg.show();
-  modalEditFlag = true;
-  idRegAux = id;
-};
+  };
 
 const editDeleteAcc = async (e) => {
   // el data-id solo lo tienen las pills dinamicas. otra manera de hacer lo de editDeleteReg
@@ -414,12 +426,16 @@ const editDeleteAcc = async (e) => {
     
     if(accActual.name == "Ahorros USD" || accActual.name == "Ahorros ARS"){
       accNameContainer.disabled = true;
+      accBalanceContainer.disabled = true;
       if (!btnDeleteAccount.classList.contains("d-none")) {
         btnDeleteAccount.classList.add("d-none");
       }
     }else{
+        accNameContainer.disabled = false;
+        accBalanceContainer.disabled = false;
       if (btnDeleteAccount.classList.contains("d-none")) {
         accNameContainer.disabled = false;
+        accBalanceContainer.disabled = false;
         btnDeleteAccount.classList.remove("d-none");
       }
     }
@@ -463,23 +479,17 @@ const deleteReg = async (id) => {
   let accToValueContainer = document.getElementById("account-to");
   let enteredAmountInput = document.getElementById("amount");
 
-  // const recordInfo = await read("register",id);
+  let confDel = confirm("¿Estas segurx de eliminar el registro?.")
+  if(confDel){
+    let resjson = await del("register", id);
 
-  const url = `${backendServer}/controllers/entryPoint.php?type=register&id=${id}`;
-
-  const response = await fetch(url, {
-    method: "DELETE",
-  });
-  if (response.ok) {
-    let a = await response.json();
-
-    window.location.reload(true);
-  } else {
-    console.error(
-      "Failed to delete target:",
-      response.status,
-      response.statusText
-    );
+    if(resjson.exito){
+      window.location.reload();
+      //sacar de la tabla
+    }else{
+      alert("Error: " + resjson.mensaje)
+    }
+  
   }
 };
 
@@ -574,6 +584,112 @@ const insertAccount = (acc) => {
   loadBalance(acc);
 };
 
+const editDeleteTarget = (e) =>{
+ 
+}
+
+
+const insertTarget = (target) => {
+  let targetDiv = document.getElementById("objetivos");
+
+  let rowDiv = document.createElement("div");
+  rowDiv.classList.add("row");
+  rowDiv.style.padding = "15px";
+  rowDiv.style.borderTop = "1px solid white";
+  rowDiv.style.borderBottom = "1px solid white";
+  rowDiv.style.textAlign = "center";
+  rowDiv.setAttribute(
+    "id",
+    `target-${targetsBuffer.data.indexOf(target)}`
+  );
+  rowDiv.setAttribute("key", target.id);
+
+  let nameDiv = document.createElement("div");
+  nameDiv.classList.add("col-md-4");
+
+  let amountDiv = document.createElement("div");
+  amountDiv.classList.add("col-md-4");
+
+  let deleteDiv = document.createElement("div");
+  deleteDiv.classList.add("col-md-4");
+
+  let deleteButton = document.createElement("button");
+  deleteButton.setAttribute("id", "btn-target");
+
+  let deleteButtonIcon = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "svg"
+  );
+
+  let path1 = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path"
+  );
+  let path2 = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path"
+  );
+
+  deleteButton.style.backgroundColor = "white";
+  deleteButton.style.width = "40px";
+  deleteButton.style.height = "40px";
+  deleteButton.style.borderRadius = "50px";
+
+  deleteButtonIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  deleteButtonIcon.setAttribute("width", "16");
+  deleteButtonIcon.setAttribute("height", "16");
+  deleteButtonIcon.setAttribute("fill", "currentColor");
+  deleteButtonIcon.setAttribute("class", "bi bi-trash");
+  deleteButtonIcon.setAttribute("viewBox", "0 0 16 16");
+
+  path1.setAttribute(
+    "d",
+    "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+  );
+  path2.setAttribute(
+    "d",
+    "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+  );
+
+  deleteButtonIcon.appendChild(path1);
+  deleteButtonIcon.appendChild(path2);
+
+  deleteButton.appendChild(deleteButtonIcon);
+  deleteDiv.appendChild(deleteButton);
+
+  //ver si ahorros usd es más alto que algún target
+
+  // revisar si refactorizar para que lo haga el be.
+
+  let ahorrosUsdElement = document.getElementById(
+    "acc-balance-p-AhorrosUSD"
+  );
+  let ahorrosUsdValue = ahorrosUsdElement.textContent;
+
+  let tgName = document.createElement("p");
+  tgName.appendChild(document.createTextNode(target.name));
+
+  let tgAmount = document.createElement("p");
+  tgAmount.appendChild(document.createTextNode(target.amount));
+
+  if (target.amount > ahorrosUsdValue) {
+    tgName.style.color = "green";
+    tgAmount.style.color = "green";
+  } else {
+    tgName.style.color = "red";
+    tgAmount.style.color = "red";
+  }
+
+  nameDiv.appendChild(tgName);
+  amountDiv.appendChild(tgAmount);
+
+  rowDiv.appendChild(nameDiv);
+  rowDiv.appendChild(amountDiv);
+  rowDiv.appendChild(deleteDiv);
+
+  targetDiv.appendChild(rowDiv);
+}
+
 const loadTargets = async () => {
   try {
     const targetsBuffer = await read("target", "all");
@@ -593,11 +709,12 @@ const loadTargets = async () => {
           rowDiv.style.borderTop = "1px solid white";
           rowDiv.style.borderBottom = "1px solid white";
           rowDiv.style.textAlign = "center";
-          rowDiv.setAttribute(
-            "id",
-            `target-${targetsBuffer.data.indexOf(target)}`
-          );
-          rowDiv.setAttribute("key", target.id);
+
+          // rowDiv.setAttribute(
+          //   "id",
+          //   `target-${targetsBuffer.data.indexOf(target)}`
+          // );
+          // rowDiv.setAttribute("key", target.id);
 
           let nameDiv = document.createElement("div");
           nameDiv.classList.add("col-md-4");
@@ -667,10 +784,12 @@ const loadTargets = async () => {
           let tgAmount = document.createElement("p");
           tgAmount.appendChild(document.createTextNode(target.amount));
 
-          if (target.amount > ahorrosUsdValue) {
+          if (target.status) {
+            deleteButton.disabled = false;
             tgName.style.color = "green";
             tgAmount.style.color = "green";
           } else {
+            deleteButton.disabled = true;
             tgName.style.color = "red";
             tgAmount.style.color = "red";
           }
@@ -832,17 +951,15 @@ const addRecord = async (event) => {
   if (verif == true) {
     if (!modalEditFlag) {
       let res = await save(recordBuffer, "register");
-      console.log(res)
       if (res.exito) {
         let objNuevo = await read("register", res.id);
         if (!objNuevo.exito) {
-          console.log(objNuevo);
           alert("Error en lectura de registro nuevo");
-        } else if (objNuevo.mensaje) {
+        } else if (objNuevo.err) {
           alert(objNuevo.mensaje);
         } else {
           console.log("Se grabo");
-          await reloadTable(objNuevo);
+          await reloadTable(objNuevo.data);
           enableCategories();
           resetFeedback();
           await refreshMoveBalance(
@@ -852,9 +969,38 @@ const addRecord = async (event) => {
           );
           document.getElementById("form-add-reg").reset();
           modalReg.hide();
+          //va esto porque no actualizamos dinamicamente el estado de los target
+          if(res.target){
+            window.location.reload();
+          }
         }
       } else {
+
+        resetFeedback();
+        if (res.err == 'type') {
+          messageValidation(moveTypeContainer, moveTypeFeedback, res.mensaje);
+        } else if (res.err == 'accFrom') {
+          if (recordBuffer.type == 'Spent' || recordBuffer.type == 'Move') {
+            messageValidation(accValueContainer, accFeedback, res.mensaje);
+          } else {
+            //si es un income y la cuenta from da error es pq hay algo mal
+            alert("Error de sistema al intepretar la cuenta del registro")
+          }
+        } else if (res.err == "accTo") {
+          if (recordBuffer.type == 'Income' || recordBuffer.type == 'Move') {
+            messageValidation(accToValueContainer, accToFeedback, res.mensaje);
+          } else {
+            alert("Error de sistema al intepretar la cuenta del registro")
+          }
+        } else if (res.err == "amount") {
+          messageValidation(enteredAmountInput, enteredAmountFeedback, res.mensaje);
+        } else if (res.err == "sys") {
+          alert("Error de sistema : " + res.mensaje)
+        } else {
+          alert("Error: " + res.mensaje);
+        }
         console.error(res.mensaje);
+       
       }
     } else {
       // es update
@@ -1174,29 +1320,63 @@ const handleSaveObjModal = async (event) => {
 
   let nombreObjetivo = document.getElementById("nombre-objetivo");
   let montoObjetivo = document.getElementById("monto-objetivo");
+  let currencyObjetivo = document.getElementById("currency-objetivo");
+  let currencyObjetivoValue = currencyObjetivo.value;
   let nombreObjetivoValue = nombreObjetivo.value;
   let montoObjetivoValue = montoObjetivo.value;
 
-  let testObj = {
-    name: nombreObjetivoValue,
-    amount: montoObjetivoValue,
-    //currency
-  };
-
-  const full = backendServer + "/controllers/entryPoint.php?type=target";
-
-  try {
-    const response = await fetch(full, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(testObj),
-    });
-  } catch (error) {
-    alert("ERROR: ", error.message);
+  
+  if (montoObjetivoValue.includes(",")) {
+    montoObjetivoValue = montoObjetivoValue.split(",").join(".");
   }
-  modalTarget.hide();
+  let isValidName = validateField(nombreObjetivoValue, 30);
+  let isValidCurrency = validateField(currencyObjetivoValue, 3);
+  if(isValidCurrency == true){
+    if(currencyObjetivoValue == "USD" || currencyObjetivoValue == "ARS"){
+      isValidCurrency = true
+    }else{
+      isValidCurrency = "Moneda invalida"
+    }
+  }
+  let isValidAmount = await validateAmount(montoObjetivoValue); 
+
+  messageValidation(nombreObjetivo,nombreObjetivoFeedback, isValidName)
+  messageValidation(currencyObjetivo,currencyObjetivoFeedback, isValidCurrency)
+  messageValidation(montoObjetivo,montoObjetivoFeedback, isValidAmount)
+
+  if (isValidName == true && isValidAmount == true && isValidCurrency == true){
+
+    let obj = {
+      name: nombreObjetivoValue,
+      amount: montoObjetivoValue,
+      currency : currencyObjetivoValue,
+    };
+
+    let res = await save(obj,"target");
+
+    if (res.exito){
+      //agregar a la lista
+      modalTarget.hide();
+      window.location.reload();
+    }else{
+      if(res.err == "name"){
+        messageValidation(nombreObjetivo,nombreObjetivoFeedback, res.mensaje)
+      }else if ( res.err == "crcy"){
+        messageValidation(currencyObjetivo,currencyObjetivoFeedback, res.mensaje)
+      }else if (res.err == "amount") {
+        messageValidation(montoObjetivo,montoObjetivoFeedback, isValidAmount)
+      }else if(res.error == "sys"){
+        alert("Error de sistema: " + res.mensaje)
+      }else{
+        alert("Error: " + res.mensaje)
+      }
+      console.error(res.mensaje)
+
+    }
+    
+  }
+
+
 };
 
 const handleDeleteTarget = async (event) => {
@@ -1206,24 +1386,10 @@ const handleDeleteTarget = async (event) => {
   let deleteTarget = elementToDelete.parentNode.parentNode;
   let keyToDelete = deleteTarget.getAttribute("key");
 
-  const full = `${backendServer}/controllers/entryPoint.php?type=target&id=${keyToDelete}`;
+  
 
-  try {
-    const response = await fetch(full, {
-      method: "DELETE",
-    });
-    if (response.ok) {
-      console.log("Target deleted successfully");
-    } else {
-      console.error(
-        "Failed to delete target:",
-        response.status,
-        response.statusText
-      );
-    }
-  } catch (error) {
-    alert("ERROR: ", error.message);
-  }
+
+
 };
 
 //-------------------------------------------
